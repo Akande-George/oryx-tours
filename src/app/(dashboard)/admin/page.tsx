@@ -11,9 +11,11 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { formatPrice } from "@/lib/format";
 import { mockBookings, mockTours } from "@/lib/mock-data";
+import { RouteGuard } from "@/components/providers/RouteGuard";
 
 export default function AdminDashboardPage() {
   return (
+    <RouteGuard allow={["admin"]}>
     <div className="space-y-8">
       <SectionHeading
         title="Admin command center"
@@ -142,5 +144,6 @@ export default function AdminDashboardPage() {
         </div>
       </div>
     </div>
+    </RouteGuard>
   );
 }

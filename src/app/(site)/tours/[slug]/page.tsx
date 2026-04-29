@@ -7,14 +7,16 @@ import { TourDetailsTabs } from "@/components/organisms/TourDetailsTabs";
 import { Badge } from "@/components/atoms";
 import { mockOperators, mockReviews, mockTours } from "@/lib/mock-data";
 
-export default function TourDetailsPage({
+export default async function TourDetailsPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
-  searchParams: { tab?: string };
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
-  const matchedTour = mockTours.find((item) => item.slug === params.slug);
+  const { slug } = await params;
+  const { tab } = await searchParams;
+  const matchedTour = mockTours.find((item) => item.slug === slug);
   const tour = matchedTour ?? mockTours[0];
   const isFallback = !matchedTour;
 
@@ -70,10 +72,7 @@ export default function TourDetailsPage({
               tags={tour.tags}
               reviews={mockReviews}
               defaultTab={
-                searchParams.tab === "itinerary" ||
-                searchParams.tab === "reviews"
-                  ? searchParams.tab
-                  : "overview"
+                tab === "itinerary" || tab === "reviews" ? tab : "overview"
               }
             />
           </div>

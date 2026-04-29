@@ -7,14 +7,13 @@ import { buttonVariants } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
 import { mockTours } from "@/lib/mock-data";
 
-export default function BookingPage({
+export default async function BookingPage({
   searchParams,
 }: {
-  searchParams: { tour?: string };
+  searchParams: Promise<{ tour?: string }>;
 }) {
-  const selectedTour = mockTours.find(
-    (tour) => tour.slug === searchParams.tour,
-  );
+  const { tour: tourSlug } = await searchParams;
+  const selectedTour = mockTours.find((tour) => tour.slug === tourSlug);
 
   return (
     <div className="py-12">

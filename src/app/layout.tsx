@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,7 +29,7 @@ export default function RootLayout({
       className={`${inter.variable} ${interTight.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-screen bg-background text-foreground">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

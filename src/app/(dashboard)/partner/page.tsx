@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { mockTours } from "@/lib/mock-data";
+import { RouteGuard } from "@/components/providers/RouteGuard";
 
 export default function PartnerDashboardPage() {
   return (
+    <RouteGuard allow={["partner", "admin"]}>
     <div className="space-y-8">
       <SectionHeading
         title="Partner operator dashboard"
@@ -103,5 +105,6 @@ export default function PartnerDashboardPage() {
         </div>
       </div>
     </div>
+    </RouteGuard>
   );
 }
