@@ -29,7 +29,7 @@ import { roleHomePath } from "@/lib/auth";
 const publicLinks = [
   { label: "Home", href: "/" },
   { label: "Tours", href: "/tours" },
-  { label: "Transfers", href: "/transfers" },
+  { label: "General logistics", href: "/transfers" },
   { label: "Personalized", href: "/personalized" },
 ];
 

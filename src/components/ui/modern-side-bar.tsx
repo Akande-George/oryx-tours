@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
   Calendar,
+  Car,
   ChevronLeft,
   ChevronRight,
   Heart,
@@ -39,6 +40,7 @@ const navigationItems: NavigationItem[] = [
   { id: "partner", name: "Partner workspace", icon: Users, href: "/partner", roles: ["partner", "admin"] },
   { id: "admin", name: "Admin overview", icon: Shield, href: "/admin", roles: ["admin"] },
   { id: "admin-tours", name: "Tours", icon: Map, href: "/admin/tours", roles: ["admin"] },
+  { id: "admin-fleet", name: "Fleet", icon: Car, href: "/admin/fleet", roles: ["admin"] },
   { id: "admin-bookings", name: "Bookings", icon: Calendar, href: "/admin/bookings", roles: ["admin"] },
   { id: "admin-revenue", name: "Revenue", icon: BarChart3, href: "/admin/revenue", roles: ["admin"] },
 ];
