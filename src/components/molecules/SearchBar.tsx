@@ -2,6 +2,7 @@ import { Calendar, MapPin, Users } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/atoms";
 import { buttonVariants } from "@/components/ui/button";
+import { todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type SearchBarProps = {
@@ -29,13 +30,17 @@ export function SearchBar({ variant = "hero", className }: SearchBarProps) {
         <div className="flex items-center gap-2 rounded-xl border border-input bg-white/80 px-3 py-2">
           <Calendar className="h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Dates"
+            type="date"
+            min={todayISO()}
             className="border-0 bg-transparent px-0 focus-visible:ring-0"
           />
         </div>
         <div className="flex items-center gap-2 rounded-xl border border-input bg-white/80 px-3 py-2">
           <Users className="h-4 w-4 text-muted-foreground" />
           <Input
+            type="number"
+            min={1}
+            defaultValue={2}
             placeholder="Guests"
             className="border-0 bg-transparent px-0 focus-visible:ring-0"
           />

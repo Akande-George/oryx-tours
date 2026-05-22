@@ -2,6 +2,7 @@ import { ActionButton, Input } from "@/components/atoms";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { Textarea } from "@/components/ui/textarea";
+import { todayISO } from "@/lib/format";
 
 export default function PersonalizedPage() {
   return (
@@ -15,13 +16,18 @@ export default function PersonalizedPage() {
           <div className="space-y-6 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
             <div className="grid gap-4 md:grid-cols-2">
               <Input placeholder="Name" />
-              <Input placeholder="Email" />
+              <Input type="email" placeholder="Email" />
               <Input placeholder="Preferred destination" />
-              <Input placeholder="Ideal travel window" />
+              <Input type="date" min={todayISO()} aria-label="Preferred travel date" />
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <Input placeholder="Estimated budget" />
-              <Input placeholder="Travel party size" />
+              <Input
+                type="number"
+                min={1}
+                defaultValue={2}
+                placeholder="Travel party size"
+              />
             </div>
             <Textarea
               placeholder="Describe the experiences you want: wellness, dining, adventure, celebrations, or cultural immersion."

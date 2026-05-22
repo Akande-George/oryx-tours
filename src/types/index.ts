@@ -1,11 +1,10 @@
 export type TourCategory =
-  | "Adventure"
   | "Luxury"
+  | "Adventure"
   | "Culture"
-  | "Desert"
-  | "City"
   | "Wellness"
-  | "Wildlife";
+  | "Sports"
+  | "Medical";
 
 export type Tour = {
   id: string;
@@ -20,10 +19,13 @@ export type Tour = {
   rating: number;
   reviewsCount: number;
   category: TourCategory;
+  description: string;
+  videoUrl?: string;
   highlights: string[];
   includes: string[];
   gradient: string;
   gallery: string[];
+  images: string[];
   tags: string[];
   operatorId: string;
 };
@@ -35,6 +37,10 @@ export type Destination = {
   toursCount: number;
   gradient: string;
   blurb: string;
+  images: string[];
+  priceFrom: number;
+  rating: number;
+  tags: string[];
 };
 
 export type Operator = {
@@ -47,15 +53,26 @@ export type Operator = {
   topBadge: string;
 };
 
+export type FleetCategory = "Economy" | "Premium" | "VIP";
+
 export type Vehicle = {
   id: string;
   name: string;
+  fleetCategory: FleetCategory;
   capacity: number;
   luggage: string;
   priceFrom: number;
+  halfDayPrice: number;
+  fullDayPrice: number;
+  extraHourPrice: number;
+  transferPrice: number;
   features: string[];
   gradient: string;
 };
+
+export type ServiceType = "tour" | "airport" | "local";
+
+export type DurationMode = "half-day" | "full-day" | "extra-hour";
 
 export type BookingStatus = "Upcoming" | "Completed" | "Cancelled";
 

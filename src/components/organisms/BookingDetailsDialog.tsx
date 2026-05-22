@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { ActionButton, Button } from "@/components/atoms";
+import { ActionButton } from "@/components/atoms";
 import {
   Dialog,
   DialogContent,
@@ -9,42 +8,58 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatDate, formatPrice } from "@/lib/format";
+import type { Booking } from "@/types";
 
 type BookingDetailsDialogProps = {
-  triggerLabel?: string;
+  booking: Booking | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
 export function BookingDetailsDialog({
-  triggerLabel = "View booking details",
+  booking,
+  open,
+  onOpenChange,
 }: BookingDetailsDialogProps) {
-  const [open, setOpen] = useState(false);
-
   return (
-    <>
-      <Button className="rounded-full" onClick={() => setOpen(true)}>
-        {triggerLabel}
-      </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Royal Dune Retreat</DialogTitle>
-            <DialogDescription>
-              Booking ref ORYX-1024 · June 18, 2026
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>Guests: 2</p>
-            <p>Suite: Private dune villa</p>
-            <p>Concierge: Assigned</p>
-          </div>
-          <ActionButton
-            label="Download receipt"
-            variant="outline"
-            className="rounded-full"
-            action="print"
-          />
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        {booking ? (
+          <>
+            <DialogHeader>
+              <DialogTitle>{booking.tourTitle}</DialogTitle>
+              <DialogDescription>
+                Booking ref {booking.reference} · {formatDate(booking.date)}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>
+                <span className="font-medium text-foreground">Guests:</span>{" "}
+                {booking.guests}
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Status:</span>{" "}
+                {booking.status}
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Total:</span>{" "}
+                {formatPrice(booking.price)}
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Concierge:</span>{" "}
+                Assigned
+              </p>
+            </div>
+            <ActionButton
+              label="Download receipt"
+              variant="outline"
+              className="rounded-full"
+              action="print"
+            />
+          </>
+        ) : null}
+      </DialogContent>
+    </Dialog>
   );
 }

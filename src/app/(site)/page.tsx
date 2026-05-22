@@ -6,41 +6,41 @@ import { CategoryCard } from "@/components/molecules/CategoryCard";
 import { DestinationCard } from "@/components/molecules/DestinationCard";
 import { TourCard } from "@/components/molecules/TourCard";
 import { FeaturedTours } from "@/components/organisms/FeaturedTours";
-import { HeroSection } from "@/components/organisms/HeroSection";
+import { Hero2 } from "@/components/ui/hero-2-1";
 import { mockDestinations, mockTours } from "@/lib/mock-data";
 
 const categories = [
   {
-    title: "Adventure",
-    description: "Wadis, canyons, and private trail guides.",
-  },
-  {
     title: "Luxury",
     description: "Private villas, refined dining, and exclusive access.",
+  },
+  {
+    title: "Adventure",
+    description: "Wadis, canyons, kayak sunrises, and reserve safaris.",
   },
   {
     title: "Culture",
     description: "Heritage quarters, ateliers, and curated tastings.",
   },
   {
-    title: "Desert",
-    description: "Dune safaris with starlit luxury camps.",
-  },
-  {
     title: "Wellness",
     description: "Oasis spa rituals and restorative programs.",
   },
   {
-    title: "Wildlife",
-    description: "Guided reserve safaris with eco-luxe stays.",
+    title: "Sports",
+    description: "Padel, watersports, and performance retreats.",
+  },
+  {
+    title: "Medical",
+    description: "Physician-led recovery and medical tourism.",
   },
 ];
 
 export default function HomePage() {
   return (
     <div className="flex flex-col gap-16">
-      <HeroSection />
-      <FeaturedTours tours={mockTours.slice(0, 4)} />
+      <Hero2 />
+      <FeaturedTours tours={mockTours.slice(0, 3)} />
 
       <section className="py-4">
         <Container className="space-y-10">
@@ -81,7 +81,7 @@ export default function HomePage() {
             subtitle="Limited departures and small group journeys."
           />
           <div className="grid gap-6 md:grid-cols-3">
-            {mockTours.slice(0, 3).map((tour) => (
+            {mockTours.slice(3, 6).map((tour) => (
               <TourCard key={tour.id} tour={tour} />
             ))}
           </div>

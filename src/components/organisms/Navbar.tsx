@@ -35,7 +35,7 @@ const publicLinks = [
 
 const customerLinks = [
   { label: "Dashboard", href: "/dashboard" },
-  { label: "Saved", href: "/dashboard/saved" },
+  { label: "Tours", href: "/dashboard/tours" },
 ];
 
 const adminLinks = [{ label: "Admin", href: "/admin" }];

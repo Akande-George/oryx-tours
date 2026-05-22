@@ -11,10 +11,12 @@ export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold">{vehicle.name}</h3>
           <Badge variant="secondary" className="rounded-full text-xs">
-            {vehicle.capacity} seats
+            {vehicle.fleetCategory}
           </Badge>
         </div>
-        <p className="text-xs text-muted-foreground">{vehicle.luggage}</p>
+        <p className="text-xs text-muted-foreground">
+          {vehicle.capacity} seats · {vehicle.luggage}
+        </p>
         <div className="flex flex-wrap gap-2">
           {vehicle.features.map((feature) => (
             <span
@@ -25,9 +27,14 @@ export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
             </span>
           ))}
         </div>
-        <p className="text-sm font-semibold text-primary">
-          From {formatPrice(vehicle.priceFrom)}
-        </p>
+        <div className="flex items-baseline justify-between pt-1">
+          <p className="text-sm font-semibold text-primary">
+            From {formatPrice(vehicle.halfDayPrice)}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Transfer {formatPrice(vehicle.transferPrice)}
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

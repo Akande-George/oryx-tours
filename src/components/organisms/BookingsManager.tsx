@@ -1,9 +1,13 @@
+"use client";
+
+import { useState } from "react";
 import { ActionButton } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { BookingCard } from "@/components/molecules/BookingCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mockBookings } from "@/lib/mock-data";
 import { BookingDetailsDialog } from "@/components/organisms/BookingDetailsDialog";
+import type { Booking } from "@/types";
 
 type BookingsManagerProps = {
   title: string;
@@ -11,24 +15,14 @@ type BookingsManagerProps = {
 };
 
 const tabDefinitions = [
-  {
-    value: "upcoming",
-    label: "Upcoming",
-    bookings: mockBookings.filter((booking) => booking.status === "Upcoming"),
-  },
-  {
-    value: "completed",
-    label: "Completed",
-    bookings: mockBookings.filter((booking) => booking.status === "Completed"),
-  },
-  {
-    value: "cancelled",
-    label: "Cancelled",
-    bookings: mockBookings.filter((booking) => booking.status === "Cancelled"),
-  },
+  { value: "upcoming", label: "Upcoming", status: "Upcoming" },
+  { value: "completed", label: "Completed", status: "Completed" },
+  { value: "cancelled", label: "Cancelled", status: "Cancelled" },
 ] as const;
 
 export function BookingsManager({ title, subtitle }: BookingsManagerProps) {
+  const [selected, setSelected] = useState<Booking | null>(null);
+
   return (
     <div className="space-y-8">
       <SectionHeading title={title} subtitle={subtitle} />
@@ -42,19 +36,35 @@ export function BookingsManager({ title, subtitle }: BookingsManagerProps) {
           ))}
         </TabsList>
 
-        {tabDefinitions.map((tab) => (
-          <TabsContent key={tab.value} value={tab.value} className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              {tab.bookings.map((booking) => (
-                <BookingCard key={booking.id} booking={booking} />
-              ))}
-            </div>
-          </TabsContent>
-        ))}
+        {tabDefinitions.map((tab) => {
+          const items = mockBookings.filter((b) => b.status === tab.status);
+          return (
+            <TabsContent
+              key={tab.value}
+              value={tab.value}
+              className="space-y-4"
+            >
+              {items.length ? (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {items.map((booking) => (
+                    <BookingCard
+                      key={booking.id}
+                      booking={booking}
+                      onClick={() => setSelected(booking)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-white/60 bg-white/70 p-6 text-sm text-muted-foreground">
+                  No {tab.label.toLowerCase()} bookings yet.
+                </div>
+              )}
+            </TabsContent>
+          );
+        })}
       </Tabs>
 
       <div className="flex flex-wrap items-center gap-3">
-        <BookingDetailsDialog />
         <ActionButton
           label="Download receipts"
           variant="outline"
@@ -62,6 +72,14 @@ export function BookingsManager({ title, subtitle }: BookingsManagerProps) {
           action="print"
         />
       </div>
+
+      <BookingDetailsDialog
+        booking={selected}
+        open={!!selected}
+        onOpenChange={(open) => {
+          if (!open) setSelected(null);
+        }}
+      />
     </div>
   );
 }

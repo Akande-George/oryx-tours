@@ -4,6 +4,7 @@ import { Button, Input } from "@/components/atoms";
 import { Textarea } from "@/components/ui/textarea";
 import { ProgressSteps } from "@/components/organisms/ProgressSteps";
 import { useBookingStore } from "@/store/booking-store";
+import { formatDate, todayISO } from "@/lib/format";
 
 const steps = ["Select dates", "Traveler details", "Review booking"];
 
@@ -22,9 +23,13 @@ export function BookingFlow({
     step,
     travelDate,
     guests,
+    pickup,
+    dropoff,
     notes,
     setTravelDate,
     setGuests,
+    setPickup,
+    setDropoff,
     setNotes,
     nextStep,
     previousStep,
@@ -34,26 +39,40 @@ export function BookingFlow({
     window.alert("Draft saved to your travel lounge.");
   };
 
+  const dateValid = travelDate !== "" && travelDate >= todayISO();
+  const guestsValid = guests >= 1;
+  const locationValid = pickup.trim() !== "" && dropoff.trim() !== "";
+
+  const canAdvance =
+    (step === 1 && dateValid && guestsValid) ||
+    (step === 2 && locationValid) ||
+    step === 3;
+
   return (
     <div className="space-y-6 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)] backdrop-blur">
       <ProgressSteps steps={steps} current={step} />
       {step === 1 && (
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <p className="text-sm font-semibold">Select travel dates</p>
+            <p className="text-sm font-semibold">
+              Select travel date <span className="text-destructive">*</span>
+            </p>
             <Input
               type="date"
+              min={todayISO()}
               value={travelDate}
               onChange={(event) => setTravelDate(event.target.value)}
             />
-            {!travelDate ? (
+            {!dateValid ? (
               <p className="text-xs text-destructive">
-                Please select a preferred departure date.
+                Pick a departure date in the future.
               </p>
             ) : null}
           </div>
           <div className="space-y-2">
-            <p className="text-sm font-semibold">Guests</p>
+            <p className="text-sm font-semibold">
+              Guests <span className="text-destructive">*</span>
+            </p>
             <Input
               type="number"
               min={1}
@@ -71,7 +90,27 @@ export function BookingFlow({
           </div>
           <div className="space-y-2">
             <p className="text-sm font-semibold">Contact email</p>
-            <Input placeholder="name@email.com" />
+            <Input type="email" placeholder="name@email.com" />
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold">
+              Pick-up location <span className="text-destructive">*</span>
+            </p>
+            <Input
+              placeholder="Hotel, airport, or address"
+              value={pickup}
+              onChange={(event) => setPickup(event.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold">
+              Drop-off location <span className="text-destructive">*</span>
+            </p>
+            <Input
+              placeholder="Final destination"
+              value={dropoff}
+              onChange={(event) => setDropoff(event.target.value)}
+            />
           </div>
           <div className="space-y-2 md:col-span-2">
             <p className="text-sm font-semibold">Special requests</p>
@@ -98,21 +137,27 @@ export function BookingFlow({
               </p>
             ) : null}
             {priceFrom ? <p>From: {priceFrom}</p> : null}
-            <p>Departure: {travelDate || "TBD"}</p>
+            <p>
+              Departure: {travelDate ? formatDate(travelDate) : "Not selected"}
+            </p>
             <p>Guests: {guests}</p>
+            <p>Pick-up: {pickup || "Not specified"}</p>
+            <p>Drop-off: {dropoff || "Not specified"}</p>
             <p>Notes: {notes || "None"}</p>
           </div>
         </div>
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button variant="outline" onClick={previousStep}>
+        <Button variant="outline" onClick={previousStep} disabled={step === 1}>
           Back
         </Button>
         <div className="flex gap-2">
           <Button variant="ghost" onClick={handleSaveDraft}>
             Save as draft
           </Button>
-          <Button onClick={nextStep}>Continue</Button>
+          <Button onClick={nextStep} disabled={!canAdvance}>
+            {step === 3 ? "Confirm booking" : "Continue"}
+          </Button>
         </div>
       </div>
     </div>

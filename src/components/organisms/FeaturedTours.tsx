@@ -11,11 +11,9 @@ export function FeaturedTours({ tours }: { tours: Tour[] }) {
           title="Featured experiences"
           subtitle="Private itineraries crafted for travelers who prefer seamless."
         />
-        <div className="flex gap-6 overflow-x-auto pb-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {tours.map((tour) => (
-            <div key={tour.id} className="min-w-[280px] flex-1">
-              <TourCard tour={tour} />
-            </div>
+            <TourCard key={tour.id} tour={tour} />
           ))}
         </div>
       </Container>

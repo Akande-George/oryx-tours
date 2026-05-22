@@ -15,6 +15,8 @@ export const formatDate = (value: string | Date) => {
   }).format(date);
 };
 
+export const todayISO = () => new Date().toISOString().slice(0, 10);
+
 export const formatCompactDate = (value: string | Date) => {
   const date = typeof value === "string" ? new Date(value) : value;
   return new Intl.DateTimeFormat("en-US", {

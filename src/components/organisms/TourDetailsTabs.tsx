@@ -12,6 +12,7 @@ const allowedTabs = ["overview", "itinerary", "reviews"] as const;
 type AllowedTab = (typeof allowedTabs)[number];
 
 type TourDetailsTabsProps = {
+  description: string;
   highlights: string[];
   tags: string[];
   reviews: Review[];
@@ -19,6 +20,7 @@ type TourDetailsTabsProps = {
 };
 
 export function TourDetailsTabs({
+  description,
   highlights,
   tags,
   reviews,
@@ -48,8 +50,16 @@ export function TourDetailsTabs({
         <TabsTrigger value="reviews">Reviews</TabsTrigger>
       </TabsList>
       <TabsContent value="overview" className="space-y-4">
-        <p className="text-sm text-muted-foreground">{highlights.join(" ")}</p>
-        <div className="flex flex-wrap gap-2">
+        <p className="text-base text-muted-foreground">{description}</p>
+        <ul className="space-y-2 text-sm text-muted-foreground">
+          {highlights.map((highlight) => (
+            <li key={highlight} className="flex gap-2">
+              <span className="text-primary">•</span>
+              <span>{highlight}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="flex flex-wrap gap-2 pt-2">
           {tags.map((tag) => (
             <Badge key={tag} variant="secondary" className="rounded-full">
               {tag}
