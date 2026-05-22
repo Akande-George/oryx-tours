@@ -50,6 +50,11 @@ export default function CustomerOverviewPage() {
   const nextTrip = upcoming[0];
   const totalSpend = completed.reduce((sum, b) => sum + b.price, 0);
 
+  const savedTours = mockTours.filter((tour) => savedSlugs.includes(tour.slug));
+  const recommendations = mockTours
+    .filter((tour) => !savedSlugs.includes(tour.slug))
+    .slice(0, 3);
+
   const firstName = user?.name.split(" ")[0] ?? "traveler";
 
   return (
@@ -187,6 +192,57 @@ export default function CustomerOverviewPage() {
       <div>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <SectionHeading
+            title="Your saved tours"
+            subtitle={
+              savedSlugs.length
+                ? "Pick up planning where you left off."
+                : "Tap the heart on any tour to start a shortlist."
+            }
+          />
+          {savedSlugs.length > 3 ? (
+            <Link
+              href="/dashboard/tours"
+              className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              <Heart className="h-4 w-4" /> View all {savedSlugs.length} saved
+            </Link>
+          ) : null}
+        </div>
+        {savedTours.length ? (
+          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {savedTours.slice(0, 3).map((tour) => (
+              <TourCard key={tour.id} tour={tour} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6 flex flex-col items-start gap-4 rounded-3xl border border-dashed border-primary/30 bg-primary/[0.04] p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+            <div className="flex items-start gap-4">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Heart className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="font-heading text-lg font-semibold">
+                  No saved tours yet
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Browse the catalog and tap the heart on any tour — it&apos;ll
+                  land here for easy access later.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/tours"
+              className={buttonVariants({ className: "rounded-full" })}
+            >
+              Browse tours
+            </Link>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <SectionHeading
             title="Recommended for you"
             subtitle="Curated journeys based on your saves and travel rhythm."
           />
@@ -198,7 +254,7 @@ export default function CustomerOverviewPage() {
           </Link>
         </div>
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {mockTours.slice(0, 3).map((tour) => (
+          {recommendations.map((tour) => (
             <TourCard key={tour.id} tour={tour} />
           ))}
         </div>

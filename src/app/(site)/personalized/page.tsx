@@ -25,6 +25,13 @@ import { Input } from "@/components/atoms";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MultiStepForm } from "@/components/ui/multi-step-form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -284,24 +291,30 @@ export default function PersonalizedPage() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="partySize">Travelers</Label>
-                      <div className="relative">
-                        <Users className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
+                      <Label htmlFor="partySize">Number of guests</Label>
+                      <Select
+                        value={String(state.partySize)}
+                        onValueChange={(value) =>
+                          update("partySize", Number(value))
+                        }
+                      >
+                        <SelectTrigger
                           id="partySize"
-                          type="number"
-                          min={1}
-                          max={20}
-                          value={state.partySize}
-                          onChange={(e) =>
-                            update(
-                              "partySize",
-                              Math.max(1, Number(e.target.value) || 1),
-                            )
-                          }
-                          className="h-11 pl-9"
-                        />
-                      </div>
+                          className="h-11 w-full justify-between rounded-lg pl-9 [&>svg]:size-4"
+                        >
+                          <Users className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                          <SelectValue placeholder="Select number of guests" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 10 }, (_, i) => i + 1).map(
+                            (count) => (
+                              <SelectItem key={count} value={String(count)}>
+                                {count} {count === 1 ? "guest" : "guests"}
+                              </SelectItem>
+                            ),
+                          )}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="startDate">Start date</Label>
@@ -586,7 +599,7 @@ export default function PersonalizedPage() {
                     <p className="mt-1">
                       {state.destination || "Destination TBD"} ·{" "}
                       {state.partySize}{" "}
-                      {state.partySize === 1 ? "traveler" : "travelers"} ·{" "}
+                      {state.partySize === 1 ? "guest" : "guests"} ·{" "}
                       {state.experiences.length || "0"} experience
                       {state.experiences.length === 1 ? "" : "s"} ·{" "}
                       {budgetOptions.find((b) => b.value === state.budget)?.label}{" "}

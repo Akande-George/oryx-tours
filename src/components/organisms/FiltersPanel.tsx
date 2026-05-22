@@ -37,7 +37,7 @@ export function FiltersPanel() {
         <div className="flex flex-1 items-center gap-2 rounded-xl border border-input bg-white/80 px-3 py-2">
           <Search className="h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search experiences, regions, or operators"
+            placeholder="Search experiences"
             value={filters.query}
             onChange={(event) => setQuery(event.target.value)}
             className="border-0 bg-transparent px-0 focus-visible:ring-0"
