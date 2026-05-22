@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Check, Search, X } from "lucide-react";
+import { Check, Pencil, Plus, Search, X } from "lucide-react";
 import { Badge, Button, Input } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import {
@@ -20,10 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TourFormDialog } from "@/components/organisms/TourFormDialog";
 import { formatPrice } from "@/lib/format";
 import { mockOperators, mockTours } from "@/lib/mock-data";
 import { RouteGuard } from "@/components/providers/RouteGuard";
-import type { TourCategory } from "@/types";
+import type { Tour, TourCategory } from "@/types";
 
 type ApprovalState = "Awaiting" | "Approved" | "Rejected";
 
@@ -44,6 +45,7 @@ const categoryOptions: ("All" | TourCategory)[] = [
 ];
 
 export default function AdminToursPage() {
+  const [tours, setTours] = useState<Tour[]>(mockTours);
   const initial = useMemo<Record<string, ApprovalState>>(() => {
     const seed: Record<string, ApprovalState> = {};
     mockTours.forEach((tour, idx) => {
@@ -55,6 +57,8 @@ export default function AdminToursPage() {
   const [approvals, setApprovals] = useState(initial);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<"All" | TourCategory>("All");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingTour, setEditingTour] = useState<Tour | null>(null);
 
   const operatorName = (operatorId: string) =>
     mockOperators.find((op) => op.id === operatorId)?.name ?? "Unknown";
@@ -63,7 +67,29 @@ export default function AdminToursPage() {
     setApprovals((prev) => ({ ...prev, [tourId]: state }));
   };
 
-  const filtered = mockTours.filter((tour) => {
+  const openAdd = () => {
+    setEditingTour(null);
+    setDialogOpen(true);
+  };
+
+  const openEdit = (tour: Tour) => {
+    setEditingTour(tour);
+    setDialogOpen(true);
+  };
+
+  const handleSubmit = (tour: Tour) => {
+    setTours((prev) => {
+      const exists = prev.some((t) => t.id === tour.id);
+      return exists
+        ? prev.map((t) => (t.id === tour.id ? tour : t))
+        : [tour, ...prev];
+    });
+    if (!approvals[tour.id]) {
+      setApprovals((prev) => ({ ...prev, [tour.id]: "Awaiting" }));
+    }
+  };
+
+  const filtered = tours.filter((tour) => {
     if (category !== "All" && tour.category !== category) return false;
     if (query && !tour.title.toLowerCase().includes(query.toLowerCase()))
       return false;
@@ -79,10 +105,20 @@ export default function AdminToursPage() {
   return (
     <RouteGuard allow={["admin"]}>
       <div className="space-y-8">
-        <SectionHeading
-          title="Tours"
-          subtitle="Review submissions, approve listings, and manage the catalog."
-        />
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <SectionHeading
+            title="Tours"
+            subtitle="Review submissions, approve listings, and manage the catalog."
+          />
+          <Button
+            type="button"
+            onClick={openAdd}
+            className="rounded-full"
+          >
+            <Plus className="size-4" />
+            Add tour
+          </Button>
+        </div>
 
         <div className="grid gap-6 sm:grid-cols-3">
           <Card className="border-white/60 bg-white/80 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.35)]">
@@ -171,6 +207,14 @@ export default function AdminToursPage() {
                         <TableCell className="text-right">
                           <div className="inline-flex gap-2">
                             <Button
+                              variant="ghost"
+                              size="sm"
+                              className="rounded-full"
+                              onClick={() => openEdit(tour)}
+                            >
+                              <Pencil className="h-3.5 w-3.5" /> Edit
+                            </Button>
+                            <Button
                               variant="outline"
                               size="sm"
                               className="rounded-full"
@@ -207,6 +251,13 @@ export default function AdminToursPage() {
             </Table>
           </div>
         </div>
+
+        <TourFormDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          initialTour={editingTour}
+          onSubmit={handleSubmit}
+        />
       </div>
     </RouteGuard>
   );
