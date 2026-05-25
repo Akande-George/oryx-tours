@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 
 function LinkedinIcon({ className }: { className?: string }) {
@@ -165,6 +165,14 @@ export function Footer() {
             <Phone className="h-4 w-4" /> +974 4493 1726
           </Link>
           <Link
+            href="https://wa.me/97439998609"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <MessageCircle className="h-4 w-4" /> WhatsApp +974 3999 8609
+          </Link>
+          <Link
             href="https://www.oryxgp.com"
             target="_blank"
             rel="noopener noreferrer"
@@ -180,8 +188,8 @@ export function Footer() {
             <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
             <span>
               Office D02, 3rd Floor, The Statement Hotel, 1002 First Avenue,
-              Off Ahmadu Bello Way, Central Business District, Federal Capital
-              Territory, Abuja, Nigeria.
+              Off Ahmadu Bello Way, Central Business District, F.C.T, Abuja,
+              Nigeria.
             </span>
           </p>
           <Link

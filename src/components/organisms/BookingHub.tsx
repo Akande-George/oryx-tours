@@ -3,13 +3,14 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Car, Map, Plane } from "lucide-react";
+import { Map, Plane, Route, Sun } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { AirportTransferFlow } from "@/components/organisms/AirportTransferFlow";
 import { BookingFlow } from "@/components/organisms/BookingFlow";
 import { LocalTransportFlow } from "@/components/organisms/LocalTransportFlow";
+import { PointToPointFlow } from "@/components/organisms/PointToPointFlow";
 import { useBookingStore } from "@/store/booking-store";
 import { formatPrice } from "@/lib/format";
 import { mockTours } from "@/lib/mock-data";
@@ -18,11 +19,15 @@ import type { ServiceType } from "@/types";
 const tabs: { value: ServiceType; label: string; Icon: typeof Plane }[] = [
   { value: "tour", label: "Tours", Icon: Map },
   { value: "airport", label: "Airport transfer", Icon: Plane },
-  { value: "local", label: "Local transport", Icon: Car },
+  { value: "local", label: "Day hire", Icon: Sun },
+  { value: "point-to-point", label: "Point to point", Icon: Route },
 ];
 
 const isServiceType = (value: string | null): value is ServiceType =>
-  value === "tour" || value === "airport" || value === "local";
+  value === "tour" ||
+  value === "airport" ||
+  value === "local" ||
+  value === "point-to-point";
 
 type BookingHubProps = {
   initialType: ServiceType;
@@ -86,7 +91,7 @@ export function BookingHub({
       ) : null}
 
       <Tabs value={serviceType} onValueChange={handleTabChange}>
-        <TabsList className="grid h-auto w-full grid-cols-1 gap-1 sm:grid-cols-3">
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-4">
           {tabs.map(({ value, label, Icon }) => (
             <TabsTrigger key={value} value={value} className="gap-2">
               <Icon className="h-4 w-4" /> {label}
@@ -108,6 +113,9 @@ export function BookingHub({
         </TabsContent>
         <TabsContent value="local" className="pt-4">
           <LocalTransportFlow />
+        </TabsContent>
+        <TabsContent value="point-to-point" className="pt-4">
+          <PointToPointFlow />
         </TabsContent>
       </Tabs>
     </div>

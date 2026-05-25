@@ -4,7 +4,10 @@ import { BookingHub } from "@/components/organisms/BookingHub";
 import type { ServiceType } from "@/types";
 
 const isServiceType = (value: string | undefined): value is ServiceType =>
-  value === "tour" || value === "airport" || value === "local";
+  value === "tour" ||
+  value === "airport" ||
+  value === "local" ||
+  value === "point-to-point";
 
 export default async function BookingPage({
   searchParams,

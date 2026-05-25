@@ -70,9 +70,11 @@ export type Vehicle = {
   gradient: string;
 };
 
-export type ServiceType = "tour" | "airport" | "local";
+export type ServiceType = "tour" | "airport" | "local" | "point-to-point";
 
 export type DurationMode = "half-day" | "full-day" | "extra-hour";
+
+export type AirportDirection = "pickup" | "dropoff";
 
 export type BookingStatus = "Upcoming" | "Completed" | "Cancelled";
 

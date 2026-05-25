@@ -4,6 +4,13 @@ import { useMemo } from "react";
 import { Clock, MapPin } from "lucide-react";
 import { Badge, Button, Input } from "@/components/atoms";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useBookingStore } from "@/store/booking-store";
 import { formatPrice, todayISO } from "@/lib/format";
 import { mockVehicles } from "@/lib/mock-data";
@@ -12,10 +19,11 @@ import type { DurationMode, FleetCategory } from "@/types";
 
 const fleetOrder: FleetCategory[] = ["Economy", "Premium", "VIP"];
 
-const durationLabel: Record<DurationMode, string> = {
+type DayHireDuration = Extract<DurationMode, "half-day" | "full-day">;
+
+const durationLabel: Record<DayHireDuration, string> = {
   "half-day": "Half day (4 hrs)",
   "full-day": "Full day (8 hrs)",
-  "extra-hour": "Full day + extra hours",
 };
 
 export function LocalTransportFlow() {
@@ -26,14 +34,12 @@ export function LocalTransportFlow() {
     dropoff,
     vehicleId,
     durationMode,
-    extraHours,
     setTravelDate,
     setGuests,
     setPickup,
     setDropoff,
     setVehicleId,
     setDurationMode,
-    setExtraHours,
   } = useBookingStore();
 
   const grouped = useMemo(() => {
@@ -43,15 +49,18 @@ export function LocalTransportFlow() {
     }));
   }, []);
 
+  const dayHireMode: DayHireDuration =
+    durationMode === "half-day" ? "half-day" : "full-day";
+
   const selected = mockVehicles.find((v) => v.id === vehicleId) ?? null;
   const dateValid = travelDate !== "" && travelDate >= todayISO();
 
   const total = useMemo(() => {
     if (!selected) return 0;
-    if (durationMode === "half-day") return selected.halfDayPrice;
-    if (durationMode === "full-day") return selected.fullDayPrice;
-    return selected.fullDayPrice + Math.max(0, extraHours) * selected.extraHourPrice;
-  }, [selected, durationMode, extraHours]);
+    return dayHireMode === "half-day"
+      ? selected.halfDayPrice
+      : selected.fullDayPrice;
+  }, [selected, dayHireMode]);
 
   const ready =
     pickup.trim() !== "" &&
@@ -63,7 +72,7 @@ export function LocalTransportFlow() {
   const handleConfirm = () => {
     window.alert(
       selected
-        ? `Local transport booked: ${selected.name} for ${durationLabel[durationMode]} on ${travelDate} (${formatPrice(total)}).`
+        ? `Day hire booked: ${selected.name} for ${durationLabel[dayHireMode]} on ${travelDate} (${formatPrice(total)}).`
         : "Booking confirmed.",
     );
   };
@@ -74,7 +83,30 @@ export function LocalTransportFlow() {
         <div className="space-y-4 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-semibold">Local transport details</h3>
+            <h3 className="text-sm font-semibold">Day hire details</h3>
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold">
+              Duration <span className="text-destructive">*</span>
+            </p>
+            <Select
+              value={dayHireMode}
+              onValueChange={(value) =>
+                setDurationMode(value as DayHireDuration)
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Choose duration" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="full-day">
+                  {durationLabel["full-day"]}
+                </SelectItem>
+                <SelectItem value="half-day">
+                  {durationLabel["half-day"]}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
@@ -120,41 +152,6 @@ export function LocalTransportFlow() {
               />
             </div>
           </div>
-          <div className="space-y-2">
-            <p className="text-sm font-semibold">Duration</p>
-            <div className="flex flex-wrap gap-2">
-              {(Object.keys(durationLabel) as DurationMode[]).map((mode) => (
-                <button
-                  key={mode}
-                  type="button"
-                  onClick={() => setDurationMode(mode)}
-                  className={cn(
-                    "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                    durationMode === mode
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-white/80 text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {durationLabel[mode]}
-                </button>
-              ))}
-            </div>
-            {durationMode === "extra-hour" ? (
-              <div className="grid gap-2 sm:max-w-xs">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                  Extra hours
-                </p>
-                <Input
-                  type="number"
-                  min={1}
-                  value={extraHours}
-                  onChange={(event) =>
-                    setExtraHours(Number(event.target.value))
-                  }
-                />
-              </div>
-            ) : null}
-          </div>
           <div className="rounded-xl border border-white/60 bg-white/70 p-4 text-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Route preview
@@ -174,6 +171,27 @@ export function LocalTransportFlow() {
 
         <Card className="border-white/60 bg-white/80 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
           <CardContent className="space-y-3 p-6">
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Choose vehicle
+              </p>
+              <Select
+                value={vehicleId ?? ""}
+                onValueChange={(value) => setVehicleId(value || null)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a vehicle for your estimate" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockVehicles.map((vehicle) => (
+                    <SelectItem key={vehicle.id} value={vehicle.id}>
+                      {vehicle.name} — {vehicle.fleetCategory} ·{" "}
+                      {vehicle.capacity} seats
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Live total
             </p>
@@ -183,20 +201,16 @@ export function LocalTransportFlow() {
                   {formatPrice(total)}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {selected.name} · {durationLabel[durationMode]}
-                  {durationMode === "extra-hour" && extraHours > 0
-                    ? ` (+${extraHours} hr)`
-                    : ""}
+                  {selected.name} · {durationLabel[dayHireMode]}
                 </p>
                 <div className="space-y-1 pt-2 text-sm text-muted-foreground">
                   <p>Half day: {formatPrice(selected.halfDayPrice)}</p>
                   <p>Full day: {formatPrice(selected.fullDayPrice)}</p>
-                  <p>Extra hour: {formatPrice(selected.extraHourPrice)}</p>
                 </div>
               </>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Select a vehicle below to see your live total.
+                Select a vehicle above to see your live total.
               </p>
             )}
             <Button
@@ -212,7 +226,7 @@ export function LocalTransportFlow() {
 
       <div className="space-y-4">
         <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          Choose your vehicle
+          Browse the fleet
         </h3>
         <div className="space-y-6">
           {grouped.map(({ category, vehicles }) => (

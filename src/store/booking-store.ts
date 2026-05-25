@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { DurationMode, ServiceType } from "@/types";
+import type { AirportDirection, DurationMode, ServiceType } from "@/types";
 
 type BookingState = {
   serviceType: ServiceType;
@@ -13,6 +13,8 @@ type BookingState = {
   extraHours: number;
   notes: string;
   promoCode: string;
+  airportDirection: AirportDirection;
+  stops: [string, string, string];
   setServiceType: (serviceType: ServiceType) => void;
   setStep: (step: number) => void;
   nextStep: () => void;
@@ -26,6 +28,8 @@ type BookingState = {
   setExtraHours: (hours: number) => void;
   setNotes: (notes: string) => void;
   setPromoCode: (code: string) => void;
+  setAirportDirection: (direction: AirportDirection) => void;
+  setStop: (index: 0 | 1 | 2, value: string) => void;
   reset: () => void;
 };
 
@@ -41,6 +45,8 @@ const initialState = {
   extraHours: 1,
   notes: "",
   promoCode: "",
+  airportDirection: "pickup" as AirportDirection,
+  stops: ["", "", ""] as [string, string, string],
 };
 
 export const useBookingStore = create<BookingState>((set) => ({
@@ -58,5 +64,12 @@ export const useBookingStore = create<BookingState>((set) => ({
   setExtraHours: (extraHours) => set({ extraHours }),
   setNotes: (notes) => set({ notes }),
   setPromoCode: (promoCode) => set({ promoCode }),
+  setAirportDirection: (airportDirection) => set({ airportDirection }),
+  setStop: (index, value) =>
+    set((state) => {
+      const next = [...state.stops] as [string, string, string];
+      next[index] = value;
+      return { stops: next };
+    }),
   reset: () => set(initialState),
 }));
