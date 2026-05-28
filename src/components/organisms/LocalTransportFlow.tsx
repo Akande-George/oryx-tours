@@ -11,10 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { VehicleCard } from "@/components/molecules/VehicleCard";
 import { useBookingStore } from "@/store/booking-store";
 import { formatPrice, todayISO } from "@/lib/format";
 import { mockVehicles } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
 import type { DurationMode, FleetCategory } from "@/types";
 
 const fleetOrder: FleetCategory[] = ["Economy", "Premium", "VIP"];
@@ -152,6 +152,27 @@ export function LocalTransportFlow() {
               />
             </div>
           </div>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold">
+              Fleet vehicle <span className="text-destructive">*</span>
+            </p>
+            <Select
+              value={vehicleId ?? ""}
+              onValueChange={(value) => setVehicleId(value || null)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a vehicle for your estimate" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockVehicles.map((vehicle) => (
+                  <SelectItem key={vehicle.id} value={vehicle.id}>
+                    {vehicle.name} — {vehicle.fleetCategory} ·{" "}
+                    {vehicle.capacity} seats
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="rounded-xl border border-white/60 bg-white/70 p-4 text-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Route preview
@@ -171,27 +192,6 @@ export function LocalTransportFlow() {
 
         <Card className="border-white/60 bg-white/80 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
           <CardContent className="space-y-3 p-6">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                Choose vehicle
-              </p>
-              <Select
-                value={vehicleId ?? ""}
-                onValueChange={(value) => setVehicleId(value || null)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a vehicle for your estimate" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockVehicles.map((vehicle) => (
-                    <SelectItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.name} — {vehicle.fleetCategory} ·{" "}
-                      {vehicle.capacity} seats
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Live total
             </p>
@@ -237,33 +237,15 @@ export function LocalTransportFlow() {
                   {vehicles.length} options
                 </Badge>
               </div>
-              <div className="grid gap-3 md:grid-cols-2">
-                {vehicles.map((vehicle) => {
-                  const active = vehicle.id === vehicleId;
-                  return (
-                    <button
-                      key={vehicle.id}
-                      type="button"
-                      onClick={() => setVehicleId(vehicle.id)}
-                      className={cn(
-                        "rounded-2xl border bg-white/80 p-4 text-left shadow-[0_16px_36px_-28px_rgba(92,70,39,0.35)] transition-all",
-                        active
-                          ? "border-primary ring-2 ring-primary/30"
-                          : "border-white/60 hover:-translate-y-0.5",
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold">{vehicle.name}</p>
-                        <p className="font-semibold text-primary">
-                          From {formatPrice(vehicle.halfDayPrice)}
-                        </p>
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {vehicle.capacity} seats · half {formatPrice(vehicle.halfDayPrice)} · full {formatPrice(vehicle.fullDayPrice)}
-                      </p>
-                    </button>
-                  );
-                })}
+              <div className="grid gap-4 md:grid-cols-2">
+                {vehicles.map((vehicle) => (
+                  <VehicleCard
+                    key={vehicle.id}
+                    vehicle={vehicle}
+                    selected={vehicle.id === vehicleId}
+                    onSelect={() => setVehicleId(vehicle.id)}
+                  />
+                ))}
               </div>
             </div>
           ))}

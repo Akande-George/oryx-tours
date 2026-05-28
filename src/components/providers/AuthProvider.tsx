@@ -25,17 +25,34 @@ type SignUpArgs = {
   email: string;
   password: string;
   role?: UserRole;
+  companyName?: string;
 };
+
+export type SignUpResult =
+  | { kind: "signed-in"; user: AuthUser }
+  | { kind: "pending"; account: StoredAccount };
 
 type AuthContextValue = {
   user: AuthUser | null;
   ready: boolean;
+  accounts: StoredAccount[];
   signIn: (args: SignInArgs) => Promise<AuthUser>;
-  signUp: (args: SignUpArgs) => Promise<AuthUser>;
+  signUp: (args: SignUpArgs) => Promise<SignUpResult>;
   signOut: () => void;
+  approvePartner: (accountId: string) => void;
+  rejectPartner: (accountId: string) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+const toAuthUser = (account: StoredAccount): AuthUser => ({
+  id: account.id,
+  name: account.name,
+  email: account.email,
+  role: account.role,
+  status: account.status,
+  operatorId: account.operatorId,
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [accounts, setAccounts] = useState<StoredAccount[]>([]);
@@ -43,7 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Reading from localStorage requires the client; hydrate on mount.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setAccounts(loadAccounts());
     setUser(loadCurrentUser());
@@ -61,12 +77,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!match) {
         throw new Error("Invalid email or password.");
       }
-      const nextUser: AuthUser = {
-        id: match.id,
-        name: match.name,
-        email: match.email,
-        role: match.role,
-      };
+      if (match.status === "pending") {
+        throw new Error(
+          "Your partner application is awaiting admin approval.",
+        );
+      }
+      if (match.status === "rejected") {
+        throw new Error(
+          "Your partner application was rejected. Contact support for details.",
+        );
+      }
+      const nextUser = toAuthUser(match);
       persistCurrentUser(nextUser);
       setUser(nextUser);
       return nextUser;
@@ -75,33 +96,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signUp = useCallback(
-    async ({ name, email, password, role = "customer" }: SignUpArgs) => {
+    async ({
+      name,
+      email,
+      password,
+      role = "customer",
+      companyName,
+    }: SignUpArgs): Promise<SignUpResult> => {
       const list = accounts.length ? accounts : loadAccounts();
       const normalizedEmail = email.trim().toLowerCase();
-      if (list.some((account) => account.email.toLowerCase() === normalizedEmail)) {
+      if (
+        list.some((account) => account.email.toLowerCase() === normalizedEmail)
+      ) {
         throw new Error("An account with this email already exists.");
       }
+      const id = `user-${Date.now()}`;
       const newAccount: StoredAccount = {
-        id: `user-${Date.now()}`,
+        id,
         name: name.trim() || "Oryx Traveler",
         email: normalizedEmail,
         password,
         role,
+        status: role === "partner" ? "pending" : "active",
+        operatorId: role === "partner" ? `op-${id}` : undefined,
+        companyName: role === "partner" ? companyName?.trim() : undefined,
       };
       const next = [...list, newAccount];
       setAccounts(next);
       saveAccounts(next);
-      const nextUser: AuthUser = {
-        id: newAccount.id,
-        name: newAccount.name,
-        email: newAccount.email,
-        role: newAccount.role,
-      };
+
+      if (role === "partner") {
+        return { kind: "pending", account: newAccount };
+      }
+      const nextUser = toAuthUser(newAccount);
       persistCurrentUser(nextUser);
       setUser(nextUser);
-      return nextUser;
+      return { kind: "signed-in", user: nextUser };
     },
     [accounts],
+  );
+
+  const updateAccountStatus = useCallback(
+    (accountId: string, status: StoredAccount["status"]) => {
+      setAccounts((prev) => {
+        const next = prev.map((account) =>
+          account.id === accountId ? { ...account, status } : account,
+        );
+        saveAccounts(next);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const approvePartner = useCallback(
+    (accountId: string) => updateAccountStatus(accountId, "active"),
+    [updateAccountStatus],
+  );
+
+  const rejectPartner = useCallback(
+    (accountId: string) => updateAccountStatus(accountId, "rejected"),
+    [updateAccountStatus],
   );
 
   const signOut = useCallback(() => {
@@ -110,8 +165,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ user, ready, signIn, signUp, signOut }),
-    [user, ready, signIn, signUp, signOut],
+    () => ({
+      user,
+      ready,
+      accounts,
+      signIn,
+      signUp,
+      signOut,
+      approvePartner,
+      rejectPartner,
+    }),
+    [user, ready, accounts, signIn, signUp, signOut, approvePartner, rejectPartner],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

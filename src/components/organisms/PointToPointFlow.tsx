@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { MapPin, Route } from "lucide-react";
+import { MapPin, Plus, Route, X } from "lucide-react";
 import { Badge, Button, Input } from "@/components/atoms";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -11,15 +11,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { VehicleCard } from "@/components/molecules/VehicleCard";
 import { useBookingStore } from "@/store/booking-store";
 import { formatPrice, todayISO } from "@/lib/format";
 import { mockVehicles } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
 import type { FleetCategory } from "@/types";
 
 const fleetOrder: FleetCategory[] = ["Economy", "Premium", "VIP"];
 
-const stopLabels = ["Point 1", "Point 2", "Point 3"] as const;
+const MAX_STOPS = 6;
 
 const locationOptions = [
   "Hamad International Airport",
@@ -53,6 +53,8 @@ export function PointToPointFlow() {
     setPickup,
     setVehicleId,
     setStop,
+    addStop,
+    removeStop,
   } = useBookingStore();
 
   const grouped = useMemo(() => {
@@ -111,42 +113,71 @@ export function PointToPointFlow() {
           </div>
           <div className="space-y-3">
             <p className="text-sm font-semibold">
-              Drop-off points <span className="text-destructive">*</span>
+              Drop-off stops <span className="text-destructive">*</span>
             </p>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {stopLabels.map((label, index) => (
-                <div key={label} className="space-y-1.5">
-                  <p className="text-xs font-medium text-muted-foreground">
-                    {label}
-                    {index === 0 ? (
-                      <span className="text-destructive"> *</span>
-                    ) : (
-                      <span className="text-muted-foreground/70">
-                        {" "}
-                        (optional)
-                      </span>
-                    )}
-                  </p>
-                  <Select
-                    value={stops[index] || ""}
-                    onValueChange={(value) =>
-                      setStop(index as 0 | 1 | 2, value ?? "")
-                    }
+            <div className="space-y-2">
+              {stops.map((value, index) => {
+                const isFirst = index === 0;
+                const canRemove = stops.length > 1;
+                return (
+                  <div
+                    key={index}
+                    className="flex items-start gap-2"
                   >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {locationOptions.map((location) => (
-                        <SelectItem key={location} value={location}>
-                          {location}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              ))}
+                    <div className="flex-1 space-y-1.5">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Stop {index + 1}
+                        {isFirst ? (
+                          <span className="text-destructive"> *</span>
+                        ) : (
+                          <span className="text-muted-foreground/70">
+                            {" "}
+                            (optional)
+                          </span>
+                        )}
+                      </p>
+                      <Select
+                        value={value || ""}
+                        onValueChange={(next) => setStop(index, next ?? "")}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue
+                            placeholder={`Select stop ${index + 1}`}
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {locationOptions.map((location) => (
+                            <SelectItem key={location} value={location}>
+                              {location}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {canRemove ? (
+                      <button
+                        type="button"
+                        onClick={() => removeStop(index)}
+                        aria-label={`Remove stop ${index + 1}`}
+                        className="mt-6 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-white/80 text-muted-foreground transition-colors hover:border-destructive hover:text-destructive"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    ) : null}
+                  </div>
+                );
+              })}
             </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={addStop}
+              disabled={stops.length >= MAX_STOPS}
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" /> Add stop
+            </Button>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
@@ -172,6 +203,27 @@ export function PointToPointFlow() {
               />
             </div>
           </div>
+          <div className="space-y-2">
+            <p className="text-sm font-semibold">
+              Fleet vehicle <span className="text-destructive">*</span>
+            </p>
+            <Select
+              value={vehicleId ?? ""}
+              onValueChange={(value) => setVehicleId(value || null)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a vehicle for your estimate" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockVehicles.map((vehicle) => (
+                  <SelectItem key={vehicle.id} value={vehicle.id}>
+                    {vehicle.name} — {vehicle.fleetCategory} ·{" "}
+                    {vehicle.capacity} seats
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="rounded-xl border border-white/60 bg-white/70 p-4 text-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Route preview
@@ -181,13 +233,12 @@ export function PointToPointFlow() {
                 <MapPin className="mt-0.5 h-4 w-4 text-primary" />
                 <span>{pickup || "Pick-up location"}</span>
               </div>
-              {stopLabels.map((label, index) => {
-                const value = stops[index];
+              {stops.map((value, index) => {
                 if (!value && index > 0) return null;
                 return (
-                  <div key={label} className="flex items-start gap-2">
+                  <div key={index} className="flex items-start gap-2">
                     <MapPin className="mt-0.5 h-4 w-4 text-secondary" />
-                    <span>{value || label}</span>
+                    <span>{value || `Stop ${index + 1}`}</span>
                   </div>
                 );
               })}
@@ -197,27 +248,6 @@ export function PointToPointFlow() {
 
         <Card className="border-white/60 bg-white/80 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
           <CardContent className="space-y-3 p-6">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                Choose vehicle
-              </p>
-              <Select
-                value={vehicleId ?? ""}
-                onValueChange={(value) => setVehicleId(value || null)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a vehicle for your estimate" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockVehicles.map((vehicle) => (
-                    <SelectItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.name} — {vehicle.fleetCategory} ·{" "}
-                      {vehicle.capacity} seats
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Estimated fare
             </p>
@@ -266,33 +296,15 @@ export function PointToPointFlow() {
                   {vehicles.length} options
                 </Badge>
               </div>
-              <div className="grid gap-3 md:grid-cols-2">
-                {vehicles.map((vehicle) => {
-                  const active = vehicle.id === vehicleId;
-                  return (
-                    <button
-                      key={vehicle.id}
-                      type="button"
-                      onClick={() => setVehicleId(vehicle.id)}
-                      className={cn(
-                        "rounded-2xl border bg-white/80 p-4 text-left shadow-[0_16px_36px_-28px_rgba(92,70,39,0.35)] transition-all",
-                        active
-                          ? "border-primary ring-2 ring-primary/30"
-                          : "border-white/60 hover:-translate-y-0.5",
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold">{vehicle.name}</p>
-                        <p className="font-semibold text-primary">
-                          {formatPrice(vehicle.transferPrice)}
-                        </p>
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {vehicle.capacity} seats · {vehicle.luggage}
-                      </p>
-                    </button>
-                  );
-                })}
+              <div className="grid gap-4 md:grid-cols-2">
+                {vehicles.map((vehicle) => (
+                  <VehicleCard
+                    key={vehicle.id}
+                    vehicle={vehicle}
+                    selected={vehicle.id === vehicleId}
+                    onSelect={() => setVehicleId(vehicle.id)}
+                  />
+                ))}
               </div>
             </div>
           ))}

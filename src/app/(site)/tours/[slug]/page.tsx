@@ -53,10 +53,13 @@ export default async function TourDetailsPage({
         <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
           <div className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
-              {tour.gallery.map((gradient, index) => (
-                <div
-                  key={`${tour.id}-${index}`}
-                  className={`h-48 rounded-2xl bg-gradient-to-br ${gradient}`}
+              {tour.images.map((src, index) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={`${tour.id}-image-${index}`}
+                  src={src}
+                  alt={`${tour.title} photo ${index + 1}`}
+                  className="h-48 w-full rounded-2xl object-cover shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]"
                 />
               ))}
             </div>

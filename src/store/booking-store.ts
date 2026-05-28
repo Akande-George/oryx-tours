@@ -14,7 +14,7 @@ type BookingState = {
   notes: string;
   promoCode: string;
   airportDirection: AirportDirection;
-  stops: [string, string, string];
+  stops: string[];
   setServiceType: (serviceType: ServiceType) => void;
   setStep: (step: number) => void;
   nextStep: () => void;
@@ -29,7 +29,9 @@ type BookingState = {
   setNotes: (notes: string) => void;
   setPromoCode: (code: string) => void;
   setAirportDirection: (direction: AirportDirection) => void;
-  setStop: (index: 0 | 1 | 2, value: string) => void;
+  setStop: (index: number, value: string) => void;
+  addStop: () => void;
+  removeStop: (index: number) => void;
   reset: () => void;
 };
 
@@ -46,8 +48,10 @@ const initialState = {
   notes: "",
   promoCode: "",
   airportDirection: "pickup" as AirportDirection,
-  stops: ["", "", ""] as [string, string, string],
+  stops: [""] as string[],
 };
+
+const MAX_STOPS = 6;
 
 export const useBookingStore = create<BookingState>((set) => ({
   ...initialState,
@@ -67,9 +71,22 @@ export const useBookingStore = create<BookingState>((set) => ({
   setAirportDirection: (airportDirection) => set({ airportDirection }),
   setStop: (index, value) =>
     set((state) => {
-      const next = [...state.stops] as [string, string, string];
+      if (index < 0 || index >= state.stops.length) return state;
+      const next = [...state.stops];
       next[index] = value;
       return { stops: next };
+    }),
+  addStop: () =>
+    set((state) =>
+      state.stops.length >= MAX_STOPS
+        ? state
+        : { stops: [...state.stops, ""] },
+    ),
+  removeStop: (index) =>
+    set((state) => {
+      if (state.stops.length <= 1) return state;
+      if (index < 0 || index >= state.stops.length) return state;
+      return { stops: state.stops.filter((_, i) => i !== index) };
     }),
   reset: () => set(initialState),
 }));

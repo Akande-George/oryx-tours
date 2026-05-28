@@ -20,9 +20,13 @@ import { Container } from "@/components/layout/Container";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { roleHomePath } from "@/lib/auth";
 
+type AccountType = "customer" | "partner";
+
 type FormData = {
+  accountType: AccountType;
   firstName: string;
   lastName: string;
+  companyName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -32,8 +36,10 @@ type FormData = {
 type FormErrors = Partial<Record<keyof FormData | "general", string>>;
 
 const initialForm: FormData = {
+  accountType: "customer",
   firstName: "",
   lastName: "",
+  companyName: "",
   email: "",
   password: "",
   confirmPassword: "",
@@ -59,6 +65,7 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [pendingPartner, setPendingPartner] = useState<{ name: string; email: string } | null>(null);
 
   const updateField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -71,6 +78,9 @@ export default function SignUpPage() {
     const next: FormErrors = {};
     if (!formData.firstName.trim()) next.firstName = "First name is required";
     if (!formData.lastName.trim()) next.lastName = "Last name is required";
+    if (formData.accountType === "partner" && !formData.companyName.trim()) {
+      next.companyName = "Company name is required for partner accounts";
+    }
     if (!formData.email.trim()) {
       next.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
@@ -105,13 +115,25 @@ export default function SignUpPage() {
     setErrors({});
     setIsLoading(true);
     try {
-      const user = await signUp({
+      const result = await signUp({
         name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
         email: formData.email.trim(),
         password: formData.password,
-        role: "customer",
+        role: formData.accountType,
+        companyName:
+          formData.accountType === "partner"
+            ? formData.companyName.trim()
+            : undefined,
       });
-      router.push(roleHomePath[user.role]);
+      if (result.kind === "pending") {
+        setPendingPartner({
+          name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
+          email: result.account.email,
+        });
+        setIsLoading(false);
+        return;
+      }
+      router.push(roleHomePath[result.user.role]);
       router.refresh();
     } catch (err) {
       setErrors({
@@ -167,11 +189,88 @@ export default function SignUpPage() {
               </p>
             </div>
 
+            {pendingPartner ? (
+              <div className="space-y-4 rounded-2xl border border-primary/20 bg-primary/5 p-6 text-sm">
+                <h2 className="text-lg font-semibold text-foreground">
+                  Application received
+                </h2>
+                <p className="text-muted-foreground">
+                  Thanks, {pendingPartner.name}. Your partner application for{" "}
+                  <strong>{pendingPartner.email}</strong> is now awaiting admin
+                  approval. We&apos;ll email you as soon as it&apos;s reviewed.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  You won&apos;t be able to sign in until your account is
+                  approved.
+                </p>
+                <div className="flex gap-3 pt-2">
+                  <Link
+                    href="/"
+                    className="rounded-full border border-border px-4 py-2 text-xs font-semibold"
+                  >
+                    Back to home
+                  </Link>
+                  <Link
+                    href="/sign-in"
+                    className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+                  >
+                    Go to sign in
+                  </Link>
+                </div>
+              </div>
+            ) : (
             <form className="space-y-5" onSubmit={handleSubmit}>
               {errors.general ? (
                 <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
                   {errors.general}
                 </p>
+              ) : null}
+
+              <div className="space-y-2">
+                <Label>Account type</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(["customer", "partner"] as AccountType[]).map((type) => {
+                    const active = formData.accountType === type;
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => updateField("accountType", type)}
+                        className={`rounded-xl border px-4 py-3 text-left text-sm transition-colors ${active ? "border-primary bg-primary/10" : "border-border bg-background hover:border-primary/40"}`}
+                      >
+                        <p className="font-semibold capitalize">
+                          {type === "customer" ? "Traveler" : "Partner operator"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {type === "customer"
+                            ? "Book tours and transfers."
+                            : "List tours and a fleet. Requires admin approval."}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {formData.accountType === "partner" ? (
+                <div className="space-y-2">
+                  <Label htmlFor="companyName">Company / operator name</Label>
+                  <Input
+                    id="companyName"
+                    value={formData.companyName}
+                    onChange={(event) =>
+                      updateField("companyName", event.target.value)
+                    }
+                    placeholder="Dune Voyages"
+                    className="h-11"
+                    disabled={isLoading}
+                  />
+                  {errors.companyName ? (
+                    <p className="text-xs text-destructive">
+                      {errors.companyName}
+                    </p>
+                  ) : null}
+                </div>
               ) : null}
 
               <div className="grid grid-cols-2 gap-3">
@@ -346,9 +445,14 @@ export default function SignUpPage() {
                 className="h-11 w-full rounded-full text-sm font-semibold"
                 disabled={isLoading}
               >
-                {isLoading ? "Creating account..." : "Create account"}
+                {isLoading
+                  ? "Creating account..."
+                  : formData.accountType === "partner"
+                    ? "Submit partner application"
+                    : "Create account"}
               </Button>
             </form>
+            )}
           </motion.div>
 
           {/* Right - story collage */}

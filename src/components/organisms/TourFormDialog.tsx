@@ -129,8 +129,9 @@ export function TourFormDialog({
     if (form.rating < 0 || form.rating > 5)
       next.rating = "Rating must be 0–5";
     if (!form.operatorId) next.operatorId = "Operator is required";
-    if (!form.images.length)
-      next.images = "Add at least one image URL";
+    if (form.images.length < 4)
+      next.images = "Add at least 4 image URLs";
+    if (!form.videoUrl?.trim()) next.videoUrl = "Video link is required";
     return next;
   };
 
@@ -337,11 +338,17 @@ export function TourFormDialog({
                   }
                 />
               </Field>
-              <Field label="Video URL (optional)" className="md:col-span-2">
+              <Field
+                label="Video URL"
+                error={errors.videoUrl}
+                required
+                className="md:col-span-2"
+                description="YouTube, Vimeo, or other embeddable video link."
+              >
                 <Input
                   value={form.videoUrl ?? ""}
                   onChange={(e) => update("videoUrl", e.target.value)}
-                  placeholder="https://..."
+                  placeholder="https://www.youtube.com/embed/..."
                 />
               </Field>
             </div>
@@ -402,10 +409,10 @@ export function TourFormDialog({
           >
             <div className="space-y-5">
               <Field
-                label="Card images (URLs)"
+                label="Tour photos (URLs)"
                 error={errors.images}
                 required
-                description="First image is the card cover."
+                description="Add at least 4 photos. First image is the card cover and the rest fill the detail page gallery."
               >
                 <ListEditor
                   value={form.images}
@@ -414,13 +421,13 @@ export function TourFormDialog({
                 />
               </Field>
               <Field
-                label="Full gallery (URLs)"
-                description="Shown on the tour detail page."
+                label="Decorative gradients (optional)"
+                description="Tailwind gradient classes used as accent panels on the detail page."
               >
                 <ListEditor
                   value={form.gallery}
                   onChange={(v) => update("gallery", v)}
-                  placeholder="https://images.unsplash.com/photo-..."
+                  placeholder="from-[#efd9bf] to-[#c79a78]"
                 />
               </Field>
               <Field

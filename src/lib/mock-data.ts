@@ -440,6 +440,8 @@ export const mockVehicles: Vehicle[] = [
     transferPrice: 60,
     features: ["AC", "Bottled water", "English driver"],
     gradient: "from-[#f3e4cf] to-[#d9b793]",
+    images: [unsplash("1549924231-f129b911e442")],
+    operatorId: "op-001",
   },
   {
     id: "veh-102",
@@ -454,6 +456,8 @@ export const mockVehicles: Vehicle[] = [
     transferPrice: 85,
     features: ["AC", "USB charging", "Spacious cabin"],
     gradient: "from-[#f0dbc4] to-[#cba17c]",
+    images: [unsplash("1570293620530-6731b2bf5e4f")],
+    operatorId: "op-001",
   },
   {
     id: "veh-201",
@@ -468,6 +472,8 @@ export const mockVehicles: Vehicle[] = [
     transferPrice: 120,
     features: ["Leather interior", "Wi-Fi", "Refreshments"],
     gradient: "from-[#f3e0c5] to-[#d2a982]",
+    images: [unsplash("1606664515524-ed2f786a0bd6")],
+    operatorId: "op-002",
   },
   {
     id: "veh-202",
@@ -482,6 +488,8 @@ export const mockVehicles: Vehicle[] = [
     transferPrice: 160,
     features: ["Panoramic roof", "USB-C ports", "Climate control"],
     gradient: "from-[#efd9bf] to-[#c79a78]",
+    images: [unsplash("1551830820-330a71b99659")],
+    operatorId: "op-002",
   },
   {
     id: "veh-301",
@@ -496,6 +504,8 @@ export const mockVehicles: Vehicle[] = [
     transferPrice: 140,
     features: ["Privacy glass", "Onboard concierge", "Ambient lighting"],
     gradient: "from-[#f4e5d0] to-[#cfac88]",
+    images: [unsplash("1563720223185-11003d516935")],
+    operatorId: "op-003",
   },
   {
     id: "veh-302",
@@ -510,6 +520,8 @@ export const mockVehicles: Vehicle[] = [
     transferPrice: 220,
     features: ["Champagne service", "Private chauffeur", "Privacy partition"],
     gradient: "from-[#f0dabb] to-[#c79873]",
+    images: [unsplash("1631295868223-63265b40d9e4")],
+    operatorId: "op-003",
   },
 ];
 

@@ -38,22 +38,11 @@ const customerLinks = [
   { label: "Tours", href: "/dashboard/tours" },
 ];
 
-const adminLinks = [{ label: "Admin", href: "/admin" }];
-
-const partnerLinks = [{ label: "Partner", href: "/partner" }];
-
 export function Navbar() {
   const router = useRouter();
   const { user, ready, signOut } = useAuth();
 
-  const roleLinks =
-    user?.role === "admin"
-      ? adminLinks
-      : user?.role === "partner"
-        ? partnerLinks
-        : user?.role === "customer"
-          ? customerLinks
-          : [];
+  const roleLinks = user?.role === "customer" ? customerLinks : [];
 
   const navLinks = [...publicLinks, ...roleLinks];
 

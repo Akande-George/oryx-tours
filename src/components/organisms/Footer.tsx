@@ -170,7 +170,8 @@ export function Footer() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
           >
-            <MessageCircle className="h-4 w-4" /> WhatsApp +974 3999 8609
+            <MessageCircle className="h-4 w-4" />
+            +974 3999 8609
           </Link>
           <Link
             href="https://www.oryxgp.com"
@@ -187,8 +188,8 @@ export function Footer() {
           <p className="flex gap-2 text-muted-foreground">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
             <span>
-              Office D02, 3rd Floor, The Statement Hotel, 1002 First Avenue,
-              Off Ahmadu Bello Way, Central Business District, F.C.T, Abuja,
+              Office D02, 3rd Floor, The Statement Hotel, 1002 First Avenue, Off
+              Ahmadu Bello Way, Central Business District, F.C.T, Abuja,
               Nigeria.
             </span>
           </p>

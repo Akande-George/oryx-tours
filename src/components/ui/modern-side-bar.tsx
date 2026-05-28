@@ -37,11 +37,15 @@ const navigationItems: NavigationItem[] = [
   { id: "customer-tours", name: "Tours", icon: Heart, href: "/dashboard/tours", roles: ["customer"] },
   { id: "customer-bookings", name: "Bookings", icon: Calendar, href: "/dashboard/bookings", roles: ["customer"] },
   { id: "customer-spending", name: "Spending", icon: Wallet, href: "/dashboard/spending", roles: ["customer"] },
-  { id: "partner", name: "Partner workspace", icon: Users, href: "/partner", roles: ["partner", "admin"] },
-  { id: "admin", name: "Admin overview", icon: Shield, href: "/admin", roles: ["admin"] },
+  { id: "partner", name: "Overview", icon: Home, href: "/partner", roles: ["partner"] },
+  { id: "partner-tours", name: "Tours", icon: Map, href: "/partner/tours", roles: ["partner"] },
+  { id: "partner-fleet", name: "Fleet", icon: Car, href: "/partner/fleet", roles: ["partner"] },
+  { id: "partner-bookings", name: "Bookings", icon: Calendar, href: "/partner/bookings", roles: ["partner"] },
+  { id: "admin", name: "Overview", icon: Shield, href: "/admin", roles: ["admin"] },
   { id: "admin-tours", name: "Tours", icon: Map, href: "/admin/tours", roles: ["admin"] },
   { id: "admin-fleet", name: "Fleet", icon: Car, href: "/admin/fleet", roles: ["admin"] },
   { id: "admin-bookings", name: "Bookings", icon: Calendar, href: "/admin/bookings", roles: ["admin"] },
+  { id: "admin-partners", name: "Partners", icon: Users, href: "/admin/partners", roles: ["admin"] },
   { id: "admin-revenue", name: "Revenue", icon: BarChart3, href: "/admin/revenue", roles: ["admin"] },
 ];
 

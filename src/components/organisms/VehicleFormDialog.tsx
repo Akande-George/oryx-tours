@@ -33,7 +33,7 @@ const gradientPresets = [
   "from-[#2a3140] to-[#5a6172]",
 ];
 
-const emptyVehicle = (): Vehicle => ({
+const emptyVehicle = (operatorId = ""): Vehicle => ({
   id: `vehicle-${Date.now()}`,
   name: "",
   fleetCategory: "Economy",
@@ -46,6 +46,8 @@ const emptyVehicle = (): Vehicle => ({
   transferPrice: 0,
   features: [],
   gradient: gradientPresets[0],
+  images: [],
+  operatorId,
 });
 
 type VehicleFormDialogProps = {
@@ -53,6 +55,7 @@ type VehicleFormDialogProps = {
   onOpenChange: (open: boolean) => void;
   initialVehicle?: Vehicle | null;
   onSubmit: (vehicle: Vehicle) => void;
+  defaultOperatorId?: string;
 };
 
 export function VehicleFormDialog({
@@ -60,10 +63,11 @@ export function VehicleFormDialog({
   onOpenChange,
   initialVehicle,
   onSubmit,
+  defaultOperatorId = "",
 }: VehicleFormDialogProps) {
   const mode = initialVehicle ? "edit" : "add";
   const [form, setForm] = useState<Vehicle>(
-    () => initialVehicle ?? emptyVehicle(),
+    () => initialVehicle ?? emptyVehicle(defaultOperatorId),
   );
   const [errors, setErrors] = useState<Partial<Record<keyof Vehicle, string>>>(
     {},
@@ -71,10 +75,14 @@ export function VehicleFormDialog({
 
   useEffect(() => {
     if (open) {
-      setForm(initialVehicle ? { ...initialVehicle } : emptyVehicle());
+      setForm(
+        initialVehicle
+          ? { ...initialVehicle }
+          : emptyVehicle(defaultOperatorId),
+      );
       setErrors({});
     }
-  }, [open, initialVehicle]);
+  }, [open, initialVehicle, defaultOperatorId]);
 
   const update = <K extends keyof Vehicle>(key: K, value: Vehicle[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -90,6 +98,7 @@ export function VehicleFormDialog({
     if (form.fullDayPrice < 0) next.fullDayPrice = "Must be ≥ 0";
     if (form.extraHourPrice < 0) next.extraHourPrice = "Must be ≥ 0";
     if (form.transferPrice < 0) next.transferPrice = "Must be ≥ 0";
+    if (!form.images.length) next.images = "Add at least one vehicle photo URL";
     return next;
   };
 
@@ -268,6 +277,23 @@ export function VehicleFormDialog({
           </FormSection>
 
           <FormSection
+            title="Photos"
+            description="Add at least one photo URL. The first image becomes the card cover."
+          >
+            <Field
+              label="Vehicle photos (URLs)"
+              error={errors.images}
+              required
+            >
+              <ListEditor
+                value={form.images}
+                onChange={(v) => update("images", v)}
+                placeholder="https://images.unsplash.com/photo-..."
+              />
+            </Field>
+          </FormSection>
+
+          <FormSection
             title="Features"
             description="Shown as chips on the vehicle card."
           >
@@ -383,6 +409,75 @@ function Field({
         <p className="text-xs text-muted-foreground">{description}</p>
       ) : null}
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
+    </div>
+  );
+}
+
+function ListEditor({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string[];
+  onChange: (next: string[]) => void;
+  placeholder?: string;
+}) {
+  const [draft, setDraft] = useState("");
+
+  const add = () => {
+    const trimmed = draft.trim();
+    if (!trimmed) return;
+    onChange([...value, trimmed]);
+    setDraft("");
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <Input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              add();
+            }
+          }}
+          placeholder={placeholder}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={add}
+          className="shrink-0 rounded-lg"
+        >
+          <Plus className="size-3.5" />
+          Add
+        </Button>
+      </div>
+      {value.length ? (
+        <ul className="space-y-1.5">
+          {value.map((item, idx) => (
+            <li
+              key={`${item}-${idx}`}
+              className="flex items-start justify-between gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            >
+              <span className="min-w-0 break-words">{item}</span>
+              <button
+                type="button"
+                onClick={() => onChange(value.filter((_, i) => i !== idx))}
+                className="shrink-0 text-muted-foreground transition-colors hover:text-destructive"
+                aria-label="Remove item"
+              >
+                <X className="size-3.5" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-xs text-muted-foreground">No entries yet.</p>
+      )}
     </div>
   );
 }

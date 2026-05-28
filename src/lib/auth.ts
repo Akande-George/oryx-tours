@@ -1,13 +1,20 @@
 export type UserRole = "customer" | "admin" | "partner";
 
+export type AccountStatus = "active" | "pending" | "rejected";
+
 export type AuthUser = {
   id: string;
   name: string;
   email: string;
   role: UserRole;
+  operatorId?: string;
+  status: AccountStatus;
 };
 
-export type StoredAccount = AuthUser & { password: string };
+export type StoredAccount = AuthUser & {
+  password: string;
+  companyName?: string;
+};
 
 export const AUTH_STORAGE_KEY = "oryx-auth-user";
 export const ACCOUNTS_STORAGE_KEY = "oryx-auth-accounts";
@@ -19,6 +26,7 @@ export const seedAccounts: StoredAccount[] = [
     email: "traveler@oryx.test",
     password: "oryx123",
     role: "customer",
+    status: "active",
   },
   {
     id: "user-admin",
@@ -26,6 +34,7 @@ export const seedAccounts: StoredAccount[] = [
     email: "admin@oryx.test",
     password: "admin123",
     role: "admin",
+    status: "active",
   },
   {
     id: "user-partner",
@@ -33,6 +42,9 @@ export const seedAccounts: StoredAccount[] = [
     email: "partner@oryx.test",
     password: "partner123",
     role: "partner",
+    status: "active",
+    operatorId: "op-001",
+    companyName: "Dune Voyages",
   },
 ];
 
@@ -54,7 +66,11 @@ export function loadAccounts(): StoredAccount[] {
       return seedAccounts;
     }
     const parsed = JSON.parse(raw) as StoredAccount[];
-    return Array.isArray(parsed) && parsed.length ? parsed : seedAccounts;
+    if (!Array.isArray(parsed) || !parsed.length) return seedAccounts;
+    return parsed.map((account) => ({
+      ...account,
+      status: account.status ?? ("active" as AccountStatus),
+    }));
   } catch {
     return seedAccounts;
   }

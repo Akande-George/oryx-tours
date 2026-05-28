@@ -68,6 +68,8 @@ export type Vehicle = {
   transferPrice: number;
   features: string[];
   gradient: string;
+  images: string[];
+  operatorId: string;
 };
 
 export type ServiceType = "tour" | "airport" | "local" | "point-to-point";
