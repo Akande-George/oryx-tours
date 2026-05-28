@@ -34,7 +34,7 @@ type BookingState = {
 };
 
 const initialState = {
-  serviceType: "tour" as ServiceType,
+  serviceType: "airport" as ServiceType,
   step: 1,
   travelDate: "",
   guests: 2,

@@ -22,8 +22,8 @@ const fleetOrder: FleetCategory[] = ["Economy", "Premium", "VIP"];
 type DayHireDuration = Extract<DurationMode, "half-day" | "full-day">;
 
 const durationLabel: Record<DayHireDuration, string> = {
-  "half-day": "Half day (4 hrs)",
-  "full-day": "Full day (8 hrs)",
+  "half-day": "Half Day",
+  "full-day": "Full Day",
 };
 
 export function LocalTransportFlow() {
