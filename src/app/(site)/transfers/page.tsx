@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { FleetCategory } from "@/types";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
@@ -24,7 +25,15 @@ export default function TransfersPage() {
           subtitle="Executive pickups with concierge-level coordination."
         />
 
-        <BookingHub initialType="airport" />
+        <Suspense
+          fallback={
+            <div className="rounded-2xl border border-white/60 bg-white/70 p-6 text-sm text-muted-foreground shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
+              Loading booking…
+            </div>
+          }
+        >
+          <BookingHub initialType="airport" />
+        </Suspense>
 
         <div className="space-y-4 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
           <div className="flex flex-wrap items-end justify-between gap-2">
