@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Globe, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 
 function LinkedinIcon({ className }: { className?: string }) {
@@ -177,9 +177,9 @@ export function Footer() {
             href="https://www.oryxgp.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="block text-muted-foreground hover:text-foreground"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
           >
-            www.oryxgp.com
+            <Globe className="h-4 w-4" /> www.oryxgp.com
           </Link>
         </div>
 

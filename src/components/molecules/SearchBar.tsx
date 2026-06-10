@@ -24,7 +24,7 @@ export function SearchBar({ variant = "hero", className }: SearchBarProps) {
           <MapPin className="h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Destination"
-            className="border-0 bg-transparent px-0 focus-visible:ring-0"
+            className="border-0 bg-transparent px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
           />
         </div>
         <div className="flex items-center gap-2 rounded-xl border border-input bg-white/80 px-3 py-2">
@@ -32,7 +32,7 @@ export function SearchBar({ variant = "hero", className }: SearchBarProps) {
           <Input
             type="date"
             min={todayISO()}
-            className="border-0 bg-transparent px-0 focus-visible:ring-0"
+            className="border-0 bg-transparent px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
           />
         </div>
         <div className="flex items-center gap-2 rounded-xl border border-input bg-white/80 px-3 py-2">
@@ -42,7 +42,7 @@ export function SearchBar({ variant = "hero", className }: SearchBarProps) {
             min={1}
             defaultValue={2}
             placeholder="Guests"
-            className="border-0 bg-transparent px-0 focus-visible:ring-0"
+            className="border-0 bg-transparent px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
           />
         </div>
       </div>

@@ -326,7 +326,7 @@ export default function PersonalizedPage() {
                           min={todayISO()}
                           value={state.startDate}
                           onChange={(e) => update("startDate", e.target.value)}
-                          className="h-11 pl-9"
+                          className="h-11 pl-9 [&::-webkit-calendar-picker-indicator]:opacity-0"
                         />
                       </div>
                     </div>
@@ -340,7 +340,7 @@ export default function PersonalizedPage() {
                           min={state.startDate || todayISO()}
                           value={state.endDate}
                           onChange={(e) => update("endDate", e.target.value)}
-                          className="h-11 pl-9"
+                          className="h-11 pl-9 [&::-webkit-calendar-picker-indicator]:opacity-0"
                         />
                       </div>
                     </div>
