@@ -115,96 +115,107 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="space-y-2 text-sm">
-          <p className="font-semibold">Experiences</p>
-          <Link
-            href="/tours"
-            className="block text-muted-foreground hover:text-foreground"
-          >
-            Luxury retreats
-          </Link>
-          <Link
-            href="/tours"
-            className="block text-muted-foreground hover:text-foreground"
-          >
-            Adventure escapes
-          </Link>
-          <Link
-            href="/tours"
-            className="block text-muted-foreground hover:text-foreground"
-          >
-            Cultural tours
-          </Link>
-          <Link
-            href="/transfers"
-            className="block text-muted-foreground hover:text-foreground"
-          >
-            Airport transfers
-          </Link>
+        <div className="text-sm">
+          <p className="mb-3 font-semibold">Experiences</p>
+          <div className="space-y-2 text-muted-foreground">
+            <Link
+              href="/tours"
+              className="block hover:text-foreground"
+            >
+              Luxury retreats
+            </Link>
+            <Link
+              href="/tours"
+              className="block hover:text-foreground"
+            >
+              Adventure escapes
+            </Link>
+            <Link
+              href="/tours"
+              className="block hover:text-foreground"
+            >
+              Cultural tours
+            </Link>
+            <Link
+              href="/transfers"
+              className="block hover:text-foreground"
+            >
+              Airport transfers
+            </Link>
+          </div>
         </div>
 
-        <div className="space-y-2 text-sm">
-          <p className="font-semibold">Global headquarters</p>
-          <p className="flex gap-2 text-muted-foreground">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>
-              Office 705, 7th Floor, Building 8, Emrair Street, Zone 18, Old
-              Salata - Corniche, Doha, Qatar.
-            </span>
-          </p>
-          <Link
-            href="mailto:info@oryxgp.com"
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <Mail className="h-4 w-4" /> info@oryxgp.com
-          </Link>
-          <Link
-            href="tel:+97444931726"
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <Phone className="h-4 w-4" /> +974 4493 1726
-          </Link>
-          <Link
-            href="https://wa.me/97439998609"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <MessageCircle className="h-4 w-4" />
-            +974 3999 8609
-          </Link>
-          <Link
-            href="https://www.oryxgp.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <Globe className="h-4 w-4" /> www.oryxgp.com
-          </Link>
+        <div className="text-sm">
+          <p className="mb-3 font-semibold">Global headquarters</p>
+          <div className="space-y-2.5 text-muted-foreground">
+            <p className="flex items-start gap-2.5 leading-relaxed">
+              <MapPin className="mt-[3px] h-4 w-4 shrink-0" />
+              <span>
+                Office 705, 7th Floor, Building 8, Emrair Street, Zone 18, Old
+                Salata - Corniche, Doha, Qatar.
+              </span>
+            </p>
+            <Link
+              href="mailto:info@oryxgp.com"
+              className="flex items-center gap-2.5 hover:text-foreground"
+            >
+              <Mail className="h-4 w-4 shrink-0" />
+              <span>info@oryxgp.com</span>
+            </Link>
+            <Link
+              href="tel:+97444931726"
+              className="flex items-center gap-2.5 hover:text-foreground"
+            >
+              <Phone className="h-4 w-4 shrink-0" />
+              <span>+974 4493 1726</span>
+            </Link>
+            <Link
+              href="https://wa.me/97439998609"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 hover:text-foreground"
+            >
+              <MessageCircle className="h-4 w-4 shrink-0" />
+              <span>+974 3999 8609</span>
+            </Link>
+            <Link
+              href="https://www.oryxgp.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 hover:text-foreground"
+            >
+              <Globe className="h-4 w-4 shrink-0" />
+              <span>www.oryxgp.com</span>
+            </Link>
+          </div>
         </div>
 
-        <div className="space-y-2 text-sm">
-          <p className="font-semibold">Africa headquarters</p>
-          <p className="flex gap-2 text-muted-foreground">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>
-              Office D02, 3rd Floor, The Statement Hotel, 1002 First Avenue, Off
-              Ahmadu Bello Way, Central Business District, F.C.T, Abuja,
-              Nigeria.
-            </span>
-          </p>
-          <Link
-            href="mailto:Oryx_africa@oryxgp.com"
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <Mail className="h-4 w-4" /> Oryx_africa@oryxgp.com
-          </Link>
-          <Link
-            href="tel:+2347072342929"
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-          >
-            <Phone className="h-4 w-4" /> +234 707 234 2929
-          </Link>
+        <div className="text-sm">
+          <p className="mb-3 font-semibold">Africa headquarters</p>
+          <div className="space-y-2.5 text-muted-foreground">
+            <p className="flex items-start gap-2.5 leading-relaxed">
+              <MapPin className="mt-[3px] h-4 w-4 shrink-0" />
+              <span>
+                Office D02, 3rd Floor, The Statement Hotel, 1002 First Avenue,
+                Off Ahmadu Bello Way, Central Business District, F.C.T, Abuja,
+                Nigeria.
+              </span>
+            </p>
+            <Link
+              href="mailto:Oryx_africa@oryxgp.com"
+              className="flex items-center gap-2.5 hover:text-foreground"
+            >
+              <Mail className="h-4 w-4 shrink-0" />
+              <span>Oryx_africa@oryxgp.com</span>
+            </Link>
+            <Link
+              href="tel:+2347072342929"
+              className="flex items-center gap-2.5 hover:text-foreground"
+            >
+              <Phone className="h-4 w-4 shrink-0" />
+              <span>+234 707 234 2929</span>
+            </Link>
+          </div>
         </div>
       </Container>
       <div className="border-t border-white/60 py-6 text-center text-xs text-muted-foreground">
