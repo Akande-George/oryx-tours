@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { Badge, Button, Input } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
@@ -22,8 +22,10 @@ import {
 } from "@/components/ui/select";
 import { VehicleFormDialog } from "@/components/organisms/VehicleFormDialog";
 import { RouteGuard } from "@/components/providers/RouteGuard";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { deleteVehicle } from "@/lib/supabase/data";
 import { formatPrice } from "@/lib/format";
-import { mockVehicles } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import type { FleetCategory, Vehicle } from "@/types";
 
@@ -41,11 +43,16 @@ const categoryBadge: Record<FleetCategory, string> = {
 };
 
 export default function AdminFleetPage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
+  const { vehicles: liveVehicles } = useSupabaseCollections();
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<"All" | FleetCategory>("All");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+
+  useEffect(() => {
+    setVehicles(liveVehicles);
+  }, [liveVehicles]);
 
   const openAdd = () => {
     setEditingVehicle(null);
@@ -66,8 +73,9 @@ export default function AdminFleetPage() {
     });
   };
 
-  const handleDelete = (id: string) => {
-    setVehicles((prev) => prev.filter((v) => v.id !== id));
+  const handleDelete = async (id: string) => {
+    const ok = await deleteVehicle(createSupabaseBrowserClient(), id);
+    if (ok) setVehicles((prev) => prev.filter((v) => v.id !== id));
   };
 
   const filtered = useMemo(
@@ -188,12 +196,8 @@ export default function AdminFleetPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>{vehicle.capacity} pax</TableCell>
-                      <TableCell>
-                        {formatPrice(vehicle.halfDayPrice)}
-                      </TableCell>
-                      <TableCell>
-                        {formatPrice(vehicle.fullDayPrice)}
-                      </TableCell>
+                      <TableCell>{formatPrice(vehicle.halfDayPrice)}</TableCell>
+                      <TableCell>{formatPrice(vehicle.fullDayPrice)}</TableCell>
                       <TableCell>
                         {formatPrice(vehicle.extraHourPrice)}
                       </TableCell>

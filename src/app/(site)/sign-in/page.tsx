@@ -11,13 +11,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Container } from "@/components/layout/Container";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { roleHomePath } from "@/lib/auth";
-import { cn } from "@/lib/utils";
-
-const demoAccounts = [
-  { label: "Customer", email: "traveler@oryx.test", password: "oryx123" },
-  { label: "Admin", email: "admin@oryx.test", password: "admin123" },
-  { label: "Partner", email: "partner@oryx.test", password: "partner123" },
-];
 
 function SignInForm() {
   const router = useRouter();
@@ -29,7 +22,6 @@ function SignInForm() {
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showDemos, setShowDemos] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,12 +44,6 @@ function SignInForm() {
       setError(err instanceof Error ? err.message : "Unable to sign in.");
       setSubmitting(false);
     }
-  };
-
-  const fillDemo = (demoEmail: string, demoPassword: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    setError(null);
   };
 
   return (
@@ -164,41 +150,6 @@ function SignInForm() {
             >
               {submitting ? "Signing in..." : "Sign in"}
             </Button>
-
-            <button
-              type="button"
-              onClick={() => setShowDemos((v) => !v)}
-              className="block w-full text-center text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {showDemos ? "Hide demo accounts" : "Try a demo account"}
-            </button>
-
-            <div
-              className={cn(
-                "grid gap-1.5 overflow-hidden transition-all duration-300",
-                showDemos
-                  ? "grid-rows-[1fr] opacity-100"
-                  : "grid-rows-[0fr] opacity-0",
-              )}
-            >
-              <div className="min-h-0 space-y-1.5">
-                {demoAccounts.map((account) => (
-                  <button
-                    key={account.email}
-                    type="button"
-                    onClick={() => fillDemo(account.email, account.password)}
-                    className="flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-background/60 px-3 py-2 text-left transition-colors hover:border-primary/40 hover:bg-accent/40"
-                  >
-                    <span className="text-xs font-semibold">
-                      {account.label}
-                    </span>
-                    <span className="truncate text-[11px] text-muted-foreground">
-                      {account.email}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
           </form>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">

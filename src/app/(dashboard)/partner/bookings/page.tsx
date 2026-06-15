@@ -15,8 +15,8 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { formatPrice } from "@/lib/format";
-import { mockBookings, mockTours } from "@/lib/mock-data";
 import type { BookingStatus } from "@/types";
 
 const statusBadge: Record<BookingStatus, string> = {
@@ -29,21 +29,21 @@ export default function PartnerBookingsPage() {
   const { user } = useAuth();
   const operatorId = user?.operatorId ?? "";
   const [query, setQuery] = useState("");
+  const { bookings: liveBookings, tours } = useSupabaseCollections();
 
   const partnerTourIds = useMemo(
     () =>
       new Set(
-        mockTours
+        tours
           .filter((tour) => tour.operatorId === operatorId)
           .map((tour) => tour.id),
       ),
-    [operatorId],
+    [operatorId, tours],
   );
 
   const bookings = useMemo(
-    () =>
-      mockBookings.filter((booking) => partnerTourIds.has(booking.tourId)),
-    [partnerTourIds],
+    () => liveBookings.filter((booking) => partnerTourIds.has(booking.tourId)),
+    [liveBookings, partnerTourIds],
   );
 
   const filtered = useMemo(

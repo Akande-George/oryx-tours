@@ -16,8 +16,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookingDetailsDialog } from "@/components/organisms/BookingDetailsDialog";
 import { formatPrice, formatCompactDate } from "@/lib/format";
-import { mockBookings } from "@/lib/mock-data";
 import { RouteGuard } from "@/components/providers/RouteGuard";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { Booking, BookingStatus } from "@/types";
 
 const tabs: { value: "all" | Lowercase<BookingStatus>; label: string }[] = [
@@ -36,14 +36,15 @@ const statusStyles: Record<BookingStatus, string> = {
 export default function AdminBookingsPage() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Booking | null>(null);
+  const { bookings } = useSupabaseCollections();
 
-  const totalValue = mockBookings
+  const totalValue = bookings
     .filter((b) => b.status !== "Cancelled")
     .reduce((sum, b) => sum + b.price, 0);
   const stats = {
-    upcoming: mockBookings.filter((b) => b.status === "Upcoming").length,
-    completed: mockBookings.filter((b) => b.status === "Completed").length,
-    cancelled: mockBookings.filter((b) => b.status === "Cancelled").length,
+    upcoming: bookings.filter((b) => b.status === "Upcoming").length,
+    completed: bookings.filter((b) => b.status === "Completed").length,
+    cancelled: bookings.filter((b) => b.status === "Cancelled").length,
   };
 
   const filterByQuery = (rows: Booking[]) =>
@@ -69,8 +70,12 @@ export default function AdminBookingsPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Total value
               </p>
-              <p className="text-2xl font-semibold">{formatPrice(totalValue)}</p>
-              <p className="text-xs text-muted-foreground">Excludes cancelled</p>
+              <p className="text-2xl font-semibold">
+                {formatPrice(totalValue)}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Excludes cancelled
+              </p>
             </CardContent>
           </Card>
           <Card className="border-white/60 bg-white/80 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.35)]">
@@ -122,8 +127,8 @@ export default function AdminBookingsPage() {
             {tabs.map((tab) => {
               const rows =
                 tab.value === "all"
-                  ? mockBookings
-                  : mockBookings.filter(
+                  ? bookings
+                  : bookings.filter(
                       (b) => b.status.toLowerCase() === tab.value,
                     );
               const filtered = filterByQuery(rows);

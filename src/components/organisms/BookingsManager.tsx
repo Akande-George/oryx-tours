@@ -5,9 +5,9 @@ import { ActionButton } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { BookingCard } from "@/components/molecules/BookingCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mockBookings } from "@/lib/mock-data";
 import { BookingDetailsDialog } from "@/components/organisms/BookingDetailsDialog";
 import type { Booking } from "@/types";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 
 type BookingsManagerProps = {
   title: string;
@@ -22,6 +22,7 @@ const tabDefinitions = [
 
 export function BookingsManager({ title, subtitle }: BookingsManagerProps) {
   const [selected, setSelected] = useState<Booking | null>(null);
+  const { bookings } = useSupabaseCollections();
 
   return (
     <div className="space-y-8">
@@ -37,7 +38,7 @@ export function BookingsManager({ title, subtitle }: BookingsManagerProps) {
         </TabsList>
 
         {tabDefinitions.map((tab) => {
-          const items = mockBookings.filter((b) => b.status === tab.status);
+          const items = bookings.filter((b) => b.status === tab.status);
           return (
             <TabsContent
               key={tab.value}

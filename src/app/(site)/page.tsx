@@ -7,7 +7,8 @@ import { DestinationCard } from "@/components/molecules/DestinationCard";
 import { TourCard } from "@/components/molecules/TourCard";
 import { FeaturedTours } from "@/components/organisms/FeaturedTours";
 import { Hero2 } from "@/components/ui/hero-2-1";
-import { mockDestinations, mockTours } from "@/lib/mock-data";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getDestinations, getTours } from "@/lib/supabase/data";
 
 const categories = [
   {
@@ -36,11 +37,17 @@ const categories = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createSupabaseServerClient();
+  const [tours, destinations] = await Promise.all([
+    getTours(supabase),
+    getDestinations(supabase),
+  ]);
+
   return (
     <div className="flex flex-col gap-16">
       <Hero2 />
-      <FeaturedTours tours={mockTours.slice(0, 3)} />
+      <FeaturedTours tours={tours.slice(0, 3)} />
 
       <section className="py-4">
         <Container className="space-y-10">
@@ -67,7 +74,7 @@ export default function HomePage() {
             subtitle="Explore signature regions loved by returning travelers."
           />
           <div className="grid gap-6 md:grid-cols-3">
-            {mockDestinations.map((destination) => (
+            {destinations.map((destination) => (
               <DestinationCard key={destination.id} destination={destination} />
             ))}
           </div>
@@ -81,7 +88,7 @@ export default function HomePage() {
             subtitle="Limited departures and small group journeys."
           />
           <div className="grid gap-6 md:grid-cols-3">
-            {mockTours.slice(3, 6).map((tour) => (
+            {tours.slice(3, 6).map((tour) => (
               <TourCard key={tour.id} tour={tour} />
             ))}
           </div>

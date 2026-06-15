@@ -9,15 +9,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
-  AuthUser,
-  StoredAccount,
-  UserRole,
-  loadAccounts,
-  loadCurrentUser,
-  persistCurrentUser,
-  saveAccounts,
-} from "@/lib/auth";
+  getProfileById,
+  getProfiles,
+  updateProfileStatus,
+} from "@/lib/supabase/data";
+import type { AuthProfile, AuthUser, UserRole } from "@/lib/auth";
 
 type SignInArgs = { email: string; password: string };
 type SignUpArgs = {
@@ -30,12 +28,12 @@ type SignUpArgs = {
 
 export type SignUpResult =
   | { kind: "signed-in"; user: AuthUser }
-  | { kind: "pending"; account: StoredAccount };
+  | { kind: "pending"; account: AuthProfile };
 
 type AuthContextValue = {
   user: AuthUser | null;
   ready: boolean;
-  accounts: StoredAccount[];
+  accounts: AuthProfile[];
   signIn: (args: SignInArgs) => Promise<AuthUser>;
   signUp: (args: SignUpArgs) => Promise<SignUpResult>;
   signOut: () => void;
@@ -44,55 +42,120 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const supabase = createSupabaseBrowserClient();
 
-const toAuthUser = (account: StoredAccount): AuthUser => ({
-  id: account.id,
-  name: account.name,
-  email: account.email,
-  role: account.role,
-  status: account.status,
-  operatorId: account.operatorId,
+const toAuthUser = (profile: AuthProfile): AuthUser => ({
+  id: profile.id,
+  name: profile.name,
+  email: profile.email,
+  role: profile.role,
+  status: profile.status,
+  operatorId: profile.operatorId,
+  companyName: profile.companyName,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [accounts, setAccounts] = useState<StoredAccount[]>([]);
+  const [accounts, setAccounts] = useState<AuthProfile[]>([]);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [ready, setReady] = useState(false);
 
+  const loadCurrentProfile = useCallback(async (userId: string) => {
+    const profile = await getProfileById(supabase, userId);
+    if (!profile) {
+      return null;
+    }
+
+    setUser(toAuthUser(profile));
+    if (profile.role === "admin") {
+      setAccounts(await getProfiles(supabase));
+    } else {
+      setAccounts([profile]);
+    }
+
+    return profile;
+  }, []);
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAccounts(loadAccounts());
-    setUser(loadCurrentUser());
-    setReady(true);
+    let active = true;
+
+    const bootstrap = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!active) return;
+
+      if (session?.user) {
+        await loadCurrentProfile(session.user.id);
+      } else {
+        setAccounts([]);
+        setUser(null);
+      }
+
+      setReady(true);
+    };
+
+    void bootstrap();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!session?.user) {
+        setUser(null);
+        setAccounts([]);
+        return;
+      }
+
+      await loadCurrentProfile(session.user.id);
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, [loadCurrentProfile]);
+
+  const refreshAccounts = useCallback(async (profile: AuthProfile | null) => {
+    if (!profile) {
+      setAccounts([]);
+      return;
+    }
+
+    if (profile.role === "admin") {
+      setAccounts(await getProfiles(supabase));
+      return;
+    }
+
+    setAccounts([profile]);
   }, []);
 
   const signIn = useCallback(
     async ({ email, password }: SignInArgs) => {
-      const list = accounts.length ? accounts : loadAccounts();
-      const match = list.find(
-        (account) =>
-          account.email.toLowerCase() === email.trim().toLowerCase() &&
-          account.password === password,
-      );
-      if (!match) {
-        throw new Error("Invalid email or password.");
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (error || !data.user) {
+        throw new Error(error?.message ?? "Invalid email or password.");
       }
-      if (match.status === "pending") {
-        throw new Error(
-          "Your partner application is awaiting admin approval.",
-        );
+
+      const profile = await loadCurrentProfile(data.user.id);
+      if (!profile) {
+        throw new Error("Your account profile is not ready yet.");
       }
-      if (match.status === "rejected") {
+      if (profile.status === "rejected") {
+        await supabase.auth.signOut();
         throw new Error(
           "Your partner application was rejected. Contact support for details.",
         );
       }
-      const nextUser = toAuthUser(match);
-      persistCurrentUser(nextUser);
+      await refreshAccounts(profile);
+      const nextUser = toAuthUser(profile);
       setUser(nextUser);
       return nextUser;
     },
-    [accounts],
+    [loadCurrentProfile, refreshAccounts],
   );
 
   const signUp = useCallback(
@@ -103,65 +166,87 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       role = "customer",
       companyName,
     }: SignUpArgs): Promise<SignUpResult> => {
-      const list = accounts.length ? accounts : loadAccounts();
       const normalizedEmail = email.trim().toLowerCase();
-      if (
-        list.some((account) => account.email.toLowerCase() === normalizedEmail)
-      ) {
-        throw new Error("An account with this email already exists.");
-      }
-      const id = `user-${Date.now()}`;
-      const newAccount: StoredAccount = {
-        id,
-        name: name.trim() || "Oryx Traveler",
+      const trimmedName = name.trim() || "Oryx Traveler";
+      const emailRedirectTo =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/auth/callback`
+          : undefined;
+
+      const { data, error } = await supabase.auth.signUp({
         email: normalizedEmail,
         password,
-        role,
-        status: role === "partner" ? "pending" : "active",
-        operatorId: role === "partner" ? `op-${id}` : undefined,
-        companyName: role === "partner" ? companyName?.trim() : undefined,
-      };
-      const next = [...list, newAccount];
-      setAccounts(next);
-      saveAccounts(next);
+        options: {
+          emailRedirectTo,
+          data: {
+            name: trimmedName,
+            role,
+            companyName: role === "partner" ? companyName?.trim() : undefined,
+          },
+        },
+      });
 
-      if (role === "partner") {
-        return { kind: "pending", account: newAccount };
+      if (error || !data.user) {
+        throw new Error(error?.message ?? "Unable to create account.");
       }
-      const nextUser = toAuthUser(newAccount);
-      persistCurrentUser(nextUser);
+
+      const profile =
+        (await getProfileById(supabase, data.user.id)) ??
+        ({
+          id: data.user.id,
+          name: trimmedName,
+          email: normalizedEmail,
+          role,
+          status: role === "partner" ? "pending" : "active",
+          operatorId:
+            role === "partner"
+              ? data.user.user_metadata?.operatorId
+              : undefined,
+          companyName: role === "partner" ? companyName?.trim() : undefined,
+        } satisfies AuthProfile);
+
+      if (!data.session) {
+        throw new Error(
+          "Check your email to confirm your account, then sign in again.",
+        );
+      }
+
+      await refreshAccounts(profile);
+      const nextUser = toAuthUser(profile);
       setUser(nextUser);
       return { kind: "signed-in", user: nextUser };
     },
-    [accounts],
+    [refreshAccounts],
   );
 
   const updateAccountStatus = useCallback(
-    (accountId: string, status: StoredAccount["status"]) => {
-      setAccounts((prev) => {
-        const next = prev.map((account) =>
-          account.id === accountId ? { ...account, status } : account,
-        );
-        saveAccounts(next);
-        return next;
-      });
+    async (accountId: string, status: AuthProfile["status"]) => {
+      const ok = await updateProfileStatus(supabase, accountId, status);
+      if (ok) {
+        setAccounts(await getProfiles(supabase));
+      }
     },
     [],
   );
 
   const approvePartner = useCallback(
-    (accountId: string) => updateAccountStatus(accountId, "active"),
+    (accountId: string) => {
+      void updateAccountStatus(accountId, "active");
+    },
     [updateAccountStatus],
   );
 
   const rejectPartner = useCallback(
-    (accountId: string) => updateAccountStatus(accountId, "rejected"),
+    (accountId: string) => {
+      void updateAccountStatus(accountId, "rejected");
+    },
     [updateAccountStatus],
   );
 
   const signOut = useCallback(() => {
-    persistCurrentUser(null);
+    void supabase.auth.signOut();
     setUser(null);
+    setAccounts([]);
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -175,7 +260,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       approvePartner,
       rejectPartner,
     }),
-    [user, ready, accounts, signIn, signUp, signOut, approvePartner, rejectPartner],
+    [
+      user,
+      ready,
+      accounts,
+      signIn,
+      signUp,
+      signOut,
+      approvePartner,
+      rejectPartner,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

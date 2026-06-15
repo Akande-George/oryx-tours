@@ -17,7 +17,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { formatDate, formatPrice } from "@/lib/format";
-import { mockBookings, mockTours } from "@/lib/mock-data";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { useSavedStore } from "@/store/saved-store";
 
 const quickLinks = [
@@ -44,14 +44,15 @@ const quickLinks = [
 export default function CustomerOverviewPage() {
   const { user } = useAuth();
   const savedSlugs = useSavedStore((state) => state.savedSlugs);
+  const { bookings, tours } = useSupabaseCollections();
 
-  const upcoming = mockBookings.filter((b) => b.status === "Upcoming");
-  const completed = mockBookings.filter((b) => b.status === "Completed");
+  const upcoming = bookings.filter((b) => b.status === "Upcoming");
+  const completed = bookings.filter((b) => b.status === "Completed");
   const nextTrip = upcoming[0];
   const totalSpend = completed.reduce((sum, b) => sum + b.price, 0);
 
-  const savedTours = mockTours.filter((tour) => savedSlugs.includes(tour.slug));
-  const recommendations = mockTours
+  const savedTours = tours.filter((tour) => savedSlugs.includes(tour.slug));
+  const recommendations = tours
     .filter((tour) => !savedSlugs.includes(tour.slug))
     .slice(0, 3);
 
@@ -133,8 +134,8 @@ export default function CustomerOverviewPage() {
               {nextTrip.reference}
             </p>
             <p className="text-base text-muted-foreground">
-              We&apos;ll send pre-trip concierge notes seven days before departure.
-              Tap below to review the itinerary.
+              We&apos;ll send pre-trip concierge notes seven days before
+              departure. Tap below to review the itinerary.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link

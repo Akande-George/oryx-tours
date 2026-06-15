@@ -6,7 +6,12 @@ import { BookingSidebar } from "@/components/organisms/BookingSidebar";
 import { OperatorCard } from "@/components/organisms/OperatorCard";
 import { TourDetailsTabs } from "@/components/organisms/TourDetailsTabs";
 import { Badge } from "@/components/atoms";
-import { mockOperators, mockReviews, mockTours } from "@/lib/mock-data";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  getOperatorById,
+  getReviews,
+  getTourBySlug,
+} from "@/lib/supabase/data";
 
 export default async function TourDetailsPage({
   params,
@@ -15,15 +20,19 @@ export default async function TourDetailsPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
+  const supabase = await createSupabaseServerClient();
   const { slug } = await params;
   const { tab } = await searchParams;
-  const tour = mockTours.find((item) => item.slug === slug);
+  const tour = await getTourBySlug(supabase, slug);
 
   if (!tour) {
     notFound();
   }
 
-  const operator = mockOperators.find((item) => item.id === tour.operatorId);
+  const [operator, reviews] = await Promise.all([
+    getOperatorById(supabase, tour.operatorId),
+    getReviews(supabase),
+  ]);
 
   return (
     <div className="py-12">
@@ -86,7 +95,7 @@ export default async function TourDetailsPage({
               description={tour.description}
               highlights={tour.highlights}
               tags={tour.tags}
-              reviews={mockReviews}
+              reviews={reviews}
               defaultTab={
                 tab === "itinerary" || tab === "reviews" ? tab : "overview"
               }

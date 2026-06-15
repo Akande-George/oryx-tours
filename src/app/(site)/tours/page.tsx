@@ -10,9 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockTours } from "@/lib/mock-data";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getTours } from "@/lib/supabase/data";
 
-export default function ToursPage() {
+export default async function ToursPage() {
+  const supabase = await createSupabaseServerClient();
+  const tours = await getTours(supabase);
+
   return (
     <div className="py-12">
       <Container className="space-y-8">
@@ -24,7 +28,7 @@ export default function ToursPage() {
         <FiltersPanel />
         <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            Showing {mockTours.length} curated experiences
+            Showing {tours.length} curated experiences
           </p>
           <Select defaultValue="recommended">
             <SelectTrigger className="w-[200px]">
@@ -39,7 +43,7 @@ export default function ToursPage() {
           </Select>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {mockTours.map((tour) => (
+          {tours.map((tour) => (
             <TourCard key={tour.id} tour={tour} />
           ))}
         </div>

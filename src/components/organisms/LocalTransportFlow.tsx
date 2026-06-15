@@ -14,7 +14,7 @@ import {
 import { VehicleCard } from "@/components/molecules/VehicleCard";
 import { useBookingStore } from "@/store/booking-store";
 import { formatPrice, todayISO } from "@/lib/format";
-import { mockVehicles } from "@/lib/mock-data";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { DurationMode, FleetCategory } from "@/types";
 
 const fleetOrder: FleetCategory[] = ["Economy", "Premium", "VIP"];
@@ -27,6 +27,7 @@ const durationLabel: Record<DayHireDuration, string> = {
 };
 
 export function LocalTransportFlow() {
+  const { vehicles } = useSupabaseCollections();
   const {
     travelDate,
     guests,
@@ -45,14 +46,14 @@ export function LocalTransportFlow() {
   const grouped = useMemo(() => {
     return fleetOrder.map((category) => ({
       category,
-      vehicles: mockVehicles.filter((v) => v.fleetCategory === category),
+      vehicles: vehicles.filter((v) => v.fleetCategory === category),
     }));
-  }, []);
+  }, [vehicles]);
 
   const dayHireMode: DayHireDuration =
     durationMode === "half-day" ? "half-day" : "full-day";
 
-  const selected = mockVehicles.find((v) => v.id === vehicleId) ?? null;
+  const selected = vehicles.find((v) => v.id === vehicleId) ?? null;
   const dateValid = travelDate !== "" && travelDate >= todayISO();
 
   const total = useMemo(() => {
@@ -164,7 +165,7 @@ export function LocalTransportFlow() {
                 <SelectValue placeholder="Select a vehicle for your estimate" />
               </SelectTrigger>
               <SelectContent>
-                {mockVehicles.map((vehicle) => (
+                {vehicles.map((vehicle) => (
                   <SelectItem key={vehicle.id} value={vehicle.id}>
                     {vehicle.name} — {vehicle.fleetCategory} ·{" "}
                     {vehicle.capacity} seats

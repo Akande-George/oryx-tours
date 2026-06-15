@@ -7,17 +7,16 @@ import { TourCard } from "@/components/molecules/TourCard";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatPrice } from "@/lib/format";
-import { mockTours } from "@/lib/mock-data";
 import { useSavedStore } from "@/store/saved-store";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 
 export default function CustomerToursPage() {
   const savedSlugs = useSavedStore((state) => state.savedSlugs);
-  const savedTours = mockTours.filter((tour) =>
-    savedSlugs.includes(tour.slug),
-  );
+  const { tours } = useSupabaseCollections();
+  const savedTours = tours.filter((tour) => savedSlugs.includes(tour.slug));
   const wishlistValue = savedTours.reduce((sum, t) => sum + t.priceFrom, 0);
 
-  const recommendations = mockTours
+  const recommendations = tours
     .filter((tour) => !savedSlugs.includes(tour.slug))
     .slice(0, 3);
 
@@ -58,7 +57,7 @@ export default function CustomerToursPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               Catalog
             </p>
-            <p className="text-2xl font-semibold">{mockTours.length}</p>
+            <p className="text-2xl font-semibold">{tours.length}</p>
             <p className="text-xs text-muted-foreground">
               Curated experiences ready to book
             </p>

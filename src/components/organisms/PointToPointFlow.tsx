@@ -14,7 +14,7 @@ import {
 import { VehicleCard } from "@/components/molecules/VehicleCard";
 import { useBookingStore } from "@/store/booking-store";
 import { formatPrice, todayISO } from "@/lib/format";
-import { mockVehicles } from "@/lib/mock-data";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { FleetCategory } from "@/types";
 
 const fleetOrder: FleetCategory[] = ["Economy", "Premium", "VIP"];
@@ -42,6 +42,7 @@ const locationOptions = [
 ] as const;
 
 export function PointToPointFlow() {
+  const { vehicles } = useSupabaseCollections();
   const {
     travelDate,
     guests,
@@ -60,11 +61,11 @@ export function PointToPointFlow() {
   const grouped = useMemo(() => {
     return fleetOrder.map((category) => ({
       category,
-      vehicles: mockVehicles.filter((v) => v.fleetCategory === category),
+      vehicles: vehicles.filter((v) => v.fleetCategory === category),
     }));
-  }, []);
+  }, [vehicles]);
 
-  const selected = mockVehicles.find((v) => v.id === vehicleId) ?? null;
+  const selected = vehicles.find((v) => v.id === vehicleId) ?? null;
   const dateValid = travelDate !== "" && travelDate >= todayISO();
 
   const activeStops = stops.filter((stop) => stop.trim() !== "");
@@ -120,10 +121,7 @@ export function PointToPointFlow() {
                 const isFirst = index === 0;
                 const canRemove = stops.length > 1;
                 return (
-                  <div
-                    key={index}
-                    className="flex items-start gap-2"
-                  >
+                  <div key={index} className="flex items-start gap-2">
                     <div className="flex-1 space-y-1.5">
                       <p className="text-xs font-medium text-muted-foreground">
                         Stop {index + 1}
@@ -215,7 +213,7 @@ export function PointToPointFlow() {
                 <SelectValue placeholder="Select a vehicle for your estimate" />
               </SelectTrigger>
               <SelectContent>
-                {mockVehicles.map((vehicle) => (
+                {vehicles.map((vehicle) => (
                   <SelectItem key={vehicle.id} value={vehicle.id}>
                     {vehicle.name} — {vehicle.fleetCategory} ·{" "}
                     {vehicle.capacity} seats

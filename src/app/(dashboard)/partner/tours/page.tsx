@@ -14,14 +14,15 @@ import {
 } from "@/components/ui/table";
 import { TourFormDialog } from "@/components/organisms/TourFormDialog";
 import { formatPrice } from "@/lib/format";
-import { mockTours } from "@/lib/mock-data";
 import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { Tour } from "@/types";
 
 export default function PartnerToursPage() {
   const { user } = useAuth();
   const operatorId = user?.operatorId ?? "";
+  const { tours: liveTours } = useSupabaseCollections();
 
   const [tours, setTours] = useState<Tour[]>([]);
   const [query, setQuery] = useState("");
@@ -30,8 +31,9 @@ export default function PartnerToursPage() {
 
   useEffect(() => {
     if (!operatorId) return;
-    setTours(mockTours.filter((tour) => tour.operatorId === operatorId));
-  }, [operatorId]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTours(liveTours.filter((tour) => tour.operatorId === operatorId));
+  }, [operatorId, liveTours]);
 
   const filtered = useMemo(
     () =>

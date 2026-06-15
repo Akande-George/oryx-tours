@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, Pencil, Plus, Search, X } from "lucide-react";
 import { Badge, Button, Input } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
@@ -22,8 +22,8 @@ import {
 } from "@/components/ui/select";
 import { TourFormDialog } from "@/components/organisms/TourFormDialog";
 import { formatPrice } from "@/lib/format";
-import { mockOperators, mockTours } from "@/lib/mock-data";
 import { RouteGuard } from "@/components/providers/RouteGuard";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { Tour, TourCategory } from "@/types";
 
 type ApprovalState = "Awaiting" | "Approved" | "Rejected";
@@ -45,14 +45,15 @@ const categoryOptions: ("All" | TourCategory)[] = [
 ];
 
 export default function AdminToursPage() {
-  const [tours, setTours] = useState<Tour[]>(mockTours);
+  const { operators, tours: liveTours } = useSupabaseCollections();
+  const [tours, setTours] = useState<Tour[]>([]);
   const initial = useMemo<Record<string, ApprovalState>>(() => {
     const seed: Record<string, ApprovalState> = {};
-    mockTours.forEach((tour, idx) => {
+    liveTours.forEach((tour, idx) => {
       seed[tour.id] = idx < 3 ? "Awaiting" : "Approved";
     });
     return seed;
-  }, []);
+  }, [liveTours]);
 
   const [approvals, setApprovals] = useState(initial);
   const [query, setQuery] = useState("");
@@ -60,8 +61,16 @@ export default function AdminToursPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTour, setEditingTour] = useState<Tour | null>(null);
 
+  useEffect(() => {
+    setTours(liveTours);
+  }, [liveTours]);
+
+  useEffect(() => {
+    setApprovals((prev) => (Object.keys(prev).length ? prev : initial));
+  }, [initial]);
+
   const operatorName = (operatorId: string) =>
-    mockOperators.find((op) => op.id === operatorId)?.name ?? "Unknown";
+    operators.find((op) => op.id === operatorId)?.name ?? "Unknown";
 
   const decide = (tourId: string, state: ApprovalState) => {
     setApprovals((prev) => ({ ...prev, [tourId]: state }));
@@ -110,11 +119,7 @@ export default function AdminToursPage() {
             title="Tours"
             subtitle="Review submissions, approve listings, and manage the catalog."
           />
-          <Button
-            type="button"
-            onClick={openAdd}
-            className="rounded-full"
-          >
+          <Button type="button" onClick={openAdd} className="rounded-full">
             <Plus className="size-4" />
             Add tour
           </Button>
@@ -200,7 +205,9 @@ export default function AdminToursPage() {
                         <TableCell>{operatorName(tour.operatorId)}</TableCell>
                         <TableCell>{formatPrice(tour.priceFrom)}</TableCell>
                         <TableCell>
-                          <Badge className={`rounded-full ${approvalBadge[state]}`}>
+                          <Badge
+                            className={`rounded-full ${approvalBadge[state]}`}
+                          >
                             {state}
                           </Badge>
                         </TableCell>

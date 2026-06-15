@@ -11,7 +11,7 @@ import { Badge } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatPrice } from "@/lib/format";
-import { mockBookings, mockOperators, mockTours } from "@/lib/mock-data";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { RouteGuard } from "@/components/providers/RouteGuard";
 
 const quickLinks = [
@@ -36,13 +36,12 @@ const quickLinks = [
 ];
 
 export default function AdminOverviewPage() {
-  const revenue = mockBookings
+  const { bookings, operators } = useSupabaseCollections();
+  const revenue = bookings
     .filter((b) => b.status !== "Cancelled")
     .reduce((sum, b) => sum + b.price, 0);
-  const upcomingCount = mockBookings.filter(
-    (b) => b.status === "Upcoming",
-  ).length;
-  const pendingApprovals = Math.max(2, Math.round(mockTours.length / 3));
+  const upcomingCount = bookings.filter((b) => b.status === "Upcoming").length;
+  const pendingApprovals = 0;
 
   return (
     <RouteGuard allow={["admin"]}>
@@ -60,7 +59,7 @@ export default function AdminOverviewPage() {
               </p>
               <p className="text-2xl font-semibold">{formatPrice(revenue)}</p>
               <p className="text-sm text-muted-foreground">
-                Across {mockBookings.length} bookings on file
+                Across {bookings.length} bookings on file
               </p>
             </CardContent>
           </Card>
@@ -82,7 +81,7 @@ export default function AdminOverviewPage() {
               </p>
               <p className="text-2xl font-semibold">{upcomingCount}</p>
               <p className="text-sm text-muted-foreground">
-                Upcoming across {mockOperators.length} operators
+                Upcoming across {operators.length} operators
               </p>
             </CardContent>
           </Card>

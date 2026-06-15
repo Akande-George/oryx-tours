@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { mockOperators } from "@/lib/mock-data";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { Tour, TourCategory } from "@/types";
 
 const tourCategories: TourCategory[] = [
@@ -52,7 +52,7 @@ const slugify = (input: string) =>
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
 
-const emptyTour = (): Tour => ({
+const emptyTour = (operatorId = ""): Tour => ({
   id: `tour-${Date.now()}`,
   slug: "",
   title: "",
@@ -73,7 +73,7 @@ const emptyTour = (): Tour => ({
   gallery: [],
   images: [],
   tags: [],
-  operatorId: mockOperators[0]?.id ?? "",
+  operatorId,
 });
 
 type TourFormDialogProps = {
@@ -90,19 +90,25 @@ export function TourFormDialog({
   onSubmit,
 }: TourFormDialogProps) {
   const mode = initialTour ? "edit" : "add";
-  const [form, setForm] = useState<Tour>(() => initialTour ?? emptyTour());
+  const { operators } = useSupabaseCollections();
+  const [form, setForm] = useState<Tour>(
+    () => initialTour ?? emptyTour(operators[0]?.id ?? ""),
+  );
   const [slugLocked, setSlugLocked] = useState<boolean>(Boolean(initialTour));
   const [errors, setErrors] = useState<Partial<Record<keyof Tour, string>>>({});
 
   useEffect(() => {
     if (open) {
-      setForm(initialTour ? { ...initialTour } : emptyTour());
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setForm(
+        initialTour ? { ...initialTour } : emptyTour(operators[0]?.id ?? ""),
+      );
       setSlugLocked(Boolean(initialTour));
       setErrors({});
     }
-  }, [open, initialTour]);
+  }, [open, initialTour, operators]);
 
-  const operatorOptions = useMemo(() => mockOperators, []);
+  const operatorOptions = useMemo(() => operators, [operators]);
 
   const update = <K extends keyof Tour>(key: K, value: Tour[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -126,11 +132,9 @@ export function TourFormDialog({
     if (!form.description.trim()) next.description = "Description is required";
     if (form.durationDays < 1) next.durationDays = "Must be at least 1 day";
     if (form.priceFrom < 0) next.priceFrom = "Price must be ≥ 0";
-    if (form.rating < 0 || form.rating > 5)
-      next.rating = "Rating must be 0–5";
+    if (form.rating < 0 || form.rating > 5) next.rating = "Rating must be 0–5";
     if (!form.operatorId) next.operatorId = "Operator is required";
-    if (form.images.length < 4)
-      next.images = "Add at least 4 image URLs";
+    if (form.images.length < 4) next.images = "Add at least 4 image URLs";
     if (!form.videoUrl?.trim()) next.videoUrl = "Video link is required";
     return next;
   };
@@ -309,7 +313,10 @@ export function TourFormDialog({
                   step={50}
                   value={form.priceFrom}
                   onChange={(e) =>
-                    update("priceFrom", Math.max(0, Number(e.target.value) || 0))
+                    update(
+                      "priceFrom",
+                      Math.max(0, Number(e.target.value) || 0),
+                    )
                   }
                 />
               </Field>
@@ -478,11 +485,7 @@ export function TourFormDialog({
           >
             Cancel
           </Button>
-          <Button
-            type="button"
-            onClick={handleSave}
-            className="rounded-full"
-          >
+          <Button type="button" onClick={handleSave} className="rounded-full">
             {mode === "edit" ? "Save changes" : "Create tour"}
           </Button>
         </DialogFooter>
@@ -598,9 +601,7 @@ function ListEditor({
               <span className="min-w-0 break-words">{item}</span>
               <button
                 type="button"
-                onClick={() =>
-                  onChange(value.filter((_, i) => i !== idx))
-                }
+                onClick={() => onChange(value.filter((_, i) => i !== idx))}
                 className="shrink-0 text-muted-foreground transition-colors hover:text-destructive"
                 aria-label="Remove item"
               >

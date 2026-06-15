@@ -15,7 +15,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { BookingDetailsDialog } from "@/components/organisms/BookingDetailsDialog";
 import { formatPrice, formatDate } from "@/lib/format";
-import { mockBookings } from "@/lib/mock-data";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { Booking, BookingStatus } from "@/types";
 
 const paymentStatus: Record<BookingStatus, { label: string; tone: string }> = {
@@ -26,9 +26,10 @@ const paymentStatus: Record<BookingStatus, { label: string; tone: string }> = {
 
 export default function CustomerSpendingPage() {
   const [selected, setSelected] = useState<Booking | null>(null);
+  const { bookings } = useSupabaseCollections();
 
-  const completed = mockBookings.filter((b) => b.status === "Completed");
-  const upcoming = mockBookings.filter((b) => b.status === "Upcoming");
+  const completed = bookings.filter((b) => b.status === "Completed");
+  const upcoming = bookings.filter((b) => b.status === "Upcoming");
   const lifetime = completed.reduce((sum, b) => sum + b.price, 0);
   const pending = upcoming.reduce((sum, b) => sum + b.price * 0.3, 0);
   const avgPerTrip =
@@ -37,7 +38,7 @@ export default function CustomerSpendingPage() {
     b.date.localeCompare(a.date),
   )[0];
 
-  const sortedBookings = [...mockBookings].sort((a, b) =>
+  const sortedBookings = [...bookings].sort((a, b) =>
     b.date.localeCompare(a.date),
   );
 

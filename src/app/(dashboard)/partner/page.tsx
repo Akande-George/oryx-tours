@@ -9,28 +9,29 @@ import { buttonVariants } from "@/components/ui/button";
 import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { formatPrice } from "@/lib/format";
-import { mockBookings, mockTours, mockVehicles } from "@/lib/mock-data";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 
 export default function PartnerOverviewPage() {
   const { user } = useAuth();
   const operatorId = user?.operatorId ?? "";
+  const { bookings, tours, vehicles } = useSupabaseCollections();
 
   const myTours = useMemo(
-    () => mockTours.filter((tour) => tour.operatorId === operatorId),
-    [operatorId],
+    () => tours.filter((tour) => tour.operatorId === operatorId),
+    [operatorId, tours],
   );
 
   const myVehicles = useMemo(
-    () => mockVehicles.filter((vehicle) => vehicle.operatorId === operatorId),
-    [operatorId],
+    () => vehicles.filter((vehicle) => vehicle.operatorId === operatorId),
+    [operatorId, vehicles],
   );
 
   const myBookings = useMemo(
     () =>
-      mockBookings.filter((booking) =>
+      bookings.filter((booking) =>
         myTours.some((tour) => tour.id === booking.tourId),
       ),
-    [myTours],
+    [bookings, myTours],
   );
 
   const earnings = myBookings

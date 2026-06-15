@@ -75,6 +75,7 @@ export function VehicleFormDialog({
 
   useEffect(() => {
     if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setForm(
         initialVehicle
           ? { ...initialVehicle }
@@ -151,10 +152,7 @@ export function VehicleFormDialog({
                 <Select
                   value={form.fleetCategory}
                   onValueChange={(v) =>
-                    update(
-                      "fleetCategory",
-                      (v ?? "Economy") as FleetCategory,
-                    )
+                    update("fleetCategory", (v ?? "Economy") as FleetCategory)
                   }
                 >
                   <SelectTrigger className="h-9 w-full">
@@ -169,16 +167,17 @@ export function VehicleFormDialog({
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="Capacity (passengers)" error={errors.capacity} required>
+              <Field
+                label="Capacity (passengers)"
+                error={errors.capacity}
+                required
+              >
                 <Input
                   type="number"
                   min={1}
                   value={form.capacity}
                   onChange={(e) =>
-                    update(
-                      "capacity",
-                      Math.max(1, Number(e.target.value) || 1),
-                    )
+                    update("capacity", Math.max(1, Number(e.target.value) || 1))
                   }
                 />
               </Field>
@@ -280,11 +279,7 @@ export function VehicleFormDialog({
             title="Photos"
             description="Add at least one photo URL. The first image becomes the card cover."
           >
-            <Field
-              label="Vehicle photos (URLs)"
-              error={errors.images}
-              required
-            >
+            <Field label="Vehicle photos (URLs)" error={errors.images} required>
               <ListEditor
                 value={form.images}
                 onChange={(v) => update("images", v)}
