@@ -1,3 +1,5 @@
+"use client";
+
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import {
   Table,
