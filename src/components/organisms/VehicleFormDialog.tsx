@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { ImageUploader } from "@/components/atoms/ImageUploader";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { FleetCategory, Vehicle } from "@/types";
 
 const fleetCategories: FleetCategory[] = ["Economy", "Premium", "VIP"];
@@ -34,7 +36,7 @@ const gradientPresets = [
 ];
 
 const emptyVehicle = (operatorId = ""): Vehicle => ({
-  id: `vehicle-${Date.now()}`,
+  id: crypto.randomUUID(),
   name: "",
   fleetCategory: "Economy",
   capacity: 4,
@@ -66,8 +68,10 @@ export function VehicleFormDialog({
   defaultOperatorId = "",
 }: VehicleFormDialogProps) {
   const mode = initialVehicle ? "edit" : "add";
+  const { operators } = useSupabaseCollections();
+  const fallbackOperatorId = defaultOperatorId || operators[0]?.id || "";
   const [form, setForm] = useState<Vehicle>(
-    () => initialVehicle ?? emptyVehicle(defaultOperatorId),
+    () => initialVehicle ?? emptyVehicle(fallbackOperatorId),
   );
   const [errors, setErrors] = useState<Partial<Record<keyof Vehicle, string>>>(
     {},
@@ -79,11 +83,11 @@ export function VehicleFormDialog({
       setForm(
         initialVehicle
           ? { ...initialVehicle }
-          : emptyVehicle(defaultOperatorId),
+          : emptyVehicle(fallbackOperatorId),
       );
       setErrors({});
     }
-  }, [open, initialVehicle, defaultOperatorId]);
+  }, [open, initialVehicle, fallbackOperatorId]);
 
   const update = <K extends keyof Vehicle>(key: K, value: Vehicle[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -100,11 +104,13 @@ export function VehicleFormDialog({
     if (form.extraHourPrice < 0) next.extraHourPrice = "Must be ≥ 0";
     if (form.transferPrice < 0) next.transferPrice = "Must be ≥ 0";
     if (!form.images.length) next.images = "Add at least one vehicle photo URL";
+    if (!form.operatorId) next.operatorId = "Operator is required";
     return next;
   };
 
   const handleSave = () => {
     const validation = validate();
+    console.log("[vehicle-form] save clicked", { form, validation });
     if (Object.keys(validation).length) {
       setErrors(validation);
       return;
@@ -187,6 +193,35 @@ export function VehicleFormDialog({
                   onChange={(e) => update("luggage", e.target.value)}
                   placeholder="3 large suitcases"
                 />
+              </Field>
+              <Field
+                label="Operator"
+                error={errors.operatorId}
+                required
+                className="md:col-span-2"
+              >
+                <Select
+                  value={form.operatorId}
+                  onValueChange={(v) => update("operatorId", v ?? "")}
+                  disabled={!operators.length}
+                >
+                  <SelectTrigger className="h-9 w-full">
+                    <SelectValue
+                      placeholder={
+                        operators.length
+                          ? "Pick an operator"
+                          : "No operators in DB — add one first"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {operators.map((op) => (
+                      <SelectItem key={op.id} value={op.id}>
+                        {op.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </Field>
             </div>
           </FormSection>
@@ -277,13 +312,15 @@ export function VehicleFormDialog({
 
           <FormSection
             title="Photos"
-            description="Add at least one photo URL. The first image becomes the card cover."
+            description="Add at least one photo. The first image becomes the card cover."
           >
-            <Field label="Vehicle photos (URLs)" error={errors.images} required>
-              <ListEditor
+            <Field label="Vehicle photos" error={errors.images} required>
+              <ImageUploader
                 value={form.images}
-                onChange={(v) => update("images", v)}
-                placeholder="https://images.unsplash.com/photo-..."
+                onChange={(urls) => update("images", urls)}
+                folder="vehicles"
+                maxFiles={6}
+                label="Vehicle photos"
               />
             </Field>
           </FormSection>

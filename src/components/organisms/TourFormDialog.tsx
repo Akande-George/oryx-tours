@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
+import { ImageUploader } from "@/components/atoms/ImageUploader";
 import type { Tour, TourCategory } from "@/types";
 
 const tourCategories: TourCategory[] = [
@@ -53,7 +54,7 @@ const slugify = (input: string) =>
     .replace(/-+/g, "-");
 
 const emptyTour = (operatorId = ""): Tour => ({
-  id: `tour-${Date.now()}`,
+  id: crypto.randomUUID(),
   slug: "",
   title: "",
   location: "",
@@ -141,6 +142,7 @@ export function TourFormDialog({
 
   const handleSave = () => {
     const validation = validate();
+    console.log("[tour-form] save clicked", { form, validation });
     if (Object.keys(validation).length) {
       setErrors(validation);
       return;
@@ -416,15 +418,17 @@ export function TourFormDialog({
           >
             <div className="space-y-5">
               <Field
-                label="Tour photos (URLs)"
+                label="Tour photos"
                 error={errors.images}
                 required
                 description="Add at least 4 photos. First image is the card cover and the rest fill the detail page gallery."
               >
-                <ListEditor
+                <ImageUploader
                   value={form.images}
-                  onChange={(v) => update("images", v)}
-                  placeholder="https://images.unsplash.com/photo-..."
+                  onChange={(urls) => update("images", urls)}
+                  folder="tours"
+                  maxFiles={12}
+                  label="Tour photos"
                 />
               </Field>
               <Field

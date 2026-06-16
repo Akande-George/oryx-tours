@@ -17,6 +17,8 @@ import { formatPrice } from "@/lib/format";
 import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { deleteTour, upsertTour } from "@/lib/supabase/data";
 import type { Tour } from "@/types";
 
 export default function PartnerToursPage() {
@@ -52,18 +54,30 @@ export default function PartnerToursPage() {
     setDialogOpen(true);
   };
 
-  const handleSubmit = (tour: Tour) => {
+  const handleSubmit = async (tour: Tour) => {
     const scoped: Tour = { ...tour, operatorId };
-    setTours((prev) => {
-      const exists = prev.some((t) => t.id === scoped.id);
-      return exists
-        ? prev.map((t) => (t.id === scoped.id ? scoped : t))
-        : [scoped, ...prev];
-    });
+    console.log("[partner/tours] handleSubmit", { scoped, operatorId });
+    try {
+      const saved = await upsertTour(createSupabaseBrowserClient(), scoped);
+      setTours((prev) => {
+        const exists = prev.some((t) => t.id === saved.id);
+        return exists
+          ? prev.map((t) => (t.id === saved.id ? saved : t))
+          : [saved, ...prev];
+      });
+    } catch (e) {
+      window.alert((e as Error).message);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    setTours((prev) => prev.filter((tour) => tour.id !== id));
+  const handleDelete = async (id: string) => {
+    console.log("[partner/tours] handleDelete", id);
+    try {
+      await deleteTour(createSupabaseBrowserClient(), id);
+      setTours((prev) => prev.filter((tour) => tour.id !== id));
+    } catch (e) {
+      window.alert((e as Error).message);
+    }
   };
 
   return (

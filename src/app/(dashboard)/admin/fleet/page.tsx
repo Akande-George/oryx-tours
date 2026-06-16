@@ -24,7 +24,7 @@ import { VehicleFormDialog } from "@/components/organisms/VehicleFormDialog";
 import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { deleteVehicle } from "@/lib/supabase/data";
+import { deleteVehicle, upsertVehicle } from "@/lib/supabase/data";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { FleetCategory, Vehicle } from "@/types";
@@ -64,16 +64,23 @@ export default function AdminFleetPage() {
     setDialogOpen(true);
   };
 
-  const handleSubmit = (vehicle: Vehicle) => {
-    setVehicles((prev) => {
-      const exists = prev.some((v) => v.id === vehicle.id);
-      return exists
-        ? prev.map((v) => (v.id === vehicle.id ? vehicle : v))
-        : [vehicle, ...prev];
-    });
+  const handleSubmit = async (vehicle: Vehicle) => {
+    console.log("[admin/fleet] handleSubmit", vehicle);
+    try {
+      const saved = await upsertVehicle(createSupabaseBrowserClient(), vehicle);
+      setVehicles((prev) => {
+        const exists = prev.some((v) => v.id === saved.id);
+        return exists
+          ? prev.map((v) => (v.id === saved.id ? saved : v))
+          : [saved, ...prev];
+      });
+    } catch (e) {
+      window.alert((e as Error).message);
+    }
   };
 
   const handleDelete = async (id: string) => {
+    console.log("[admin/fleet] handleDelete", id);
     const ok = await deleteVehicle(createSupabaseBrowserClient(), id);
     if (ok) setVehicles((prev) => prev.filter((v) => v.id !== id));
   };

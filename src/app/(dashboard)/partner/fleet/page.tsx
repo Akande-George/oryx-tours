@@ -24,7 +24,7 @@ import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import { deleteVehicle } from "@/lib/supabase/data";
+import { deleteVehicle, upsertVehicle } from "@/lib/supabase/data";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { FleetCategory, Vehicle } from "@/types";
@@ -70,17 +70,24 @@ export default function PartnerFleetPage() {
     setDialogOpen(true);
   };
 
-  const handleSubmit = (vehicle: Vehicle) => {
+  const handleSubmit = async (vehicle: Vehicle) => {
     const scoped: Vehicle = { ...vehicle, operatorId };
-    setVehicles((prev) => {
-      const exists = prev.some((v) => v.id === scoped.id);
-      return exists
-        ? prev.map((v) => (v.id === scoped.id ? scoped : v))
-        : [scoped, ...prev];
-    });
+    console.log("[partner/fleet] handleSubmit", { scoped, operatorId });
+    try {
+      const saved = await upsertVehicle(createSupabaseBrowserClient(), scoped);
+      setVehicles((prev) => {
+        const exists = prev.some((v) => v.id === saved.id);
+        return exists
+          ? prev.map((v) => (v.id === saved.id ? saved : v))
+          : [saved, ...prev];
+      });
+    } catch (e) {
+      window.alert((e as Error).message);
+    }
   };
 
   const handleDelete = async (id: string) => {
+    console.log("[partner/fleet] handleDelete", id);
     const ok = await deleteVehicle(createSupabaseBrowserClient(), id);
     if (ok) setVehicles((prev) => prev.filter((v) => v.id !== id));
   };

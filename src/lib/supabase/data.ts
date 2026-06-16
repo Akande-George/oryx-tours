@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AuthProfile, AccountStatus } from "@/lib/auth";
 import type {
   Booking,
+  BookingStatus,
   Destination,
   Operator,
   Review,
@@ -79,6 +80,26 @@ export const updateProfileStatus = async (
   }
 
   return !error;
+};
+
+export const updateProfile = async (
+  client: SupabaseClient,
+  id: string,
+  patch: Partial<Pick<AuthProfile, "name" | "companyName">>,
+) => {
+  const { data, error } = await client
+    .from("profiles")
+    .update(patch)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(`Failed to update profile ${id}`, error);
+    throw new Error(formatSupabaseError("Failed to update profile", error));
+  }
+
+  return data as AuthProfile;
 };
 
 export const getTourBySlug = async (client: SupabaseClient, slug: string) => {
@@ -169,4 +190,93 @@ export const deleteVehicle = async (client: SupabaseClient, id: string) => {
   }
 
   return !error;
+};
+
+const formatSupabaseError = (
+  label: string,
+  err: { message?: string; details?: string; hint?: string; code?: string },
+) => {
+  const parts = [err.message, err.details, err.hint].filter(Boolean);
+  const summary = parts.length ? parts.join(" — ") : "Unknown error";
+  return `${label}: ${summary}${err.code ? ` (code ${err.code})` : ""}`;
+};
+
+const upsertRow = async <T extends { id: string }>(
+  client: SupabaseClient,
+  table: string,
+  row: T,
+  label: string,
+): Promise<T> => {
+  console.log(`[supabase] upsert ${label}`, row);
+  const { data, error } = await client
+    .from(table)
+    .upsert(row)
+    .select()
+    .single();
+
+  console.log(`[supabase] upsert ${label} result`, { data, error });
+
+  if (error) {
+    console.error(`Failed to upsert ${label} ${row.id}`, error);
+    throw new Error(formatSupabaseError(`Failed to save ${label}`, error));
+  }
+
+  return data as T;
+};
+
+const deleteRow = async (
+  client: SupabaseClient,
+  table: string,
+  id: string,
+  label: string,
+) => {
+  const { error } = await client.from(table).delete().eq("id", id);
+
+  if (error) {
+    console.error(`Failed to delete ${label} ${id}`, error);
+    throw new Error(formatSupabaseError(`Failed to delete ${label}`, error));
+  }
+};
+
+export const upsertTour = (client: SupabaseClient, tour: Tour) =>
+  upsertRow<Tour>(client, "tours", tour, "tour");
+
+export const deleteTour = (client: SupabaseClient, id: string) =>
+  deleteRow(client, "tours", id, "tour");
+
+export const upsertVehicle = (client: SupabaseClient, vehicle: Vehicle) =>
+  upsertRow<Vehicle>(client, "vehicles", vehicle, "vehicle");
+
+export const createBooking = async (
+  client: SupabaseClient,
+  booking: Booking,
+) => {
+  const { data, error } = await client
+    .from("bookings")
+    .insert(booking)
+    .select()
+    .single();
+
+  if (error) {
+    console.error(`Failed to create booking`, error);
+    throw new Error(formatSupabaseError("Failed to create booking", error));
+  }
+
+  return data as Booking;
+};
+
+export const updateBookingStatus = async (
+  client: SupabaseClient,
+  id: string,
+  status: BookingStatus,
+) => {
+  const { error } = await client
+    .from("bookings")
+    .update({ status })
+    .eq("id", id);
+
+  if (error) {
+    console.error(`Failed to update booking ${id}`, error);
+    throw new Error(formatSupabaseError("Failed to update booking", error));
+  }
 };

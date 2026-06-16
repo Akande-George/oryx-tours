@@ -1,6 +1,9 @@
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
+import { BookingFlow } from "@/components/organisms/BookingFlow";
 import { BookingHub } from "@/components/organisms/BookingHub";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getTourBySlug } from "@/lib/supabase/data";
 import type { ServiceType } from "@/types";
 
 const isServiceType = (value: string | undefined): value is ServiceType =>
@@ -9,9 +12,28 @@ const isServiceType = (value: string | undefined): value is ServiceType =>
 export default async function BookingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string }>;
+  searchParams: Promise<{ type?: string; tour?: string }>;
 }) {
-  const { type } = await searchParams;
+  const { type, tour: tourSlug } = await searchParams;
+
+  if (tourSlug) {
+    const supabase = await createSupabaseServerClient();
+    const tour = await getTourBySlug(supabase, tourSlug);
+    if (tour) {
+      return (
+        <div className="py-12">
+          <Container className="space-y-8">
+            <SectionHeading
+              title={`Book ${tour.title}`}
+              subtitle={`${tour.location} · ${tour.durationDays} days · ${tour.groupSize}`}
+            />
+            <BookingFlow tour={tour} />
+          </Container>
+        </div>
+      );
+    }
+  }
+
   const initialType: ServiceType = isServiceType(type) ? type : "airport";
 
   return (

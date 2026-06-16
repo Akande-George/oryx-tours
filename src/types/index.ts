@@ -80,6 +80,8 @@ export type AirportDirection = "pickup" | "dropoff";
 
 export type BookingStatus = "Upcoming" | "Completed" | "Cancelled";
 
+export type PaymentStatus = "pending" | "paid" | "failed";
+
 export type Booking = {
   id: string;
   tourId: string;
@@ -90,6 +92,10 @@ export type Booking = {
   price: number;
   reference: string;
   gradient: string;
+  customerId?: string;
+  paymentId?: string;
+  paymentStatus?: PaymentStatus;
+  paidAmount?: number;
 };
 
 export type Review = {

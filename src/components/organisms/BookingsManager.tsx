@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActionButton } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { BookingCard } from "@/components/molecules/BookingCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookingDetailsDialog } from "@/components/organisms/BookingDetailsDialog";
-import type { Booking } from "@/types";
+import type { Booking, BookingStatus } from "@/types";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 type BookingsManagerProps = {
   title: string;
@@ -22,7 +23,27 @@ const tabDefinitions = [
 
 export function BookingsManager({ title, subtitle }: BookingsManagerProps) {
   const [selected, setSelected] = useState<Booking | null>(null);
-  const { bookings } = useSupabaseCollections();
+  const { user } = useAuth();
+  const { bookings: liveBookings } = useSupabaseCollections();
+  const myBookings = useMemo(
+    () =>
+      user ? liveBookings.filter((b) => b.customerId === user.id) : [],
+    [liveBookings, user],
+  );
+  const [bookings, setBookings] = useState<Booking[]>([]);
+
+  useEffect(() => {
+    setBookings(myBookings);
+  }, [myBookings]);
+
+  const handleStatusChange = (id: string, status: BookingStatus) => {
+    setBookings((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, status } : b)),
+    );
+    setSelected((current) =>
+      current && current.id === id ? { ...current, status } : current,
+    );
+  };
 
   return (
     <div className="space-y-8">
@@ -80,6 +101,8 @@ export function BookingsManager({ title, subtitle }: BookingsManagerProps) {
         onOpenChange={(open) => {
           if (!open) setSelected(null);
         }}
+        cancellable
+        onStatusChange={handleStatusChange}
       />
     </div>
   );

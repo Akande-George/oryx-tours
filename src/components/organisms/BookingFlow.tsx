@@ -1,24 +1,25 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button, Input } from "@/components/atoms";
 import { Textarea } from "@/components/ui/textarea";
 import { ProgressSteps } from "@/components/organisms/ProgressSteps";
 import { useBookingStore } from "@/store/booking-store";
-import { formatDate, todayISO } from "@/lib/format";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { formatDate, formatPrice, todayISO } from "@/lib/format";
+import type { Tour } from "@/types";
 
 const steps = ["Select dates", "Traveler details", "Review booking"];
 
 type BookingFlowProps = {
-  tourTitle?: string;
-  tourLocation?: string;
-  priceFrom?: string;
+  tour: Tour;
 };
 
-export function BookingFlow({
-  tourTitle,
-  tourLocation,
-  priceFrom,
-}: BookingFlowProps) {
+export function BookingFlow({ tour }: BookingFlowProps) {
+  const router = useRouter();
+  const { user } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
   const {
     step,
     travelDate,
@@ -33,11 +34,8 @@ export function BookingFlow({
     setNotes,
     nextStep,
     previousStep,
+    reset,
   } = useBookingStore();
-
-  const handleSaveDraft = () => {
-    window.alert("Draft saved to your travel lounge.");
-  };
 
   const dateValid = travelDate !== "" && travelDate >= todayISO();
   const guestsValid = guests >= 1;
@@ -47,6 +45,46 @@ export function BookingFlow({
     (step === 1 && dateValid && guestsValid) ||
     (step === 2 && locationValid) ||
     step === 3;
+
+  const totalPrice = tour.priceFrom * guests;
+
+  const handleConfirm = async () => {
+    if (!user) {
+      router.push(
+        `/sign-in?redirect=${encodeURIComponent(`/booking?tour=${tour.slug}`)}`,
+      );
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/payments/myfatoorah/initiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tourId: tour.id,
+          date: travelDate,
+          guests,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.paymentUrl) {
+        throw new Error(json.error ?? "Could not start payment");
+      }
+      reset();
+      window.location.href = json.paymentUrl;
+    } catch (e) {
+      window.alert((e as Error).message);
+      setSubmitting(false);
+    }
+  };
+
+  const handlePrimary = () => {
+    if (step === 3) {
+      void handleConfirm();
+    } else {
+      nextStep();
+    }
+  };
 
   return (
     <div className="space-y-6 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)] backdrop-blur">
@@ -124,19 +162,13 @@ export function BookingFlow({
       )}
       {step === 3 && (
         <div className="space-y-3 text-sm text-muted-foreground">
-          <p>
-            Review your itinerary details and confirm your booking with a 30%
-            deposit. A dedicated concierge will follow up within 1 hour.
-          </p>
-          <div className="rounded-xl border border-border bg-muted/40 p-4">
+          <p>Review your itinerary details before confirming.</p>
+          <div className="space-y-1 rounded-xl border border-border bg-muted/40 p-4">
             <p className="font-semibold text-foreground">Booking summary</p>
-            {tourTitle ? (
-              <p>
-                Tour: {tourTitle}
-                {tourLocation ? ` · ${tourLocation}` : ""}
-              </p>
-            ) : null}
-            {priceFrom ? <p>From: {priceFrom}</p> : null}
+            <p>
+              Tour: {tour.title} · {tour.location}
+            </p>
+            <p>From: {formatPrice(tour.priceFrom)} per guest</p>
             <p>
               Departure: {travelDate ? formatDate(travelDate) : "Not selected"}
             </p>
@@ -144,21 +176,27 @@ export function BookingFlow({
             <p>Pick-up: {pickup || "Not specified"}</p>
             <p>Drop-off: {dropoff || "Not specified"}</p>
             <p>Notes: {notes || "None"}</p>
+            <p className="pt-2 font-semibold text-foreground">
+              Total: {formatPrice(totalPrice)}
+            </p>
           </div>
         </div>
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button variant="outline" onClick={previousStep} disabled={step === 1}>
+        <Button
+          variant="outline"
+          onClick={previousStep}
+          disabled={step === 1 || submitting}
+        >
           Back
         </Button>
-        <div className="flex gap-2">
-          <Button variant="ghost" onClick={handleSaveDraft}>
-            Save as draft
-          </Button>
-          <Button onClick={nextStep} disabled={!canAdvance}>
-            {step === 3 ? "Confirm booking" : "Continue"}
-          </Button>
-        </div>
+        <Button onClick={handlePrimary} disabled={!canAdvance || submitting}>
+          {step === 3
+            ? submitting
+              ? "Confirming…"
+              : "Confirm booking"
+            : "Continue"}
+        </Button>
       </div>
     </div>
   );

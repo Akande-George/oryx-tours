@@ -16,22 +16,25 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BookingDetailsDialog } from "@/components/organisms/BookingDetailsDialog";
 import { formatPrice, formatDate } from "@/lib/format";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
+import { useAuth } from "@/components/providers/AuthProvider";
 import type { Booking, BookingStatus } from "@/types";
 
-const paymentStatus: Record<BookingStatus, { label: string; tone: string }> = {
-  Upcoming: { label: "Deposit paid", tone: "bg-amber-100 text-amber-800" },
-  Completed: { label: "Paid", tone: "bg-emerald-100 text-emerald-800" },
-  Cancelled: { label: "Refunded", tone: "bg-slate-100 text-slate-700" },
+const statusTone: Record<BookingStatus, string> = {
+  Upcoming: "bg-amber-100 text-amber-800",
+  Completed: "bg-emerald-100 text-emerald-800",
+  Cancelled: "bg-slate-100 text-slate-700",
 };
 
 export default function CustomerSpendingPage() {
   const [selected, setSelected] = useState<Booking | null>(null);
-  const { bookings } = useSupabaseCollections();
+  const { user } = useAuth();
+  const { bookings: allBookings } = useSupabaseCollections();
+  const bookings = user
+    ? allBookings.filter((b) => b.customerId === user.id)
+    : [];
 
   const completed = bookings.filter((b) => b.status === "Completed");
-  const upcoming = bookings.filter((b) => b.status === "Upcoming");
   const lifetime = completed.reduce((sum, b) => sum + b.price, 0);
-  const pending = upcoming.reduce((sum, b) => sum + b.price * 0.3, 0);
   const avgPerTrip =
     completed.length === 0 ? 0 : Math.round(lifetime / completed.length);
   const lastPayment = [...completed].sort((a, b) =>
@@ -49,7 +52,7 @@ export default function CustomerSpendingPage() {
         subtitle="A full record of payments, deposits, and receipts."
       />
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-3">
         <Card className="border-white/60 bg-white/80 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.35)]">
           <CardContent className="space-y-1 p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -58,17 +61,6 @@ export default function CustomerSpendingPage() {
             <p className="text-2xl font-semibold">{formatPrice(lifetime)}</p>
             <p className="text-xs text-muted-foreground">
               From {completed.length} completed trips
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-white/60 bg-white/80 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.35)]">
-          <CardContent className="space-y-1 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              Outstanding
-            </p>
-            <p className="text-2xl font-semibold">{formatPrice(pending)}</p>
-            <p className="text-xs text-muted-foreground">
-              30% deposits on {upcoming.length} upcoming
             </p>
           </CardContent>
         </Card>
@@ -128,30 +120,29 @@ export default function CustomerSpendingPage() {
             </TableHeader>
             <TableBody>
               {sortedBookings.length ? (
-                sortedBookings.map((booking) => {
-                  const status = paymentStatus[booking.status];
-                  return (
-                    <TableRow
-                      key={booking.id}
-                      className="cursor-pointer hover:bg-muted/40"
-                      onClick={() => setSelected(booking)}
-                    >
-                      <TableCell>{formatDate(booking.date)}</TableCell>
-                      <TableCell>{booking.tourTitle}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {booking.reference}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={`rounded-full ${status.tone}`}>
-                          {status.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {formatPrice(booking.price)}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
+                sortedBookings.map((booking) => (
+                  <TableRow
+                    key={booking.id}
+                    className="cursor-pointer hover:bg-muted/40"
+                    onClick={() => setSelected(booking)}
+                  >
+                    <TableCell>{formatDate(booking.date)}</TableCell>
+                    <TableCell>{booking.tourTitle}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {booking.reference}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        className={`rounded-full ${statusTone[booking.status]}`}
+                      >
+                        {booking.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right font-medium">
+                      {formatPrice(booking.price)}
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : (
                 <TableRow>
                   <TableCell

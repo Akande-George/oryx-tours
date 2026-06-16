@@ -13,6 +13,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
   getProfileById,
   getProfiles,
+  updateProfile,
   updateProfileStatus,
 } from "@/lib/supabase/data";
 import type { AuthProfile, AuthUser, UserRole } from "@/lib/auth";
@@ -30,6 +31,8 @@ export type SignUpResult =
   | { kind: "signed-in"; user: AuthUser }
   | { kind: "pending"; account: AuthProfile };
 
+type ProfilePatch = Partial<Pick<AuthProfile, "name" | "companyName">>;
+
 type AuthContextValue = {
   user: AuthUser | null;
   ready: boolean;
@@ -39,6 +42,7 @@ type AuthContextValue = {
   signOut: () => void;
   approvePartner: (accountId: string) => void;
   rejectPartner: (accountId: string) => void;
+  updateMyProfile: (patch: ProfilePatch) => Promise<AuthUser>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -249,6 +253,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAccounts([]);
   }, []);
 
+  const updateMyProfile = useCallback(
+    async (patch: ProfilePatch) => {
+      if (!user) throw new Error("Not signed in");
+      const updated = await updateProfile(supabase, user.id, patch);
+      const nextUser = toAuthUser(updated);
+      setUser(nextUser);
+      setAccounts((prev) =>
+        prev.length
+          ? prev.map((p) => (p.id === updated.id ? updated : p))
+          : [updated],
+      );
+      return nextUser;
+    },
+    [user],
+  );
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -259,6 +279,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       approvePartner,
       rejectPartner,
+      updateMyProfile,
     }),
     [
       user,
@@ -269,6 +290,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       approvePartner,
       rejectPartner,
+      updateMyProfile,
     ],
   );
 

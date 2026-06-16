@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { Badge, Input } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
@@ -20,6 +20,8 @@ import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { Booking, BookingStatus } from "@/types";
 
+
+
 const tabs: { value: "all" | Lowercase<BookingStatus>; label: string }[] = [
   { value: "all", label: "All" },
   { value: "upcoming", label: "Upcoming" },
@@ -36,7 +38,21 @@ const statusStyles: Record<BookingStatus, string> = {
 export default function AdminBookingsPage() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Booking | null>(null);
-  const { bookings } = useSupabaseCollections();
+  const { bookings: liveBookings } = useSupabaseCollections();
+  const [bookings, setBookings] = useState<Booking[]>([]);
+
+  useEffect(() => {
+    setBookings(liveBookings);
+  }, [liveBookings]);
+
+  const handleStatusChange = (id: string, status: BookingStatus) => {
+    setBookings((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, status } : b)),
+    );
+    setSelected((current) =>
+      current && current.id === id ? { ...current, status } : current,
+    );
+  };
 
   const totalValue = bookings
     .filter((b) => b.status !== "Cancelled")
@@ -200,6 +216,8 @@ export default function AdminBookingsPage() {
           onOpenChange={(open) => {
             if (!open) setSelected(null);
           }}
+          editable
+          onStatusChange={handleStatusChange}
         />
       </div>
     </RouteGuard>

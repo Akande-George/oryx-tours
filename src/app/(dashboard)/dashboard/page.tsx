@@ -44,7 +44,10 @@ const quickLinks = [
 export default function CustomerOverviewPage() {
   const { user } = useAuth();
   const savedSlugs = useSavedStore((state) => state.savedSlugs);
-  const { bookings, tours } = useSupabaseCollections();
+  const { bookings: allBookings, tours } = useSupabaseCollections();
+  const bookings = user
+    ? allBookings.filter((b) => b.customerId === user.id)
+    : [];
 
   const upcoming = bookings.filter((b) => b.status === "Upcoming");
   const completed = bookings.filter((b) => b.status === "Completed");
@@ -132,10 +135,6 @@ export default function CustomerOverviewPage() {
             <p className="text-sm text-muted-foreground">
               {formatDate(nextTrip.date)} · {nextTrip.guests} guests · ref{" "}
               {nextTrip.reference}
-            </p>
-            <p className="text-base text-muted-foreground">
-              We&apos;ll send pre-trip concierge notes seven days before
-              departure. Tap below to review the itinerary.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
