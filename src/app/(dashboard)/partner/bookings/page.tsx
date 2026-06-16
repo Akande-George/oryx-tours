@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { FileDown, Search } from "lucide-react";
+import Link from "next/link";
 import { Badge, Input } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import {
@@ -105,6 +106,7 @@ export default function PartnerBookingsPage() {
                   <TableHead>Guests</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Value</TableHead>
+                  <TableHead className="text-right">Pass</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -125,12 +127,21 @@ export default function PartnerBookingsPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>{formatPrice(booking.price)}</TableCell>
+                      <TableCell className="text-right">
+                        <Link
+                          href={`/passes/booking/${booking.id}`}
+                          target="_blank"
+                          className="inline-flex h-8 items-center gap-1 rounded-full px-3 text-xs font-medium hover:bg-accent"
+                        >
+                          <FileDown className="h-3.5 w-3.5" /> Pass
+                        </Link>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={6}
+                      colSpan={7}
                       className="text-center text-sm text-muted-foreground"
                     >
                       No bookings for your tours yet.

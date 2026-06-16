@@ -108,6 +108,14 @@ export function BookingDetailsDialog({
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
+              <a
+                href={`/passes/booking/${booking.id}?auto=1`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-9 items-center rounded-full border border-input bg-background px-4 text-sm font-medium hover:bg-accent"
+              >
+                Download pass
+              </a>
               <ActionButton
                 label="Download receipt"
                 variant="outline"

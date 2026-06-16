@@ -1,0 +1,201 @@
+.pass-shell {
+  background: #f6f1e9;
+  min-height: 100vh;
+  padding: 32px 16px;
+  display: flex;
+  justify-content: center;
+  color: #2a241a;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.pass-card {
+  background: white;
+  width: 100%;
+  max-width: 720px;
+  border-radius: 18px;
+  box-shadow: 0 18px 60px -25px rgba(60, 40, 20, 0.35);
+  overflow: hidden;
+}
+
+.pass-header {
+  background: linear-gradient(135deg, #efd9bf 0%, #c79a78 100%);
+  padding: 28px 32px 36px;
+  color: #2a1d10;
+}
+
+.pass-header h1 {
+  font-family: var(--font-inter-tight), system-ui, sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.pass-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.pass-body {
+  padding: 28px 32px 24px;
+}
+
+.pass-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px dashed rgba(60, 40, 20, 0.12);
+  font-size: 14px;
+}
+
+.pass-row:last-child { border-bottom: none; }
+
+.pass-row dt {
+  color: rgba(60, 40, 20, 0.6);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  align-self: center;
+}
+
+.pass-row dd { font-weight: 600; margin: 0; text-align: right; }
+
+.pass-reference {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 20px;
+  letter-spacing: 0.18em;
+  background: #2a241a;
+  color: #f6f1e9;
+  padding: 14px 18px;
+  border-radius: 10px;
+  text-align: center;
+  margin-top: 18px;
+}
+
+.pass-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 24px 0 16px;
+}
+
+.pass-qr img {
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  border: 1px solid rgba(60, 40, 20, 0.12);
+}
+
+.pass-qr-caption {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(60, 40, 20, 0.6);
+}
+
+.pass-footer {
+  background: #2a241a;
+  color: #f6f1e9;
+  padding: 16px 32px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.pass-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.pass-actions button,
+.pass-actions a {
+  border-radius: 999px;
+  border: 1px solid rgba(60, 40, 20, 0.2);
+  background: white;
+  color: #2a241a;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.pass-actions button:hover,
+.pass-actions a:hover {
+  background: #2a241a;
+  color: #f6f1e9;
+}
+
+.pass-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 24px;
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+.pass-grid .label {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(60, 40, 20, 0.55);
+  margin-bottom: 4px;
+}
+
+.pass-grid .value { font-weight: 600; }
+
+.pass-photos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.pass-photos img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.pass-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.pass-features span {
+  background: rgba(60, 40, 20, 0.06);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.pass-error {
+  padding: 60px 32px;
+  text-align: center;
+  background: white;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 480px;
+}
+
+@media print {
+  .pass-shell {
+    background: white;
+    padding: 0;
+  }
+  .pass-card { box-shadow: none; border-radius: 0; }
+  .pass-actions, .no-print { display: none !important; }
+  @page { size: A5; margin: 12mm; }
+}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { FileDown, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { Badge, Button, Input } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import {
@@ -198,6 +199,13 @@ export default function PartnerFleetPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="inline-flex gap-2">
+                          <Link
+                            href={`/passes/vehicle/${vehicle.id}`}
+                            target="_blank"
+                            className="inline-flex h-8 items-center gap-1 rounded-full px-3 text-xs font-medium hover:bg-accent"
+                          >
+                            <FileDown className="h-3.5 w-3.5" /> Pass
+                          </Link>
                           <Button
                             variant="ghost"
                             size="sm"
