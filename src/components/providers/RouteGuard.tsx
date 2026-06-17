@@ -11,6 +11,20 @@ type RouteGuardProps = {
   allow?: UserRole[];
 };
 
+function GuardSplash({ label }: { label: string }) {
+  return (
+    <Container className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
+      <div className="relative h-10 w-10">
+        <span className="absolute inset-0 animate-ping rounded-full bg-primary/30" />
+        <span className="absolute inset-1 rounded-full bg-primary" />
+      </div>
+      <p className="text-sm font-medium tracking-wide text-muted-foreground">
+        {label}
+      </p>
+    </Container>
+  );
+}
+
 export function RouteGuard({ children, allow }: RouteGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -28,28 +42,10 @@ export function RouteGuard({ children, allow }: RouteGuardProps) {
     }
   }, [ready, user, allow, router, pathname]);
 
-  if (!ready) {
-    return (
-      <Container className="py-20 text-sm text-muted-foreground">
-        Loading your workspace...
-      </Container>
-    );
-  }
-
-  if (!user) {
-    return (
-      <Container className="py-20 text-sm text-muted-foreground">
-        Redirecting to sign in...
-      </Container>
-    );
-  }
-
+  if (!ready) return <GuardSplash label="Preparing your workspace" />;
+  if (!user) return <GuardSplash label="Redirecting to sign in" />;
   if (allow && !allow.includes(user.role)) {
-    return (
-      <Container className="py-20 text-sm text-muted-foreground">
-        Access not permitted for this role.
-      </Container>
-    );
+    return <GuardSplash label="This area is restricted" />;
   }
 
   return <>{children}</>;

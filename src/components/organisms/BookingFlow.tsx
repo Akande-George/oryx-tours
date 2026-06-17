@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Input } from "@/components/atoms";
+import { Button, DateInput, Input } from "@/components/atoms";
 import { Textarea } from "@/components/ui/textarea";
 import { ProgressSteps } from "@/components/organisms/ProgressSteps";
 import { useBookingStore } from "@/store/booking-store";
@@ -95,8 +95,7 @@ export function BookingFlow({ tour }: BookingFlowProps) {
             <p className="text-sm font-semibold">
               Select travel date <span className="text-destructive">*</span>
             </p>
-            <Input
-              type="date"
+            <DateInput
               min={todayISO()}
               value={travelDate}
               onChange={(event) => setTravelDate(event.target.value)}

@@ -4,45 +4,29 @@ import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { CategoryCard } from "@/components/molecules/CategoryCard";
 import { DestinationCard } from "@/components/molecules/DestinationCard";
-import { TourCard } from "@/components/molecules/TourCard";
 import { FeaturedTours } from "@/components/organisms/FeaturedTours";
 import { Hero2 } from "@/components/ui/hero-2-1";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getDestinations, getTours } from "@/lib/supabase/data";
-
-const categories = [
-  {
-    title: "Luxury",
-    description: "Private villas, refined dining, and exclusive access.",
-  },
-  {
-    title: "Adventure",
-    description: "Wadis, canyons, kayak sunrises, and reserve safaris.",
-  },
-  {
-    title: "Culture",
-    description: "Heritage quarters, ateliers, and curated tastings.",
-  },
-  {
-    title: "Wellness",
-    description: "Oasis spa rituals and restorative programs.",
-  },
-  {
-    title: "Sports",
-    description: "Padel, watersports, and performance retreats.",
-  },
-  {
-    title: "Medical",
-    description: "Physician-led recovery and medical tourism.",
-  },
-];
+import {
+  getCategories,
+  getDestinations,
+  getTours,
+} from "@/lib/supabase/data";
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
-  const [tours, destinations] = await Promise.all([
+  const [tours, destinations, categoriesRaw] = await Promise.all([
     getTours(supabase),
     getDestinations(supabase),
+    getCategories(supabase),
   ]);
+
+  const categories = [...categoriesRaw].sort((a, b) => {
+    const ao = a.order ?? 0;
+    const bo = b.order ?? 0;
+    if (ao !== bo) return ao - bo;
+    return a.title.localeCompare(b.title);
+  });
 
   return (
     <div className="flex flex-col gap-16">
@@ -55,15 +39,21 @@ export default async function HomePage() {
             title="Categories for every tempo"
             subtitle="Select a travel rhythm that matches your mood and timeline."
           />
-          <div className="grid gap-6 md:grid-cols-3">
-            {categories.map((category) => (
-              <CategoryCard
-                key={category.title}
-                title={category.title}
-                description={category.description}
-              />
-            ))}
-          </div>
+          {categories.length ? (
+            <div className="grid gap-6 md:grid-cols-3">
+              {categories.map((category) => (
+                <CategoryCard
+                  key={category.id}
+                  title={category.title}
+                  description={category.description}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No categories defined yet.
+            </p>
+          )}
         </Container>
       </section>
 
@@ -76,20 +66,6 @@ export default async function HomePage() {
           <div className="grid gap-6 md:grid-cols-3">
             {destinations.map((destination) => (
               <DestinationCard key={destination.id} destination={destination} />
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      <section className="py-4">
-        <Container className="space-y-10">
-          <SectionHeading
-            title="Oryx signature collection"
-            subtitle="Limited departures and small group journeys."
-          />
-          <div className="grid gap-6 md:grid-cols-3">
-            {tours.slice(3, 6).map((tour) => (
-              <TourCard key={tour.id} tour={tour} />
             ))}
           </div>
         </Container>

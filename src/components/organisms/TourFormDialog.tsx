@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { Button, Input } from "@/components/atoms";
 import { Label } from "@/components/ui/label";
@@ -21,18 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { ImageUploader } from "@/components/atoms/ImageUploader";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { Tour, TourCategory } from "@/types";
-
-const tourCategories: TourCategory[] = [
-  "Luxury",
-  "Adventure",
-  "Culture",
-  "Wellness",
-  "Sports",
-  "Medical",
-];
 
 const difficulties: Tour["difficulty"][] = ["Easy", "Moderate", "Challenging"];
 
@@ -53,7 +44,7 @@ const slugify = (input: string) =>
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
 
-const emptyTour = (operatorId = ""): Tour => ({
+const emptyTour = (): Tour => ({
   id: crypto.randomUUID(),
   slug: "",
   title: "",
@@ -74,7 +65,7 @@ const emptyTour = (operatorId = ""): Tour => ({
   gallery: [],
   images: [],
   tags: [],
-  operatorId,
+  operatorId: "",
 });
 
 type TourFormDialogProps = {
@@ -91,25 +82,19 @@ export function TourFormDialog({
   onSubmit,
 }: TourFormDialogProps) {
   const mode = initialTour ? "edit" : "add";
-  const { operators } = useSupabaseCollections();
-  const [form, setForm] = useState<Tour>(
-    () => initialTour ?? emptyTour(operators[0]?.id ?? ""),
-  );
+  const { categories } = useSupabaseCollections();
+  const [form, setForm] = useState<Tour>(() => initialTour ?? emptyTour());
   const [slugLocked, setSlugLocked] = useState<boolean>(Boolean(initialTour));
   const [errors, setErrors] = useState<Partial<Record<keyof Tour, string>>>({});
 
   useEffect(() => {
     if (open) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setForm(
-        initialTour ? { ...initialTour } : emptyTour(operators[0]?.id ?? ""),
-      );
+      setForm(initialTour ? { ...initialTour } : emptyTour());
       setSlugLocked(Boolean(initialTour));
       setErrors({});
     }
-  }, [open, initialTour, operators]);
-
-  const operatorOptions = useMemo(() => operators, [operators]);
+  }, [open, initialTour]);
 
   const update = <K extends keyof Tour>(key: K, value: Tour[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -134,7 +119,6 @@ export function TourFormDialog({
     if (form.durationDays < 1) next.durationDays = "Must be at least 1 day";
     if (form.priceFrom < 0) next.priceFrom = "Price must be ≥ 0";
     if (form.rating < 0 || form.rating > 5) next.rating = "Rating must be 0–5";
-    if (!form.operatorId) next.operatorId = "Operator is required";
     if (form.images.length < 4) next.images = "Add at least 4 image URLs";
     if (!form.videoUrl?.trim()) next.videoUrl = "Video link is required";
     return next;
@@ -219,17 +203,22 @@ export function TourFormDialog({
               <Field label="Category">
                 <Select
                   value={form.category}
-                  onValueChange={(v) =>
-                    update("category", (v ?? "Luxury") as TourCategory)
-                  }
+                  onValueChange={(v) => update("category", v as TourCategory)}
+                  disabled={!categories.length}
                 >
                   <SelectTrigger className="h-9 w-full">
-                    <SelectValue placeholder="Pick a category" />
+                    <SelectValue
+                      placeholder={
+                        categories.length
+                          ? "Pick a category"
+                          : "No categories yet — add one in /admin/categories"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    {tourCategories.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={c.title}>
+                        {c.title}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -249,28 +238,6 @@ export function TourFormDialog({
                     {difficulties.map((d) => (
                       <SelectItem key={d} value={d}>
                         {d}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
-              <Field
-                label="Operator"
-                error={errors.operatorId}
-                required
-                className="md:col-span-2"
-              >
-                <Select
-                  value={form.operatorId}
-                  onValueChange={(v) => update("operatorId", v ?? "")}
-                >
-                  <SelectTrigger className="h-9 w-full">
-                    <SelectValue placeholder="Pick an operator" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {operatorOptions.map((op) => (
-                      <SelectItem key={op.id} value={op.id}>
-                        {op.name} · {op.rating}★ · {op.responseTime}
                       </SelectItem>
                     ))}
                   </SelectContent>

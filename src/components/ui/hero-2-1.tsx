@@ -47,9 +47,9 @@ const Hero2 = () => {
             Design the journey that matches your pace and palette.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-white/80">
-            From dune sanctuaries to coastal charters, Oryx crafts bespoke
-            experiences with a private guide, curated dining, and seamless
-            transfers.
+            From dune sanctuaries to coastal charters, Oryx Group crafts
+            bespoke experiences with a private guide, curated dining, and
+            seamless transfers.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link

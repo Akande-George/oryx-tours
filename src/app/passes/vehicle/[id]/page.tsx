@@ -130,7 +130,7 @@ export default async function VehiclePassPage({
       </div>
 
       <footer className="pass-footer">
-        Oryx Tours fleet · concierge@oryxtours.com
+        Oryx Group fleet · info@oryxgp.com
       </footer>
     </article>
   );

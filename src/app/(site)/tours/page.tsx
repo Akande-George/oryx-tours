@@ -12,10 +12,52 @@ import {
 } from "@/components/ui/select";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTours } from "@/lib/supabase/data";
+import type { Tour, TourCategory } from "@/types";
 
-export default async function ToursPage() {
+type ToursPageProps = {
+  searchParams: Promise<{
+    q?: string;
+    category?: string;
+    date?: string;
+    guests?: string;
+  }>;
+};
+
+export default async function ToursPage({ searchParams }: ToursPageProps) {
+  const { q, category, guests } = await searchParams;
   const supabase = await createSupabaseServerClient();
-  const tours = await getTours(supabase);
+  const allTours = await getTours(supabase);
+
+  const tours = allTours.filter((tour: Tour) => {
+    if (category && tour.category !== (category as TourCategory)) return false;
+    if (q) {
+      const needle = q.toLowerCase();
+      const haystack = [
+        tour.title,
+        tour.location,
+        tour.region,
+        tour.description,
+        ...(tour.tags ?? []),
+      ]
+        .join(" ")
+        .toLowerCase();
+      if (!haystack.includes(needle)) return false;
+    }
+    if (guests) {
+      const required = Number(guests);
+      if (Number.isFinite(required) && required >= 1) {
+        const cap = parseInt(tour.groupSize.replace(/[^0-9]/g, ""), 10);
+        if (Number.isFinite(cap) && cap > 0 && cap < required) return false;
+      }
+    }
+    return true;
+  });
+
+  const activeFilters = [
+    q ? `"${q}"` : null,
+    category ? `Category: ${category}` : null,
+    guests ? `${guests} guests` : null,
+  ].filter(Boolean);
 
   return (
     <div className="py-12">
@@ -28,7 +70,10 @@ export default async function ToursPage() {
         <FiltersPanel />
         <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            Showing {tours.length} curated experiences
+            Showing {tours.length} of {allTours.length} experiences
+            {activeFilters.length
+              ? ` — filtered by ${activeFilters.join(" · ")}`
+              : ""}
           </p>
           <Select defaultValue="recommended">
             <SelectTrigger className="w-[200px]">
@@ -42,15 +87,17 @@ export default async function ToursPage() {
             </SelectContent>
           </Select>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {tours.map((tour) => (
-            <TourCard key={tour.id} tour={tour} />
-          ))}
-        </div>
-        <div className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/70 px-6 py-4 text-sm text-muted-foreground">
-          <span>Page 1 of 4</span>
-          <span>Infinite scroll ready</span>
-        </div>
+        {tours.length ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {tours.map((tour) => (
+              <TourCard key={tour.id} tour={tour} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-white/60 bg-white/60 p-10 text-center text-sm text-muted-foreground">
+            No tours match those filters. Try removing one to widen the search.
+          </div>
+        )}
       </Container>
     </div>
   );

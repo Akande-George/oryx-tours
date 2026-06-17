@@ -28,18 +28,16 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { deleteTour, upsertTour } from "@/lib/supabase/data";
 import type { Tour, TourCategory } from "@/types";
 
-const categoryOptions: ("All" | TourCategory)[] = [
-  "All",
-  "Luxury",
-  "Adventure",
-  "Culture",
-  "Wellness",
-  "Sports",
-  "Medical",
-];
-
 export default function AdminToursPage() {
-  const { operators, tours: liveTours } = useSupabaseCollections();
+  const {
+    operators,
+    tours: liveTours,
+    categories: liveCategories,
+  } = useSupabaseCollections();
+  const categoryOptions = useMemo<("All" | TourCategory)[]>(
+    () => ["All", ...liveCategories.map((c) => c.title)],
+    [liveCategories],
+  );
   const [tours, setTours] = useState<Tour[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<"All" | TourCategory>("All");

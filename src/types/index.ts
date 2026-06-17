@@ -1,10 +1,11 @@
-export type TourCategory =
-  | "Luxury"
-  | "Adventure"
-  | "Culture"
-  | "Wellness"
-  | "Sports"
-  | "Medical";
+export type TourCategory = string;
+
+export type Category = {
+  id: string;
+  title: string;
+  description: string;
+  order?: number;
+};
 
 export type Tour = {
   id: string;

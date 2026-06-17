@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   ArrowUpRight,
   Bed,
-  CalendarDays,
   CheckCircle2,
   Compass,
   DollarSign,
@@ -21,7 +20,7 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
-import { Input } from "@/components/atoms";
+import { DateInput, Input } from "@/components/atoms";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MultiStepForm } from "@/components/ui/multi-step-form";
@@ -264,7 +263,7 @@ export default function PersonalizedPage() {
               size="lg"
               footerContent={
                 <a
-                  href="mailto:concierge@oryx.test"
+                  href="mailto:info@oryxgp.com"
                   className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
                 >
                   Talk to a concierge instead
@@ -285,7 +284,7 @@ export default function PersonalizedPage() {
                           onChange={(e) =>
                             update("destination", e.target.value)
                           }
-                          placeholder="Cairo, Marrakech, Maldives..."
+                          placeholder="National Museum of Qatar"
                           className="h-11 pl-9"
                         />
                       </div>
@@ -318,31 +317,23 @@ export default function PersonalizedPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="startDate">Start date</Label>
-                      <div className="relative">
-                        <CalendarDays className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          id="startDate"
-                          type="date"
-                          min={todayISO()}
-                          value={state.startDate}
-                          onChange={(e) => update("startDate", e.target.value)}
-                          className="h-11 pl-9 [&::-webkit-calendar-picker-indicator]:opacity-0"
-                        />
-                      </div>
+                      <DateInput
+                        id="startDate"
+                        min={todayISO()}
+                        value={state.startDate}
+                        onChange={(e) => update("startDate", e.target.value)}
+                        className="h-11"
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="endDate">End date</Label>
-                      <div className="relative">
-                        <CalendarDays className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          id="endDate"
-                          type="date"
-                          min={state.startDate || todayISO()}
-                          value={state.endDate}
-                          onChange={(e) => update("endDate", e.target.value)}
-                          className="h-11 pl-9 [&::-webkit-calendar-picker-indicator]:opacity-0"
-                        />
-                      </div>
+                      <DateInput
+                        id="endDate"
+                        min={state.startDate || todayISO()}
+                        value={state.endDate}
+                        onChange={(e) => update("endDate", e.target.value)}
+                        className="h-11"
+                      />
                     </div>
                   </div>
                   <p className="rounded-xl border border-primary/15 bg-primary/5 px-4 py-3 text-xs text-muted-foreground">

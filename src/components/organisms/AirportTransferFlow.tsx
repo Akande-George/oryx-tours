@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { MapPin, Plane } from "lucide-react";
-import { Badge, Button, Input } from "@/components/atoms";
+import { Badge, Button, DateInput, Input } from "@/components/atoms";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -135,8 +135,7 @@ export function AirportTransferFlow() {
               <p className="text-sm font-semibold">
                 Transfer date <span className="text-destructive">*</span>
               </p>
-              <Input
-                type="date"
+              <DateInput
                 min={todayISO()}
                 value={travelDate}
                 onChange={(event) => setTravelDate(event.target.value)}

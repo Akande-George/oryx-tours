@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { MapPin, Plus, Route, X } from "lucide-react";
-import { Badge, Button, Input } from "@/components/atoms";
+import { Badge, Button, DateInput, Input } from "@/components/atoms";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -182,8 +182,7 @@ export function PointToPointFlow() {
               <p className="text-sm font-semibold">
                 Service date <span className="text-destructive">*</span>
               </p>
-              <Input
-                type="date"
+              <DateInput
                 min={todayISO()}
                 value={travelDate}
                 onChange={(event) => setTravelDate(event.target.value)}

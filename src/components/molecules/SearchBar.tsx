@@ -1,7 +1,9 @@
-import { Calendar, MapPin, Users } from "lucide-react";
-import Link from "next/link";
-import { Input } from "@/components/atoms";
-import { buttonVariants } from "@/components/ui/button";
+"use client";
+
+import { useState } from "react";
+import { MapPin, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Button, DateInput, Input } from "@/components/atoms";
 import { todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +13,20 @@ type SearchBarProps = {
 };
 
 export function SearchBar({ variant = "hero", className }: SearchBarProps) {
+  const router = useRouter();
+  const [destination, setDestination] = useState("");
+  const [date, setDate] = useState("");
+  const [guests, setGuests] = useState(2);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (destination.trim()) params.set("q", destination.trim());
+    if (date) params.set("date", date);
+    if (guests) params.set("guests", String(guests));
+    const qs = params.toString();
+    router.push(`/tours${qs ? `?${qs}` : ""}`);
+  };
+
   return (
     <div
       className={cn(
@@ -24,23 +40,23 @@ export function SearchBar({ variant = "hero", className }: SearchBarProps) {
           <MapPin className="h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Destination"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
             className="border-0 bg-transparent px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
           />
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-input bg-white/80 px-3 py-2">
-          <Calendar className="h-4 w-4 text-muted-foreground" />
-          <Input
-            type="date"
-            min={todayISO()}
-            className="border-0 bg-transparent px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
-          />
-        </div>
+        <DateInput
+          min={todayISO()}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
         <div className="flex items-center gap-2 rounded-xl border border-input bg-white/80 px-3 py-2">
           <Users className="h-4 w-4 text-muted-foreground" />
           <Input
             type="number"
             min={1}
-            defaultValue={2}
+            value={guests}
+            onChange={(e) => setGuests(Math.max(1, Number(e.target.value) || 1))}
             placeholder="Guests"
             className="border-0 bg-transparent px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
           />
@@ -50,12 +66,13 @@ export function SearchBar({ variant = "hero", className }: SearchBarProps) {
         <p className="text-sm text-muted-foreground">
           Curated for private, refined travel experiences.
         </p>
-        <Link
-          href="/tours"
-          className={buttonVariants({ className: "rounded-full px-6" })}
+        <Button
+          type="button"
+          onClick={handleSearch}
+          className="rounded-full px-6"
         >
           Search experiences
-        </Link>
+        </Button>
       </div>
     </div>
   );

@@ -107,7 +107,7 @@ export default async function BookingPassPage({
       </div>
 
       <footer className="pass-footer">
-        Present this pass on arrival · concierge@oryxtours.com
+        Present this pass on arrival · info@oryxgp.com
       </footer>
     </article>
   );

@@ -3,6 +3,7 @@ import type { AuthProfile, AccountStatus } from "@/lib/auth";
 import type {
   Booking,
   BookingStatus,
+  Category,
   Destination,
   Operator,
   Review,
@@ -44,6 +45,9 @@ export const getBookings = (client: SupabaseClient) =>
 
 export const getReviews = (client: SupabaseClient) =>
   readCollection<Review>(client, "reviews", "reviews");
+
+export const getCategories = (client: SupabaseClient) =>
+  readCollection<Category>(client, "categories", "categories");
 
 export const getProfiles = (client: SupabaseClient) =>
   readCollection<AuthProfile>(client, "profiles", "profiles");
@@ -246,6 +250,12 @@ export const deleteTour = (client: SupabaseClient, id: string) =>
 
 export const upsertVehicle = (client: SupabaseClient, vehicle: Vehicle) =>
   upsertRow<Vehicle>(client, "vehicles", vehicle, "vehicle");
+
+export const upsertCategory = (client: SupabaseClient, category: Category) =>
+  upsertRow<Category>(client, "categories", category, "category");
+
+export const deleteCategory = (client: SupabaseClient, id: string) =>
+  deleteRow(client, "categories", id, "category");
 
 export const createBooking = async (
   client: SupabaseClient,
