@@ -1,6 +1,7 @@
 import "server-only";
 
-const apiBase = process.env.MYFATOORAH_API_BASE;
+const apiBase =
+  process.env.MYFATOORAH_BASE_URL ?? process.env.MYFATOORAH_API_BASE;
 const apiToken = process.env.MYFATOORAH_API_TOKEN;
 const currency = process.env.MYFATOORAH_CURRENCY ?? "USD";
 
@@ -19,7 +20,8 @@ type MyFatoorahEnvelope<T> = {
 };
 
 const call = async <T>(path: string, body: unknown): Promise<T> => {
-  const res = await fetch(`${requireEnv(apiBase, "MYFATOORAH_API_BASE")}${path}`, {
+  const base = requireEnv(apiBase, "MYFATOORAH_BASE_URL").replace(/\/+$/, "");
+  const res = await fetch(`${base}${path}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -29,7 +31,14 @@ const call = async <T>(path: string, body: unknown): Promise<T> => {
     cache: "no-store",
   });
 
-  const json = (await res.json()) as MyFatoorahEnvelope<T>;
+  let json: MyFatoorahEnvelope<T> | null = null;
+  try {
+    json = (await res.json()) as MyFatoorahEnvelope<T>;
+  } catch {
+    throw new Error(
+      `MyFatoorah ${path}: HTTP ${res.status} ${res.statusText} (no JSON body)`,
+    );
+  }
   if (!json.IsSuccess || !json.Data) {
     const details =
       json.ValidationErrors?.map((v) => `${v.Name}: ${v.Error}`).join("; ") ??

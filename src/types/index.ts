@@ -28,7 +28,7 @@ export type Tour = {
   gallery: string[];
   images: string[];
   tags: string[];
-  operatorId: string;
+  operatorId?: string | null;
 };
 
 export type Destination = {
@@ -67,6 +67,7 @@ export type Vehicle = {
   fullDayPrice: number;
   extraHourPrice: number;
   transferPrice: number;
+  pointToPointPrice: number;
   features: string[];
   gradient: string;
   images: string[];

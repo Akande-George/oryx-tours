@@ -47,11 +47,21 @@ export function BookingDetailsDialog({
     if (!booking || next === booking.status) return;
     setSaving(true);
     try {
-      await updateBookingStatus(
-        createSupabaseBrowserClient(),
-        booking.id,
-        next,
-      );
+      if (next === "Cancelled") {
+        const res = await fetch("/api/bookings/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bookingId: booking.id }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error ?? "Could not cancel");
+      } else {
+        await updateBookingStatus(
+          createSupabaseBrowserClient(),
+          booking.id,
+          next,
+        );
+      }
       onStatusChange?.(booking.id, next);
     } catch (e) {
       window.alert((e as Error).message);

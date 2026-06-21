@@ -64,7 +64,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
 
   const loadCurrentProfile = useCallback(async (userId: string) => {
+    console.log("[auth] loadCurrentProfile", userId);
     const profile = await getProfileById(supabase, userId);
+    console.log("[auth] profile fetched", profile);
     if (!profile) {
       return null;
     }
@@ -83,20 +85,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let active = true;
 
     const bootstrap = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      console.log("[auth] bootstrap start");
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-      if (!active) return;
+        if (!active) return;
+        console.log("[auth] session", session?.user?.id ?? "(none)");
 
-      if (session?.user) {
-        await loadCurrentProfile(session.user.id);
-      } else {
-        setAccounts([]);
-        setUser(null);
+        if (session?.user) {
+          await loadCurrentProfile(session.user.id);
+        } else {
+          setAccounts([]);
+          setUser(null);
+        }
+      } catch (e) {
+        console.error("[auth] bootstrap failed", e);
+      } finally {
+        if (active) {
+          console.log("[auth] bootstrap ready=true");
+          setReady(true);
+        }
       }
-
-      setReady(true);
     };
 
     void bootstrap();
@@ -135,18 +146,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(
     async ({ email, password }: SignInArgs) => {
+      console.log("[auth] signIn start", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
 
       if (error || !data.user) {
+        console.error("[auth] signIn failed", error);
         throw new Error(error?.message ?? "Invalid email or password.");
       }
 
-      const profile = await loadCurrentProfile(data.user.id);
+      let profile = await loadCurrentProfile(data.user.id);
       if (!profile) {
-        throw new Error("Your account profile is not ready yet.");
+        // Self-heal: the profiles row never landed (no trigger / RLS issue).
+        // Create a minimal customer profile from the auth user metadata
+        // so the user isn't stuck in a redirect loop.
+        console.warn("[auth] no profile row — creating fallback");
+        const meta = data.user.user_metadata ?? {};
+        const fallback: AuthProfile = {
+          id: data.user.id,
+          email: data.user.email ?? email.trim().toLowerCase(),
+          name: (meta.name as string) ?? data.user.email?.split("@")[0] ?? "Oryx Traveler",
+          role: (meta.role as AuthProfile["role"]) ?? "customer",
+          status: "active",
+          operatorId: meta.operatorId as string | undefined,
+          companyName: meta.companyName as string | undefined,
+        };
+        const { error: insertErr } = await supabase
+          .from("profiles")
+          .upsert(fallback);
+        if (insertErr) {
+          console.error("[auth] fallback profile insert failed", insertErr);
+          throw new Error(
+            `Account profile not ready: ${insertErr.message}`,
+          );
+        }
+        profile = fallback;
       }
       if (profile.status === "rejected") {
         await supabase.auth.signOut();
@@ -157,6 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await refreshAccounts(profile);
       const nextUser = toAuthUser(profile);
       setUser(nextUser);
+      console.log("[auth] signIn ok", nextUser.role);
       return nextUser;
     },
     [loadCurrentProfile, refreshAccounts],
@@ -218,6 +255,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await refreshAccounts(profile);
       const nextUser = toAuthUser(profile);
       setUser(nextUser);
+      void fetch("/api/users/welcome", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: profile.email,
+          name: profile.name,
+          role: profile.role,
+        }),
+      }).catch(() => {});
       return { kind: "signed-in", user: nextUser };
     },
     [refreshAccounts],

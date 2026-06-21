@@ -36,7 +36,6 @@ interface NavigationItem {
 
 const navigationItems: NavigationItem[] = [
   { id: "dashboard", name: "Overview", icon: Home, href: "/dashboard", roles: ["customer"] },
-  { id: "customer-tours", name: "Tours", icon: Heart, href: "/dashboard/tours", roles: ["customer"] },
   { id: "customer-bookings", name: "Bookings", icon: Calendar, href: "/dashboard/bookings", roles: ["customer"] },
   { id: "customer-spending", name: "Spending", icon: Wallet, href: "/dashboard/spending", roles: ["customer"] },
   { id: "partner", name: "Overview", icon: Home, href: "/partner", roles: ["partner"] },

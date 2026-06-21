@@ -211,10 +211,15 @@ const upsertRow = async <T extends { id: string }>(
   row: T,
   label: string,
 ): Promise<T> => {
-  console.log(`[supabase] upsert ${label}`, row);
+  // Strip null / undefined / empty-string keys so they don't trip
+  // FK / not-null constraints when the caller wants the DB default.
+  const sanitized = Object.fromEntries(
+    Object.entries(row).filter(([, v]) => v !== null && v !== undefined && v !== ""),
+  );
+  console.log(`[supabase] upsert ${label}`, sanitized);
   const { data, error } = await client
     .from(table)
-    .upsert(row)
+    .upsert(sanitized)
     .select()
     .single();
 

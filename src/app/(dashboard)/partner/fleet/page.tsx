@@ -158,6 +158,7 @@ export default function PartnerFleetPage() {
                   <TableHead>Half day</TableHead>
                   <TableHead>Full day</TableHead>
                   <TableHead>Airport</TableHead>
+                  <TableHead>Point-to-point</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -197,6 +198,9 @@ export default function PartnerFleetPage() {
                       <TableCell>
                         {formatPrice(vehicle.transferPrice)}
                       </TableCell>
+                      <TableCell>
+                        {formatPrice(vehicle.pointToPointPrice ?? 0)}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="inline-flex gap-2">
                           <Link
@@ -229,7 +233,7 @@ export default function PartnerFleetPage() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={7}
+                      colSpan={8}
                       className="text-center text-sm text-muted-foreground"
                     >
                       {vehicles.length

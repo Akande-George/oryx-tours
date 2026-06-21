@@ -199,7 +199,7 @@ export default function AdminToursPage() {
                           {tour.category}
                         </Badge>
                       </TableCell>
-                      <TableCell>{operatorName(tour.operatorId)}</TableCell>
+                      <TableCell>{operatorName(tour.operatorId ?? "")}</TableCell>
                       <TableCell>{formatPrice(tour.priceFrom)}</TableCell>
                       <TableCell>{tour.rating.toFixed(1)}</TableCell>
                       <TableCell className="text-right">

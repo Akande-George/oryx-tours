@@ -8,8 +8,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { cn } from "@/lib/utils";
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?q=80&w=2400&auto=format&fit=crop";
+const HERO_IMAGE = "/Tours.png";
 
 const Hero2 = () => {
   return (
@@ -33,7 +32,7 @@ const Hero2 = () => {
         <div className="mx-auto flex max-w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 shadow-[0_18px_40px_-30px_rgba(0,0,0,0.6)] backdrop-blur">
           <Sparkles className="h-4 w-4 text-amber-200" />
           <span className="text-sm font-medium text-white/90">
-            Curated by Oryx concierge
+            Curated by Oryx Group
           </span>
         </div>
 

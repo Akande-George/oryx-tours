@@ -30,7 +30,9 @@ export default async function TourDetailsPage({
   }
 
   const [operator, reviews] = await Promise.all([
-    getOperatorById(supabase, tour.operatorId),
+    tour.operatorId
+      ? getOperatorById(supabase, tour.operatorId)
+      : Promise.resolve(null),
     getReviews(supabase),
   ]);
 

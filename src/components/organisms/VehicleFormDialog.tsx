@@ -45,6 +45,7 @@ const emptyVehicle = (operatorId = ""): Vehicle => ({
   fullDayPrice: 0,
   extraHourPrice: 0,
   transferPrice: 0,
+  pointToPointPrice: 0,
   features: [],
   gradient: gradientPresets[0],
   images: [],
@@ -100,6 +101,7 @@ export function VehicleFormDialog({
     if (form.fullDayPrice < 0) next.fullDayPrice = "Must be ≥ 0";
     if (form.extraHourPrice < 0) next.extraHourPrice = "Must be ≥ 0";
     if (form.transferPrice < 0) next.transferPrice = "Must be ≥ 0";
+    if (form.pointToPointPrice < 0) next.pointToPointPrice = "Must be ≥ 0";
     if (!form.images.length) next.images = "Add at least one vehicle photo URL";
     return next;
   };
@@ -114,6 +116,7 @@ export function VehicleFormDialog({
     const lowestRate = Math.min(
       form.halfDayPrice || Infinity,
       form.transferPrice || Infinity,
+      form.pointToPointPrice || Infinity,
     );
     const priceFrom =
       lowestRate === Infinity ? form.priceFrom : Math.round(lowestRate);
@@ -265,6 +268,24 @@ export function VehicleFormDialog({
                   onChange={(e) =>
                     update(
                       "transferPrice",
+                      Math.max(0, Number(e.target.value) || 0),
+                    )
+                  }
+                />
+              </Field>
+              <Field
+                label="Point-to-point (USD)"
+                description="Single ride between two addresses."
+                error={errors.pointToPointPrice}
+              >
+                <Input
+                  type="number"
+                  min={0}
+                  step={5}
+                  value={form.pointToPointPrice}
+                  onChange={(e) =>
+                    update(
+                      "pointToPointPrice",
                       Math.max(0, Number(e.target.value) || 0),
                     )
                   }

@@ -65,7 +65,7 @@ const emptyTour = (): Tour => ({
   gallery: [],
   images: [],
   tags: [],
-  operatorId: "",
+  operatorId: null,
 });
 
 type TourFormDialogProps = {

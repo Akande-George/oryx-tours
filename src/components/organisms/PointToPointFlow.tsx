@@ -73,7 +73,8 @@ export function PointToPointFlow() {
 
   const total = useMemo(() => {
     if (!selected) return 0;
-    return selected.transferPrice * stopCount;
+    const perLeg = selected.pointToPointPrice || selected.transferPrice;
+    return perLeg * stopCount;
   }, [selected, stopCount]);
 
   const ready =
@@ -209,7 +210,11 @@ export function PointToPointFlow() {
               onValueChange={(value) => setVehicleId(value || null)}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a vehicle for your estimate" />
+                <SelectValue placeholder="Select a vehicle for your estimate">
+                  {selected
+                    ? `${selected.name} — ${selected.fleetCategory} · ${selected.capacity} seats`
+                    : null}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {vehicles.map((vehicle) => (
@@ -256,7 +261,10 @@ export function PointToPointFlow() {
                 <p className="text-sm text-muted-foreground">
                   {selected.name} · {stopCount}{" "}
                   {stopCount === 1 ? "stop" : "stops"} ·{" "}
-                  {formatPrice(selected.transferPrice)} per leg
+                  {formatPrice(
+                    selected.pointToPointPrice || selected.transferPrice,
+                  )}{" "}
+                  per leg
                 </p>
                 <ul className="space-y-1 pt-2 text-sm text-muted-foreground">
                   {selected.features.map((feature) => (

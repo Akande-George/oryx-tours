@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -59,6 +60,19 @@ function SignInForm() {
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           className="rounded-2xl border border-white/60 bg-white/90 p-7 shadow-[0_30px_60px_-30px_rgba(92,70,39,0.45)] backdrop-blur"
         >
+          <div className="mb-6 flex justify-center">
+            <div className="flex items-center justify-center rounded-2xl bg-white p-3 shadow-[0_10px_30px_-15px_rgba(92,70,39,0.45)] ring-1 ring-black/5">
+              <Image
+                src="/logo.png"
+                alt="Oryx Group"
+                width={72}
+                height={110}
+                priority
+                className="h-20 w-auto"
+              />
+            </div>
+          </div>
+
           <div className="mb-6 space-y-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-primary">
               Welcome back

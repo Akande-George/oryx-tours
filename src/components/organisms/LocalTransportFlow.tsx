@@ -161,7 +161,11 @@ export function LocalTransportFlow() {
               onValueChange={(value) => setVehicleId(value || null)}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a vehicle for your estimate" />
+                <SelectValue placeholder="Select a vehicle for your estimate">
+                  {selected
+                    ? `${selected.name} — ${selected.fleetCategory} · ${selected.capacity} seats`
+                    : null}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {vehicles.map((vehicle) => (

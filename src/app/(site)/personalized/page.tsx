@@ -299,9 +299,8 @@ export default function PersonalizedPage() {
                       >
                         <SelectTrigger
                           id="partySize"
-                          className="h-11 w-full justify-between rounded-lg pl-9 [&>svg]:size-4"
+                          className="h-11 w-full justify-between rounded-lg [&>svg]:size-4"
                         >
-                          <Users className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                           <SelectValue placeholder="Select number of guests" />
                         </SelectTrigger>
                         <SelectContent>

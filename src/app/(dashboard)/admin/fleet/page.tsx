@@ -170,6 +170,7 @@ export default function AdminFleetPage() {
                   <TableHead>Full day</TableHead>
                   <TableHead>Extra hour</TableHead>
                   <TableHead>Airport</TableHead>
+                  <TableHead>Point-to-point</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -212,6 +213,9 @@ export default function AdminFleetPage() {
                       <TableCell>
                         {formatPrice(vehicle.transferPrice)}
                       </TableCell>
+                      <TableCell>
+                        {formatPrice(vehicle.pointToPointPrice ?? 0)}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="inline-flex gap-2">
                           <Link
@@ -244,7 +248,7 @@ export default function AdminFleetPage() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={8}
+                      colSpan={9}
                       className="text-center text-sm text-muted-foreground"
                     >
                       No vehicles match these filters.

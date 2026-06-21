@@ -80,6 +80,12 @@ export default async function VehiclePassPage({
             <p className="label">Airport transfer</p>
             <p className="value">{formatPrice(vehicle.transferPrice)}</p>
           </div>
+          <div>
+            <p className="label">Point-to-point</p>
+            <p className="value">
+              {formatPrice(vehicle.pointToPointPrice ?? 0)}
+            </p>
+          </div>
         </div>
 
         {vehicle.features.length ? (
