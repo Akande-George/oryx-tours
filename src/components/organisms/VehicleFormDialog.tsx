@@ -21,9 +21,20 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { ImageUploader } from "@/components/atoms/ImageUploader";
-import type { FleetCategory, Vehicle } from "@/types";
+import type { FleetCategory, Vehicle, VehicleType } from "@/types";
 
 const fleetCategories: FleetCategory[] = ["Economy", "Premium", "VIP"];
+
+const vehicleTypes: VehicleType[] = [
+  "Sedan",
+  "SUV",
+  "Van",
+  "Coach",
+  "Pickup",
+  "Limousine",
+  "Crossover",
+  "Other",
+];
 
 const gradientPresets = [
   "from-[#cfe8da] to-[#7fb792]",
@@ -38,6 +49,7 @@ const emptyVehicle = (operatorId = ""): Vehicle => ({
   id: crypto.randomUUID(),
   name: "",
   fleetCategory: "Economy",
+  vehicleType: "Sedan",
   capacity: 4,
   luggage: "2 carry-on bags",
   priceFrom: 0,
@@ -167,6 +179,25 @@ export function VehicleFormDialog({
                     {fleetCategories.map((c) => (
                       <SelectItem key={c} value={c}>
                         {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Vehicle type">
+                <Select
+                  value={form.vehicleType ?? "Sedan"}
+                  onValueChange={(v) =>
+                    update("vehicleType", (v ?? "Sedan") as VehicleType)
+                  }
+                >
+                  <SelectTrigger className="h-9 w-full">
+                    <SelectValue placeholder="Pick a type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {vehicleTypes.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
                       </SelectItem>
                     ))}
                   </SelectContent>

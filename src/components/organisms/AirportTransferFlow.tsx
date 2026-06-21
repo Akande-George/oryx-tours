@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
 import { MapPin, Plane } from "lucide-react";
-import { Badge, Button, DateInput, Input } from "@/components/atoms";
+import { Button, DateInput, Input } from "@/components/atoms";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -11,13 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { VehicleCard } from "@/components/molecules/VehicleCard";
+import { FleetBrowser } from "@/components/organisms/FleetBrowser";
 import { useBookingStore } from "@/store/booking-store";
 import { formatPrice, todayISO } from "@/lib/format";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
-import type { AirportDirection, FleetCategory } from "@/types";
-
-const fleetOrder: FleetCategory[] = ["Economy", "Premium", "VIP"];
+import type { AirportDirection } from "@/types";
 
 export function AirportTransferFlow() {
   const { vehicles } = useSupabaseCollections();
@@ -35,13 +32,6 @@ export function AirportTransferFlow() {
     setVehicleId,
     setAirportDirection,
   } = useBookingStore();
-
-  const grouped = useMemo(() => {
-    return fleetOrder.map((category) => ({
-      category,
-      vehicles: vehicles.filter((v) => v.fleetCategory === category),
-    }));
-  }, [vehicles]);
 
   const selected = vehicles.find((v) => v.id === vehicleId) ?? null;
   const dateValid = travelDate !== "" && travelDate >= todayISO();
@@ -231,33 +221,11 @@ export function AirportTransferFlow() {
         </Card>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          Browse the fleet
-        </h3>
-        <div className="space-y-6">
-          {grouped.map(({ category, vehicles }) => (
-            <div key={category} className="space-y-3">
-              <div className="flex items-center gap-2">
-                <h4 className="text-sm font-semibold">{category}</h4>
-                <Badge variant="secondary" className="rounded-full text-xs">
-                  {vehicles.length} options
-                </Badge>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
-                {vehicles.map((vehicle) => (
-                  <VehicleCard
-                    key={vehicle.id}
-                    vehicle={vehicle}
-                    selected={vehicle.id === vehicleId}
-                    onSelect={() => setVehicleId(vehicle.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <FleetBrowser
+        vehicles={vehicles}
+        selectedVehicleId={vehicleId}
+        onSelect={setVehicleId}
+      />
     </div>
   );
 }

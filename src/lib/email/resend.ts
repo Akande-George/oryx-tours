@@ -3,7 +3,10 @@ import "server-only";
 const RESEND_API = "https://api.resend.com/emails";
 
 const apiKey = process.env.RESEND_API_KEY;
-const fromEmail = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
+const fromEmail =
+  process.env.RESEND_FROM ??
+  process.env.RESEND_FROM_EMAIL ??
+  "Oryx Group <onboarding@resend.dev>";
 const replyTo = process.env.RESEND_REPLY_TO ?? "info@oryxgp.com";
 
 export type EmailArgs = {

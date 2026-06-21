@@ -46,14 +46,11 @@ const initialForm: FormData = {
   acceptTerms: false,
 };
 
-const unsplash = (id: string) =>
-  `https://images.unsplash.com/photo-${id}?q=80&w=1200&auto=format&fit=crop`;
-
 const collageImages = [
-  { id: "1540555700478-4be289fbecef", alt: "Coastal getaway" },
-  { id: "1500627964684-141351970a7f", alt: "Riverside view" },
-  { id: "1547036967-23d11aacaee0", alt: "Ancient temple" },
-  { id: "1571896349842-33c89424de2d", alt: "Cultural details" },
+  { src: "/corniche-022.jpg", alt: "Doha Corniche skyline" },
+  { src: "/an-incredible-view-of.jpg", alt: "Coastal Qatar view" },
+  { src: "/banana-island-resort-058.jpg", alt: "Banana Island Resort" },
+  { src: "/20220127-1643268462-571.jpg", alt: "Qatar heritage detail" },
 ];
 
 export default function SignUpPage() {
@@ -457,12 +454,12 @@ export default function SignUpPage() {
 
           {/* Right - story collage */}
           <div className="relative hidden bg-[radial-gradient(80%_60%_at_80%_30%,rgba(207,232,218,0.6),transparent_70%),linear-gradient(160deg,#f4ede0_0%,#e7d6c1_100%)] p-6 lg:block">
-            <div className="grid h-full grid-cols-2 grid-rows-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
-                className="flex flex-col justify-between rounded-2xl bg-primary p-5 text-primary-foreground"
+                className="flex aspect-square flex-col justify-between rounded-2xl bg-primary p-5 text-primary-foreground"
               >
                 <Compass className="size-5 opacity-80" />
                 <div>
@@ -479,10 +476,11 @@ export default function SignUpPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
-                className="overflow-hidden rounded-2xl"
+                className="aspect-square overflow-hidden rounded-2xl"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={unsplash(collageImages[0].id)}
+                  src={collageImages[0].src}
                   alt={collageImages[0].alt}
                   className="h-full w-full object-cover"
                 />
@@ -492,10 +490,11 @@ export default function SignUpPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
-                className="overflow-hidden rounded-2xl"
+                className="aspect-square overflow-hidden rounded-2xl"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={unsplash(collageImages[1].id)}
+                  src={collageImages[1].src}
                   alt={collageImages[1].alt}
                   className="h-full w-full object-cover"
                 />
@@ -505,10 +504,11 @@ export default function SignUpPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45, duration: 0.6 }}
-                className="overflow-hidden rounded-2xl"
+                className="aspect-square overflow-hidden rounded-2xl"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={unsplash(collageImages[2].id)}
+                  src={collageImages[2].src}
                   alt={collageImages[2].alt}
                   className="h-full w-full object-cover"
                 />
@@ -518,10 +518,11 @@ export default function SignUpPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.55, duration: 0.6 }}
-                className="overflow-hidden rounded-2xl"
+                className="aspect-square overflow-hidden rounded-2xl"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={unsplash(collageImages[3].id)}
+                  src={collageImages[3].src}
                   alt={collageImages[3].alt}
                   className="h-full w-full object-cover"
                 />
@@ -531,7 +532,7 @@ export default function SignUpPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.6 }}
-                className="flex flex-col justify-between rounded-2xl bg-secondary p-5 text-secondary-foreground"
+                className="flex aspect-square flex-col justify-between rounded-2xl bg-secondary p-5 text-secondary-foreground"
               >
                 <HeartHandshake className="size-5 opacity-80" />
                 <div>

@@ -56,10 +56,21 @@ export type Operator = {
 
 export type FleetCategory = "Economy" | "Premium" | "VIP";
 
+export type VehicleType =
+  | "Sedan"
+  | "SUV"
+  | "Van"
+  | "Coach"
+  | "Pickup"
+  | "Limousine"
+  | "Crossover"
+  | "Other";
+
 export type Vehicle = {
   id: string;
   name: string;
   fleetCategory: FleetCategory;
+  vehicleType?: VehicleType;
   capacity: number;
   luggage: string;
   priceFrom: number;

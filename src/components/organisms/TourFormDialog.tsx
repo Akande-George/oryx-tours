@@ -120,7 +120,6 @@ export function TourFormDialog({
     if (form.priceFrom < 0) next.priceFrom = "Price must be ≥ 0";
     if (form.rating < 0 || form.rating > 5) next.rating = "Rating must be 0–5";
     if (form.images.length < 4) next.images = "Add at least 4 image URLs";
-    if (!form.videoUrl?.trim()) next.videoUrl = "Video link is required";
     return next;
   };
 
@@ -317,9 +316,8 @@ export function TourFormDialog({
               <Field
                 label="Video URL"
                 error={errors.videoUrl}
-                required
                 className="md:col-span-2"
-                description="YouTube, Vimeo, or other embeddable video link."
+                description="Optional. YouTube, Vimeo, or other embeddable video link."
               >
                 <Input
                   value={form.videoUrl ?? ""}

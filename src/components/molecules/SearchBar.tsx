@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { MapPin, Users } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Calendar, MapPin, Users } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button, DateInput, Input } from "@/components/atoms";
 import { todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -14,21 +14,43 @@ type SearchBarProps = {
 
 export function SearchBar({ variant = "hero", className }: SearchBarProps) {
   const router = useRouter();
-  const [destination, setDestination] = useState("");
-  const [date, setDate] = useState("");
-  const [guests, setGuests] = useState(2);
+  const searchParams = useSearchParams();
+
+  const [destination, setDestination] = useState(searchParams.get("q") ?? "");
+  const [date, setDate] = useState(searchParams.get("date") ?? "");
+  const [guests, setGuests] = useState(
+    Math.max(1, Number(searchParams.get("guests") ?? "2") || 2),
+  );
+
+  // Re-sync on URL changes (e.g. category clicked elsewhere)
+  useEffect(() => {
+    setDestination(searchParams.get("q") ?? "");
+    setDate(searchParams.get("date") ?? "");
+    const g = Number(searchParams.get("guests") ?? "2");
+    setGuests(Math.max(1, Number.isFinite(g) ? g : 2));
+  }, [searchParams]);
 
   const handleSearch = () => {
-    const params = new URLSearchParams();
+    // Preserve any unrelated params (category, duration, rating)
+    const params = new URLSearchParams(searchParams.toString());
     if (destination.trim()) params.set("q", destination.trim());
+    else params.delete("q");
     if (date) params.set("date", date);
-    if (guests) params.set("guests", String(guests));
+    else params.delete("date");
+    if (guests && guests > 1) params.set("guests", String(guests));
+    else params.delete("guests");
     const qs = params.toString();
     router.push(`/tours${qs ? `?${qs}` : ""}`);
   };
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    handleSearch();
+  };
+
   return (
-    <div
+    <form
+      onSubmit={handleSubmit}
       className={cn(
         "flex w-full flex-col gap-3 rounded-2xl border border-white/60 bg-white/70 p-4 shadow-[0_20px_60px_-32px_rgba(92,70,39,0.5)] backdrop-blur",
         variant === "compact" && "rounded-xl p-3",
@@ -45,18 +67,25 @@ export function SearchBar({ variant = "hero", className }: SearchBarProps) {
             className="border-0 bg-transparent px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
           />
         </div>
-        <DateInput
-          min={todayISO()}
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
+        <div className="flex items-center gap-2 rounded-xl border border-input bg-white/80 px-3 py-2">
+          <Calendar className="h-4 w-4 shrink-0 text-muted-foreground" />
+          <DateInput
+            min={todayISO()}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            hideIcon
+            className="h-auto border-0 bg-transparent px-0 py-0 text-foreground shadow-none focus-visible:ring-0"
+          />
+        </div>
         <div className="flex items-center gap-2 rounded-xl border border-input bg-white/80 px-3 py-2">
           <Users className="h-4 w-4 text-muted-foreground" />
           <Input
             type="number"
             min={1}
             value={guests}
-            onChange={(e) => setGuests(Math.max(1, Number(e.target.value) || 1))}
+            onChange={(e) =>
+              setGuests(Math.max(1, Number(e.target.value) || 1))
+            }
             placeholder="Guests"
             className="border-0 bg-transparent px-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
           />
@@ -66,14 +95,10 @@ export function SearchBar({ variant = "hero", className }: SearchBarProps) {
         <p className="text-sm text-muted-foreground">
           Curated for private, refined travel experiences.
         </p>
-        <Button
-          type="button"
-          onClick={handleSearch}
-          className="rounded-full px-6"
-        >
+        <Button type="submit" className="rounded-full px-6">
           Search experiences
         </Button>
       </div>
-    </div>
+    </form>
   );
 }

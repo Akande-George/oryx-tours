@@ -20,13 +20,30 @@ type ToursPageProps = {
     category?: string;
     date?: string;
     guests?: string;
+    duration?: string;
+    rating?: string;
   }>;
 };
 
+const matchesDuration = (days: number, range: string) => {
+  switch (range) {
+    case "1-2 days":
+      return days <= 2;
+    case "3-5 days":
+      return days >= 3 && days <= 5;
+    case "6+ days":
+      return days >= 6;
+    default:
+      return true;
+  }
+};
+
 export default async function ToursPage({ searchParams }: ToursPageProps) {
-  const { q, category, guests } = await searchParams;
+  const { q, category, guests, duration, rating } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const allTours = await getTours(supabase);
+
+  const ratingThreshold = rating ? Number(rating) : 0;
 
   const tours = allTours.filter((tour: Tour) => {
     if (category && tour.category !== (category as TourCategory)) return false;
@@ -50,6 +67,8 @@ export default async function ToursPage({ searchParams }: ToursPageProps) {
         if (Number.isFinite(cap) && cap > 0 && cap < required) return false;
       }
     }
+    if (duration && !matchesDuration(tour.durationDays, duration)) return false;
+    if (ratingThreshold > 0 && tour.rating < ratingThreshold) return false;
     return true;
   });
 
@@ -57,6 +76,8 @@ export default async function ToursPage({ searchParams }: ToursPageProps) {
     q ? `"${q}"` : null,
     category ? `Category: ${category}` : null,
     guests ? `${guests} guests` : null,
+    duration && duration !== "Any" ? duration : null,
+    ratingThreshold > 0 ? `${ratingThreshold}+ stars` : null,
   ].filter(Boolean);
 
   return (
