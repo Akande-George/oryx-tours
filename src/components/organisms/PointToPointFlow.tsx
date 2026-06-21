@@ -18,26 +18,6 @@ import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 
 const MAX_STOPS = 6;
 
-const locationOptions = [
-  "Hamad International Airport",
-  "Doha Corniche",
-  "Souq Waqif",
-  "The Pearl-Qatar",
-  "Katara Cultural Village",
-  "Msheireb Downtown Doha",
-  "Lusail City",
-  "Education City",
-  "Aspire Park",
-  "Doha Festival City",
-  "Villaggio Mall",
-  "Mall of Qatar",
-  "Sheraton Doha",
-  "Four Seasons Doha",
-  "St Regis Doha",
-  "Banana Island Resort",
-  "Khor Al Adaid (Inland Sea)",
-] as const;
-
 export function PointToPointFlow() {
   const { vehicles } = useSupabaseCollections();
   const {
@@ -125,23 +105,15 @@ export function PointToPointFlow() {
                           </span>
                         )}
                       </p>
-                      <Select
-                        value={value || ""}
-                        onValueChange={(next) => setStop(index, next ?? "")}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue
-                            placeholder={`Select stop ${index + 1}`}
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {locationOptions.map((location) => (
-                            <SelectItem key={location} value={location}>
-                              {location}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Input
+                        value={value}
+                        onChange={(e) => setStop(index, e.target.value)}
+                        placeholder={
+                          isFirst
+                            ? "Drop-off address or landmark"
+                            : `Stop ${index + 1} address`
+                        }
+                      />
                     </div>
                     {canRemove ? (
                       <button

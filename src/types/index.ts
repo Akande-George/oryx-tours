@@ -54,7 +54,14 @@ export type Operator = {
   topBadge: string;
 };
 
-export type FleetCategory = "Economy" | "Premium" | "VIP";
+export type FleetCategory = string;
+
+export type FleetCategoryRecord = {
+  id: string;
+  title: string;
+  description?: string;
+  order?: number;
+};
 
 export type VehicleType =
   | "Sedan"

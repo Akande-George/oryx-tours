@@ -30,23 +30,36 @@ import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { FleetCategory, Vehicle } from "@/types";
 
-const categoryOptions: ("All" | FleetCategory)[] = [
-  "All",
-  "Economy",
-  "Premium",
-  "VIP",
-];
-
-const categoryBadge: Record<FleetCategory, string> = {
+const legacyBadgeTones: Record<string, string> = {
   Economy: "bg-emerald-100 text-emerald-800",
   Premium: "bg-amber-100 text-amber-800",
   VIP: "bg-rose-100 text-rose-700",
 };
+const categoryBadge = (name: string) =>
+  legacyBadgeTones[name] ?? "bg-slate-100 text-slate-800";
 
 export default function PartnerFleetPage() {
   const { user } = useAuth();
   const operatorId = user?.operatorId ?? "";
-  const { vehicles: liveVehicles } = useSupabaseCollections();
+  const {
+    vehicles: liveVehicles,
+    fleetCategories,
+    refresh,
+  } = useSupabaseCollections();
+  const categoryOptions: ("All" | FleetCategory)[] = useMemo(
+    () => [
+      "All",
+      ...[...fleetCategories]
+        .sort((a, b) => {
+          const ao = a.order ?? 0;
+          const bo = b.order ?? 0;
+          if (ao !== bo) return ao - bo;
+          return a.title.localeCompare(b.title);
+        })
+        .map((c) => c.title),
+    ],
+    [fleetCategories],
+  );
 
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [query, setQuery] = useState("");
@@ -82,6 +95,7 @@ export default function PartnerFleetPage() {
           ? prev.map((v) => (v.id === saved.id ? saved : v))
           : [saved, ...prev];
       });
+      void refresh();
     } catch (e) {
       window.alert((e as Error).message);
     }
@@ -90,7 +104,10 @@ export default function PartnerFleetPage() {
   const handleDelete = async (id: string) => {
     console.log("[partner/fleet] handleDelete", id);
     const ok = await deleteVehicle(createSupabaseBrowserClient(), id);
-    if (ok) setVehicles((prev) => prev.filter((v) => v.id !== id));
+    if (ok) {
+      setVehicles((prev) => prev.filter((v) => v.id !== id));
+      void refresh();
+    }
   };
 
   const filtered = useMemo(
@@ -186,10 +203,10 @@ export default function PartnerFleetPage() {
                         <Badge
                           className={cn(
                             "rounded-full",
-                            categoryBadge[vehicle.fleetCategory],
+                            categoryBadge(vehicle.fleetCategory),
                           )}
                         >
-                          {vehicle.fleetCategory}
+                          {vehicle.fleetCategory || "—"}
                         </Badge>
                       </TableCell>
                       <TableCell>{vehicle.capacity} pax</TableCell>

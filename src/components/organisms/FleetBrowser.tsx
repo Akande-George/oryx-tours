@@ -11,16 +11,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { VehicleCard } from "@/components/molecules/VehicleCard";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { FleetCategory, Vehicle, VehicleType } from "@/types";
 
 const PAGE_SIZE = 8;
-
-const categoryOptions: ("All" | FleetCategory)[] = [
-  "All",
-  "Economy",
-  "Premium",
-  "VIP",
-];
 
 const typeOptions: ("All" | VehicleType)[] = [
   "All",
@@ -47,6 +41,22 @@ export function FleetBrowser({
   onSelect,
   title = "Browse the fleet",
 }: FleetBrowserProps) {
+  const { fleetCategories } = useSupabaseCollections();
+  const categoryOptions: ("All" | FleetCategory)[] = useMemo(
+    () => [
+      "All",
+      ...[...fleetCategories]
+        .sort((a, b) => {
+          const ao = a.order ?? 0;
+          const bo = b.order ?? 0;
+          if (ao !== bo) return ao - bo;
+          return a.title.localeCompare(b.title);
+        })
+        .map((c) => c.title),
+    ],
+    [fleetCategories],
+  );
+
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<"All" | FleetCategory>("All");
   const [vehicleType, setVehicleType] = useState<"All" | VehicleType>("All");

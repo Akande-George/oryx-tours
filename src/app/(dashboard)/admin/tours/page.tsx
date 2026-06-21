@@ -33,6 +33,7 @@ export default function AdminToursPage() {
     operators,
     tours: liveTours,
     categories: liveCategories,
+    refresh,
   } = useSupabaseCollections();
   const categoryOptions = useMemo<("All" | TourCategory)[]>(
     () => ["All", ...liveCategories.map((c) => c.title)],
@@ -71,6 +72,7 @@ export default function AdminToursPage() {
           ? prev.map((t) => (t.id === saved.id ? saved : t))
           : [saved, ...prev];
       });
+      void refresh();
     } catch (e) {
       window.alert((e as Error).message);
     }
@@ -81,6 +83,7 @@ export default function AdminToursPage() {
     try {
       await deleteTour(createSupabaseBrowserClient(), id);
       setTours((prev) => prev.filter((t) => t.id !== id));
+      void refresh();
     } catch (e) {
       window.alert((e as Error).message);
     }

@@ -24,7 +24,7 @@ import type { Tour } from "@/types";
 export default function PartnerToursPage() {
   const { user } = useAuth();
   const operatorId = user?.operatorId ?? "";
-  const { tours: liveTours } = useSupabaseCollections();
+  const { tours: liveTours, refresh } = useSupabaseCollections();
 
   const [tours, setTours] = useState<Tour[]>([]);
   const [query, setQuery] = useState("");
@@ -65,6 +65,7 @@ export default function PartnerToursPage() {
           ? prev.map((t) => (t.id === saved.id ? saved : t))
           : [saved, ...prev];
       });
+      void refresh();
     } catch (e) {
       window.alert((e as Error).message);
     }
@@ -75,6 +76,7 @@ export default function PartnerToursPage() {
     try {
       await deleteTour(createSupabaseBrowserClient(), id);
       setTours((prev) => prev.filter((tour) => tour.id !== id));
+      void refresh();
     } catch (e) {
       window.alert((e as Error).message);
     }

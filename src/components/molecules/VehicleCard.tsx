@@ -61,9 +61,6 @@ export function VehicleCard({
           <p className="text-sm font-semibold text-primary">
             From {formatPrice(vehicle.halfDayPrice)}
           </p>
-          <p className="text-xs text-muted-foreground">
-            Transfer {formatPrice(vehicle.transferPrice)}
-          </p>
         </div>
       </CardContent>
     </Card>

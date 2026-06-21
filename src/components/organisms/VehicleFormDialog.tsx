@@ -21,9 +21,8 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { ImageUploader } from "@/components/atoms/ImageUploader";
+import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { FleetCategory, Vehicle, VehicleType } from "@/types";
-
-const fleetCategories: FleetCategory[] = ["Economy", "Premium", "VIP"];
 
 const vehicleTypes: VehicleType[] = [
   "Sedan",
@@ -48,7 +47,7 @@ const gradientPresets = [
 const emptyVehicle = (operatorId = ""): Vehicle => ({
   id: crypto.randomUUID(),
   name: "",
-  fleetCategory: "Economy",
+  fleetCategory: "",
   vehicleType: "Sedan",
   capacity: 4,
   luggage: "2 carry-on bags",
@@ -80,6 +79,13 @@ export function VehicleFormDialog({
   defaultOperatorId = "",
 }: VehicleFormDialogProps) {
   const mode = initialVehicle ? "edit" : "add";
+  const { fleetCategories } = useSupabaseCollections();
+  const sortedFleetCategories = [...fleetCategories].sort((a, b) => {
+    const ao = a.order ?? 0;
+    const bo = b.order ?? 0;
+    if (ao !== bo) return ao - bo;
+    return a.title.localeCompare(b.title);
+  });
   const [form, setForm] = useState<Vehicle>(
     () => initialVehicle ?? emptyVehicle(defaultOperatorId),
   );
@@ -115,6 +121,8 @@ export function VehicleFormDialog({
     if (form.transferPrice < 0) next.transferPrice = "Must be ≥ 0";
     if (form.pointToPointPrice < 0) next.pointToPointPrice = "Must be ≥ 0";
     if (!form.images.length) next.images = "Add at least one vehicle photo URL";
+    if (!form.fleetCategory?.trim())
+      next.fleetCategory = "Pick a fleet category";
     return next;
   };
 
@@ -169,16 +177,23 @@ export function VehicleFormDialog({
                 <Select
                   value={form.fleetCategory}
                   onValueChange={(v) =>
-                    update("fleetCategory", (v ?? "Economy") as FleetCategory)
+                    update("fleetCategory", (v ?? "") as FleetCategory)
                   }
+                  disabled={!sortedFleetCategories.length}
                 >
                   <SelectTrigger className="h-9 w-full">
-                    <SelectValue placeholder="Pick a category" />
+                    <SelectValue
+                      placeholder={
+                        sortedFleetCategories.length
+                          ? "Pick a category"
+                          : "No fleet categories yet — add one in /admin/fleet-categories"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
-                    {fleetCategories.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
+                    {sortedFleetCategories.map((c) => (
+                      <SelectItem key={c.id} value={c.title}>
+                        {c.title}
                       </SelectItem>
                     ))}
                   </SelectContent>

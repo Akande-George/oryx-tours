@@ -5,6 +5,7 @@ import type {
   BookingStatus,
   Category,
   Destination,
+  FleetCategoryRecord,
   Operator,
   Review,
   Tour,
@@ -48,6 +49,13 @@ export const getReviews = (client: SupabaseClient) =>
 
 export const getCategories = (client: SupabaseClient) =>
   readCollection<Category>(client, "categories", "categories");
+
+export const getFleetCategories = (client: SupabaseClient) =>
+  readCollection<FleetCategoryRecord>(
+    client,
+    "fleet_categories",
+    "fleet categories",
+  );
 
 export const getProfiles = (client: SupabaseClient) =>
   readCollection<AuthProfile>(client, "profiles", "profiles");
@@ -261,6 +269,20 @@ export const upsertCategory = (client: SupabaseClient, category: Category) =>
 
 export const deleteCategory = (client: SupabaseClient, id: string) =>
   deleteRow(client, "categories", id, "category");
+
+export const upsertFleetCategory = (
+  client: SupabaseClient,
+  category: FleetCategoryRecord,
+) =>
+  upsertRow<FleetCategoryRecord>(
+    client,
+    "fleet_categories",
+    category,
+    "fleet category",
+  );
+
+export const deleteFleetCategory = (client: SupabaseClient, id: string) =>
+  deleteRow(client, "fleet_categories", id, "fleet category");
 
 export const createBooking = async (
   client: SupabaseClient,

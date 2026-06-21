@@ -47,6 +47,7 @@ const navigationItems: NavigationItem[] = [
   { id: "admin-tours", name: "Tours", icon: Map, href: "/admin/tours", roles: ["admin"] },
   { id: "admin-categories", name: "Categories", icon: Tag, href: "/admin/categories", roles: ["admin"] },
   { id: "admin-fleet", name: "Fleet", icon: Car, href: "/admin/fleet", roles: ["admin"] },
+  { id: "admin-fleet-categories", name: "Fleet categories", icon: Tag, href: "/admin/fleet-categories", roles: ["admin"] },
   { id: "admin-bookings", name: "Bookings", icon: Calendar, href: "/admin/bookings", roles: ["admin"] },
   { id: "admin-partners", name: "Partners", icon: Users, href: "/admin/partners", roles: ["admin"] },
   { id: "admin-revenue", name: "Revenue", icon: BarChart3, href: "/admin/revenue", roles: ["admin"] },
