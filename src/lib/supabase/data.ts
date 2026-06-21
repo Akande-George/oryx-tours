@@ -16,8 +16,15 @@ const readCollection = async <T>(
   client: SupabaseClient,
   table: string,
   label: string,
+  orderColumn: string = "id",
 ) => {
-  const { data, error } = await client.from(table).select("*");
+  // Ordering by a deterministic column (default: id) keeps row positions
+  // stable across reads — without it, Postgres is free to return rows in
+  // any order, so an UPDATE shuffles items in the UI.
+  const { data, error } = await client
+    .from(table)
+    .select("*")
+    .order(orderColumn, { ascending: true });
 
   if (error) {
     if (process.env.NODE_ENV !== "production") {
