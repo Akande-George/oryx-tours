@@ -4,6 +4,7 @@ type SavedState = {
   savedSlugs: string[];
   toggleSaved: (slug: string) => void;
   isSaved: (slug: string) => boolean;
+  reset: () => void;
 };
 
 export const useSavedStore = create<SavedState>((set, get) => ({
@@ -18,4 +19,5 @@ export const useSavedStore = create<SavedState>((set, get) => ({
       };
     }),
   isSaved: (slug) => get().savedSlugs.includes(slug),
+  reset: () => set({ savedSlugs: [] }),
 }));

@@ -39,7 +39,7 @@ type AuthContextValue = {
   accounts: AuthProfile[];
   signIn: (args: SignInArgs) => Promise<AuthUser>;
   signUp: (args: SignUpArgs) => Promise<SignUpResult>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
   approvePartner: (accountId: string) => void;
   rejectPartner: (accountId: string) => void;
   updateMyProfile: (patch: ProfilePatch) => Promise<AuthUser>;
@@ -293,10 +293,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [updateAccountStatus],
   );
 
-  const signOut = useCallback(() => {
-    void supabase.auth.signOut();
+  const signOut = useCallback(async () => {
+    console.log("[auth] signOut start");
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error("[auth] supabase signOut threw", e);
+    }
     setUser(null);
     setAccounts([]);
+
+    if (typeof window !== "undefined") {
+      // Clear known app keys; leave unrelated keys alone.
+      try {
+        window.localStorage.removeItem("oryx-remember-me");
+        // Sweep any leftover supabase auth tokens (defensive).
+        for (let i = window.localStorage.length - 1; i >= 0; i--) {
+          const k = window.localStorage.key(i);
+          if (k && (k.startsWith("sb-") || k.includes("supabase"))) {
+            window.localStorage.removeItem(k);
+          }
+        }
+        window.sessionStorage.clear();
+      } catch {
+        /* ignore storage errors */
+      }
+
+      // Force a full reload so React/zustand state, route guards, and the
+      // sidebar all reset cleanly. Avoids the "Redirecting to Sign in"
+      // limbo when client-side routing races RLS-driven user state.
+      window.location.replace("/sign-in");
+    }
   }, []);
 
   const updateMyProfile = useCallback(

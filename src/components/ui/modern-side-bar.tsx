@@ -3,7 +3,7 @@
 import { useEffect, useState, type ComponentType } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   BarChart3,
   Calendar,
@@ -53,7 +53,6 @@ const navigationItems: NavigationItem[] = [
 ];
 
 export function Sidebar({ className = "" }: { className?: string }) {
-  const router = useRouter();
   const pathname = usePathname();
   const { user, signOut } = useAuth();
 
@@ -80,9 +79,7 @@ export function Sidebar({ className = "" }: { className?: string }) {
   };
 
   const handleSignOut = () => {
-    signOut();
-    router.push("/");
-    router.refresh();
+    void signOut();
   };
 
   const initials = user
