@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FleetBrowser } from "@/components/organisms/FleetBrowser";
+import { toast } from "@/components/molecules/Toaster";
 import { useBookingStore } from "@/store/booking-store";
 import { formatPrice, todayISO } from "@/lib/format";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
@@ -58,10 +59,11 @@ export function AirportTransferFlow() {
     : "Airport terminal";
 
   const handleConfirm = () => {
-    window.alert(
+    toast.success(
+      "Transfer confirmed",
       selected
-        ? `Transfer confirmed: ${selected.name} from ${pickup} to ${dropoff} on ${travelDate} (${formatPrice(selected.transferPrice)}).`
-        : "Transfer confirmed.",
+        ? `${selected.name} · ${pickup} → ${dropoff} · ${travelDate} · ${formatPrice(selected.transferPrice)}`
+        : undefined,
     );
   };
 

@@ -20,6 +20,8 @@ import {
   deleteFleetCategory,
   upsertFleetCategory,
 } from "@/lib/supabase/data";
+import { toast } from "@/components/molecules/Toaster";
+import { confirmAction } from "@/components/molecules/ConfirmDialog";
 import type { FleetCategoryRecord } from "@/types";
 
 export default function AdminFleetCategoriesPage() {
@@ -54,6 +56,7 @@ export default function AdminFleetCategoriesPage() {
   };
 
   const handleSubmit = async (record: FleetCategoryRecord) => {
+    const isEdit = items.some((c) => c.id === record.id);
     try {
       const saved = await upsertFleetCategory(
         createSupabaseBrowserClient(),
@@ -65,17 +68,32 @@ export default function AdminFleetCategoriesPage() {
           ? prev.map((c) => (c.id === saved.id ? saved : c))
           : [...prev, saved];
       });
+      toast.success(
+        isEdit ? "Fleet category updated" : "Fleet category added",
+        saved.title,
+      );
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't save category", (e as Error).message);
     }
   };
 
   const handleDelete = async (id: string) => {
+    const removed = items.find((c) => c.id === id);
+    const ok = await confirmAction({
+      title: "Delete this fleet category?",
+      description: removed
+        ? `"${removed.title}" will be removed. Vehicles tagged with it will keep the string.`
+        : "This fleet category will be permanently removed.",
+      confirmLabel: "Delete",
+      tone: "destructive",
+    });
+    if (!ok) return;
     try {
       await deleteFleetCategory(createSupabaseBrowserClient(), id);
       setItems((prev) => prev.filter((c) => c.id !== id));
+      toast.success("Fleet category deleted", removed?.title);
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't delete category", (e as Error).message);
     }
   };
 

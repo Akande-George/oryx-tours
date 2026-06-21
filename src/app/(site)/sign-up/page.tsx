@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Container } from "@/components/layout/Container";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { toast } from "@/components/molecules/Toaster";
 import { roleHomePath } from "@/lib/auth";
 
 type AccountType = "customer" | "partner";
@@ -127,16 +128,21 @@ export default function SignUpPage() {
           name: `${formData.firstName.trim()} ${formData.lastName.trim()}`,
           email: result.account.email,
         });
+        toast.info(
+          "Application received",
+          "We'll review your operator account within 48 hours.",
+        );
         setIsLoading(false);
         return;
       }
+      toast.success(`Welcome to Oryx Group, ${formData.firstName.trim()}`);
       router.push(roleHomePath[result.user.role]);
       router.refresh();
     } catch (err) {
-      setErrors({
-        general:
-          err instanceof Error ? err.message : "Unable to create account.",
-      });
+      const message =
+        err instanceof Error ? err.message : "Unable to create account.";
+      setErrors({ general: message });
+      toast.error("Sign up failed", message);
       setIsLoading(false);
     }
   };

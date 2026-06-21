@@ -19,6 +19,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { updateBookingStatus } from "@/lib/supabase/data";
+import { toast } from "@/components/molecules/Toaster";
 import { formatDate, formatPrice } from "@/lib/format";
 import type { Booking, BookingStatus } from "@/types";
 
@@ -63,8 +64,12 @@ export function BookingDetailsDialog({
         );
       }
       onStatusChange?.(booking.id, next);
+      toast.success(
+        next === "Cancelled" ? "Booking cancelled" : `Booking ${next.toLowerCase()}`,
+        booking.reference,
+      );
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't update booking", (e as Error).message);
     } finally {
       setSaving(false);
     }

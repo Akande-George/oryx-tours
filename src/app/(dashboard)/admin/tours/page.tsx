@@ -26,6 +26,8 @@ import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { deleteTour, upsertTour } from "@/lib/supabase/data";
+import { toast } from "@/components/molecules/Toaster";
+import { confirmAction } from "@/components/molecules/ConfirmDialog";
 import type { Tour, TourCategory } from "@/types";
 
 export default function AdminToursPage() {
@@ -64,6 +66,7 @@ export default function AdminToursPage() {
 
   const handleSubmit = async (tour: Tour) => {
     console.log("[admin/tours] handleSubmit", tour);
+    const isEdit = tours.some((t) => t.id === tour.id);
     try {
       const saved = await upsertTour(createSupabaseBrowserClient(), tour);
       setTours((prev) => {
@@ -73,19 +76,22 @@ export default function AdminToursPage() {
           : [saved, ...prev];
       });
       void refresh();
+      toast.success(isEdit ? "Tour updated" : "Tour added", saved.title);
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't save tour", (e as Error).message);
     }
   };
 
   const handleDelete = async (id: string) => {
     console.log("[admin/tours] handleDelete", id);
+    const removed = tours.find((t) => t.id === id);
     try {
       await deleteTour(createSupabaseBrowserClient(), id);
       setTours((prev) => prev.filter((t) => t.id !== id));
       void refresh();
+      toast.success("Tour deleted", removed?.title);
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't delete tour", (e as Error).message);
     }
   };
 

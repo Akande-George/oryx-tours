@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Container } from "@/components/layout/Container";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { toast } from "@/components/molecules/Toaster";
 import { roleHomePath } from "@/lib/auth";
 
 function SignInForm() {
@@ -39,10 +40,14 @@ function SignInForm() {
         nextPath && nextPath.startsWith("/")
           ? nextPath
           : roleHomePath[user.role];
+      toast.success(`Welcome back, ${user.name.split(" ")[0] || "there"}`);
       router.push(target);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to sign in.");
+      const message =
+        err instanceof Error ? err.message : "Unable to sign in.";
+      setError(message);
+      toast.error("Sign in failed", message);
       setSubmitting(false);
     }
   };

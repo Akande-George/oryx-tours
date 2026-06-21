@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FleetBrowser } from "@/components/organisms/FleetBrowser";
+import { toast } from "@/components/molecules/Toaster";
 import { useBookingStore } from "@/store/booking-store";
 import { formatPrice, todayISO } from "@/lib/format";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
@@ -56,12 +57,13 @@ export function PointToPointFlow() {
 
   const handleConfirm = () => {
     if (!selected) {
-      window.alert("Booking confirmed.");
+      toast.success("Booking confirmed");
       return;
     }
     const route = [pickup, ...activeStops].join(" → ");
-    window.alert(
-      `Point-to-point booked: ${selected.name} on ${travelDate} (${formatPrice(total)}).\nRoute: ${route}`,
+    toast.success(
+      "Point-to-point booked",
+      `${selected.name} · ${travelDate} · ${formatPrice(total)} · ${route}`,
     );
   };
 

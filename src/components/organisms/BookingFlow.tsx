@@ -8,6 +8,7 @@ import { ProgressSteps } from "@/components/organisms/ProgressSteps";
 import { useBookingStore } from "@/store/booking-store";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { formatDate, formatPrice, todayISO } from "@/lib/format";
+import { toast } from "@/components/molecules/Toaster";
 import type { Tour } from "@/types";
 
 const steps = ["Select dates", "Traveler details", "Review booking"];
@@ -73,7 +74,7 @@ export function BookingFlow({ tour }: BookingFlowProps) {
       reset();
       window.location.href = json.paymentUrl;
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't start payment", (e as Error).message);
       setSubmitting(false);
     }
   };

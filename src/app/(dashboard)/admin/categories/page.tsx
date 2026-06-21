@@ -17,6 +17,8 @@ import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { deleteCategory, upsertCategory } from "@/lib/supabase/data";
+import { toast } from "@/components/molecules/Toaster";
+import { confirmAction } from "@/components/molecules/ConfirmDialog";
 import type { Category } from "@/types";
 
 export default function AdminCategoriesPage() {
@@ -51,6 +53,7 @@ export default function AdminCategoriesPage() {
   };
 
   const handleSubmit = async (category: Category) => {
+    const isEdit = categories.some((c) => c.id === category.id);
     try {
       const saved = await upsertCategory(
         createSupabaseBrowserClient(),
@@ -62,17 +65,29 @@ export default function AdminCategoriesPage() {
           ? prev.map((c) => (c.id === saved.id ? saved : c))
           : [...prev, saved];
       });
+      toast.success(isEdit ? "Category updated" : "Category added", saved.title);
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't save category", (e as Error).message);
     }
   };
 
   const handleDelete = async (id: string) => {
+    const removed = categories.find((c) => c.id === id);
+    const ok = await confirmAction({
+      title: "Delete this category?",
+      description: removed
+        ? `"${removed.title}" will be removed. Tours that reference it will keep the string but lose the source row.`
+        : "This category will be permanently removed.",
+      confirmLabel: "Delete",
+      tone: "destructive",
+    });
+    if (!ok) return;
     try {
       await deleteCategory(createSupabaseBrowserClient(), id);
       setCategories((prev) => prev.filter((c) => c.id !== id));
+      toast.success("Category deleted", removed?.title);
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't delete category", (e as Error).message);
     }
   };
 

@@ -16,6 +16,7 @@ import {
   updateProfile,
   updateProfileStatus,
 } from "@/lib/supabase/data";
+import { toast } from "@/components/molecules/Toaster";
 import type { AuthProfile, AuthUser, UserRole } from "@/lib/auth";
 
 type SignInArgs = { email: string; password: string };
@@ -280,15 +281,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const approvePartner = useCallback(
-    (accountId: string) => {
-      void updateAccountStatus(accountId, "active");
+    async (accountId: string) => {
+      await updateAccountStatus(accountId, "active");
+      toast.success("Partner approved");
     },
     [updateAccountStatus],
   );
 
   const rejectPartner = useCallback(
-    (accountId: string) => {
-      void updateAccountStatus(accountId, "rejected");
+    async (accountId: string) => {
+      await updateAccountStatus(accountId, "rejected");
+      toast.info("Partner rejected");
     },
     [updateAccountStatus],
   );
@@ -302,6 +305,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setUser(null);
     setAccounts([]);
+
+    toast.info("Signed out");
 
     if (typeof window !== "undefined") {
       // Clear known app keys; leave unrelated keys alone.
@@ -328,7 +333,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateMyProfile = useCallback(
     async (patch: ProfilePatch) => {
-      if (!user) throw new Error("Not signed in");
+      if (!user) {
+        toast.error("Not signed in");
+        throw new Error("Not signed in");
+      }
       const updated = await updateProfile(supabase, user.id, patch);
       const nextUser = toAuthUser(updated);
       setUser(nextUser);

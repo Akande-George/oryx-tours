@@ -26,6 +26,8 @@ import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { deleteVehicle, upsertVehicle } from "@/lib/supabase/data";
+import { toast } from "@/components/molecules/Toaster";
+import { confirmAction } from "@/components/molecules/ConfirmDialog";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { FleetCategory, Vehicle } from "@/types";
@@ -80,6 +82,7 @@ export default function AdminFleetPage() {
 
   const handleSubmit = async (vehicle: Vehicle) => {
     console.log("[admin/fleet] handleSubmit", vehicle);
+    const isEdit = vehicles.some((v) => v.id === vehicle.id);
     try {
       const saved = await upsertVehicle(createSupabaseBrowserClient(), vehicle);
       setVehicles((prev) => {
@@ -89,17 +92,31 @@ export default function AdminFleetPage() {
           : [saved, ...prev];
       });
       void refresh();
+      toast.success(isEdit ? "Vehicle updated" : "Vehicle added", saved.name);
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't save vehicle", (e as Error).message);
     }
   };
 
   const handleDelete = async (id: string) => {
     console.log("[admin/fleet] handleDelete", id);
+    const removed = vehicles.find((v) => v.id === id);
+    const confirmed = await confirmAction({
+      title: "Remove this vehicle?",
+      description: removed
+        ? `"${removed.name}" will be permanently removed from the fleet.`
+        : "This vehicle will be permanently removed.",
+      confirmLabel: "Remove",
+      tone: "destructive",
+    });
+    if (!confirmed) return;
     const ok = await deleteVehicle(createSupabaseBrowserClient(), id);
     if (ok) {
       setVehicles((prev) => prev.filter((v) => v.id !== id));
       void refresh();
+      toast.success("Vehicle removed", removed?.name);
+    } else {
+      toast.error("Couldn't remove vehicle");
     }
   };
 

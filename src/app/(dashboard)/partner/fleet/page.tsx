@@ -26,6 +26,8 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { deleteVehicle, upsertVehicle } from "@/lib/supabase/data";
+import { toast } from "@/components/molecules/Toaster";
+import { confirmAction } from "@/components/molecules/ConfirmDialog";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { FleetCategory, Vehicle } from "@/types";
@@ -87,6 +89,7 @@ export default function PartnerFleetPage() {
   const handleSubmit = async (vehicle: Vehicle) => {
     const scoped: Vehicle = { ...vehicle, operatorId };
     console.log("[partner/fleet] handleSubmit", { scoped, operatorId });
+    const isEdit = vehicles.some((v) => v.id === scoped.id);
     try {
       const saved = await upsertVehicle(createSupabaseBrowserClient(), scoped);
       setVehicles((prev) => {
@@ -96,17 +99,31 @@ export default function PartnerFleetPage() {
           : [saved, ...prev];
       });
       void refresh();
+      toast.success(isEdit ? "Vehicle updated" : "Vehicle added", saved.name);
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't save vehicle", (e as Error).message);
     }
   };
 
   const handleDelete = async (id: string) => {
     console.log("[partner/fleet] handleDelete", id);
+    const removed = vehicles.find((v) => v.id === id);
+    const confirmed = await confirmAction({
+      title: "Remove this vehicle?",
+      description: removed
+        ? `"${removed.name}" will be permanently removed.`
+        : "This vehicle will be permanently removed.",
+      confirmLabel: "Remove",
+      tone: "destructive",
+    });
+    if (!confirmed) return;
     const ok = await deleteVehicle(createSupabaseBrowserClient(), id);
     if (ok) {
       setVehicles((prev) => prev.filter((v) => v.id !== id));
       void refresh();
+      toast.success("Vehicle removed", removed?.name);
+    } else {
+      toast.error("Couldn't remove vehicle");
     }
   };
 

@@ -19,6 +19,8 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { deleteTour, upsertTour } from "@/lib/supabase/data";
+import { toast } from "@/components/molecules/Toaster";
+import { confirmAction } from "@/components/molecules/ConfirmDialog";
 import type { Tour } from "@/types";
 
 export default function PartnerToursPage() {
@@ -57,6 +59,7 @@ export default function PartnerToursPage() {
   const handleSubmit = async (tour: Tour) => {
     const scoped: Tour = { ...tour, operatorId };
     console.log("[partner/tours] handleSubmit", { scoped, operatorId });
+    const isEdit = tours.some((t) => t.id === scoped.id);
     try {
       const saved = await upsertTour(createSupabaseBrowserClient(), scoped);
       setTours((prev) => {
@@ -66,19 +69,31 @@ export default function PartnerToursPage() {
           : [saved, ...prev];
       });
       void refresh();
+      toast.success(isEdit ? "Tour updated" : "Tour added", saved.title);
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't save tour", (e as Error).message);
     }
   };
 
   const handleDelete = async (id: string) => {
     console.log("[partner/tours] handleDelete", id);
+    const removed = tours.find((t) => t.id === id);
+    const ok = await confirmAction({
+      title: "Delete this tour?",
+      description: removed
+        ? `"${removed.title}" will be permanently removed.`
+        : "This tour will be permanently removed.",
+      confirmLabel: "Delete",
+      tone: "destructive",
+    });
+    if (!ok) return;
     try {
       await deleteTour(createSupabaseBrowserClient(), id);
       setTours((prev) => prev.filter((tour) => tour.id !== id));
       void refresh();
+      toast.success("Tour deleted", removed?.title);
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't delete tour", (e as Error).message);
     }
   };
 

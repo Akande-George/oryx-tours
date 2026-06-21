@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FleetBrowser } from "@/components/organisms/FleetBrowser";
+import { toast } from "@/components/molecules/Toaster";
 import { useBookingStore } from "@/store/booking-store";
 import { formatPrice, todayISO } from "@/lib/format";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
@@ -62,10 +63,11 @@ export function LocalTransportFlow() {
     !!selected;
 
   const handleConfirm = () => {
-    window.alert(
+    toast.success(
+      "Day hire booked",
       selected
-        ? `Day hire booked: ${selected.name} for ${durationLabel[dayHireMode]} on ${travelDate} (${formatPrice(total)}).`
-        : "Booking confirmed.",
+        ? `${selected.name} · ${durationLabel[dayHireMode]} · ${travelDate} · ${formatPrice(total)}`
+        : undefined,
     );
   };
 

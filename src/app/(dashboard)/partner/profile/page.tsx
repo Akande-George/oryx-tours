@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { toast } from "@/components/molecules/Toaster";
 
 export default function PartnerProfilePage() {
   const { user, updateMyProfile } = useAuth();
@@ -37,8 +38,9 @@ export default function PartnerProfilePage() {
         companyName: companyName.trim() || undefined,
       });
       setMessage("Profile updated.");
+      toast.success("Profile updated");
     } catch (e) {
-      window.alert((e as Error).message);
+      toast.error("Couldn't update profile", (e as Error).message);
     } finally {
       setSaving(false);
     }

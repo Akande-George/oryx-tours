@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { Toaster } from "@/components/molecules/Toaster";
+import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,6 +32,8 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-background text-foreground">
         <AuthProvider>{children}</AuthProvider>
+        <Toaster />
+        <ConfirmDialog />
       </body>
     </html>
   );

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/atoms";
+import { toast } from "@/components/molecules/Toaster";
 
 type ActionButtonProps = {
   label: string;
@@ -39,7 +40,7 @@ export function ActionButton({
       return;
     }
 
-    window.alert(message ?? `${label} confirmed.`);
+    toast.success(message ?? `${label} confirmed.`);
   };
 
   return (

@@ -1,15 +1,9 @@
 import { SearchBar } from "@/components/molecules/SearchBar";
+import { SortSelect } from "@/components/molecules/SortSelect";
 import { TourCard } from "@/components/molecules/TourCard";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { FiltersPanel } from "@/components/organisms/FiltersPanel";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTours } from "@/lib/supabase/data";
 import type { Tour, TourCategory } from "@/types";
@@ -22,6 +16,7 @@ type ToursPageProps = {
     guests?: string;
     duration?: string;
     rating?: string;
+    sort?: string;
   }>;
 };
 
@@ -38,14 +33,31 @@ const matchesDuration = (days: number, range: string) => {
   }
 };
 
+const sortTours = (tours: Tour[], sort?: string): Tour[] => {
+  const copy = [...tours];
+  switch (sort) {
+    case "price-asc":
+      return copy.sort((a, b) => a.priceFrom - b.priceFrom);
+    case "price-desc":
+      return copy.sort((a, b) => b.priceFrom - a.priceFrom);
+    case "rating":
+      return copy.sort((a, b) => {
+        if (b.rating !== a.rating) return b.rating - a.rating;
+        return (b.reviewsCount ?? 0) - (a.reviewsCount ?? 0);
+      });
+    default:
+      return copy;
+  }
+};
+
 export default async function ToursPage({ searchParams }: ToursPageProps) {
-  const { q, category, guests, duration, rating } = await searchParams;
+  const { q, category, guests, duration, rating, sort } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const allTours = await getTours(supabase);
 
   const ratingThreshold = rating ? Number(rating) : 0;
 
-  const tours = allTours.filter((tour: Tour) => {
+  const filtered = allTours.filter((tour: Tour) => {
     if (category && tour.category !== (category as TourCategory)) return false;
     if (q) {
       const needle = q.toLowerCase();
@@ -72,6 +84,8 @@ export default async function ToursPage({ searchParams }: ToursPageProps) {
     return true;
   });
 
+  const tours = sortTours(filtered, sort);
+
   const activeFilters = [
     q ? `"${q}"` : null,
     category ? `Category: ${category}` : null,
@@ -96,17 +110,7 @@ export default async function ToursPage({ searchParams }: ToursPageProps) {
               ? ` — filtered by ${activeFilters.join(" · ")}`
               : ""}
           </p>
-          <Select defaultValue="recommended">
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="recommended">Recommended</SelectItem>
-              <SelectItem value="price-asc">Price: Low to High</SelectItem>
-              <SelectItem value="price-desc">Price: High to Low</SelectItem>
-              <SelectItem value="rating">Top rated</SelectItem>
-            </SelectContent>
-          </Select>
+          <SortSelect />
         </div>
         {tours.length ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
