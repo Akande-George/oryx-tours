@@ -226,17 +226,28 @@ const upsertRow = async <T extends { id: string }>(
   row: T,
   label: string,
 ): Promise<T> => {
-  // Strip null / undefined / empty-string keys so they don't trip
-  // FK / not-null constraints when the caller wants the DB default.
+  // Normalize the row before writing:
+  //  - drop `undefined` keys (no value to write)
+  //  - convert an empty `operatorId` to null so it doesn't trip the FK
+  // Everything else — including empty strings and empty arrays — is kept so
+  // that editing can clear a field back to empty (e.g. removing a video URL
+  // or emptying the itinerary).
   const sanitized = Object.fromEntries(
-    Object.entries(row).filter(([, v]) => v !== null && v !== undefined && v !== ""),
+    Object.entries(row)
+      .filter(([, v]) => v !== undefined)
+      .map(([k, v]) => {
+        if (k === "operatorId" && (v === "" || v === null)) return [k, null];
+        return [k, v];
+      }),
   );
   console.log(`[supabase] upsert ${label}`, sanitized);
+  // NOTE: use .select() (not .single()). With .single(), a successful write
+  // whose row is then hidden by an RLS SELECT policy returns 0 rows and
+  // surfaces as an error — making a save that actually persisted look failed.
   const { data, error } = await client
     .from(table)
     .upsert(sanitized)
-    .select()
-    .single();
+    .select();
 
   console.log(`[supabase] upsert ${label} result`, { data, error });
 
@@ -245,7 +256,10 @@ const upsertRow = async <T extends { id: string }>(
     throw new Error(formatSupabaseError(`Failed to save ${label}`, error));
   }
 
-  return data as T;
+  // If the write succeeded but the select returned nothing (RLS read rules),
+  // fall back to the row we just sent so the UI still updates optimistically.
+  const saved = (data && data[0]) ?? sanitized;
+  return saved as T;
 };
 
 const deleteRow = async (

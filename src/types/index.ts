@@ -7,6 +7,13 @@ export type Category = {
   order?: number;
 };
 
+export type ItineraryItem = {
+  title: string;
+  detail: string;
+  duration?: string;
+  admission?: string;
+};
+
 export type Tour = {
   id: string;
   slug: string;
@@ -24,6 +31,8 @@ export type Tour = {
   videoUrl?: string;
   highlights: string[];
   includes: string[];
+  itinerary?: ItineraryItem[];
+  reviews?: Review[];
   gradient: string;
   gallery: string[];
   images: string[];

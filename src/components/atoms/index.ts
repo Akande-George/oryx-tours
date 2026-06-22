@@ -4,3 +4,4 @@ export { Badge } from "@/components/ui/badge";
 export { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export { ActionButton } from "@/components/atoms/ActionButton";
 export { DateInput } from "@/components/atoms/DateInput";
+export { Spinner, LoadingState } from "@/components/atoms/Spinner";

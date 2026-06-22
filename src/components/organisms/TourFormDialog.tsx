@@ -23,7 +23,8 @@ import {
 import { cn } from "@/lib/utils";
 import { ImageUploader } from "@/components/atoms/ImageUploader";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
-import type { Tour, TourCategory } from "@/types";
+import { RatingStars } from "@/components/molecules/RatingStars";
+import type { ItineraryItem, Review, Tour, TourCategory } from "@/types";
 
 const difficulties: Tour["difficulty"][] = ["Easy", "Moderate", "Challenging"];
 
@@ -61,6 +62,8 @@ const emptyTour = (): Tour => ({
   videoUrl: "",
   highlights: [],
   includes: [],
+  itinerary: [],
+  reviews: [],
   gradient: gradientPresets[0],
   gallery: [],
   images: [],
@@ -322,7 +325,7 @@ export function TourFormDialog({
                 <Input
                   value={form.videoUrl ?? ""}
                   onChange={(e) => update("videoUrl", e.target.value)}
-                  placeholder="https://www.youtube.com/embed/..."
+                  placeholder="Paste a video link (optional)"
                 />
               </Field>
             </div>
@@ -343,25 +346,16 @@ export function TourFormDialog({
           </FormSection>
 
           <FormSection
-            title="Itinerary highlights"
-            description="What stands out about this trip. One bullet per line."
+            title="What's included"
+            description="Inclusions listed in the sidebar — guide, meals, transfers, and so on. One per line."
           >
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Highlights">
-                <ListEditor
-                  value={form.highlights}
-                  onChange={(v) => update("highlights", v)}
-                  placeholder="Sunrise over the dunes"
-                />
-              </Field>
-              <Field label="What's included">
-                <ListEditor
-                  value={form.includes}
-                  onChange={(v) => update("includes", v)}
-                  placeholder="Private guide for 3 days"
-                />
-              </Field>
-            </div>
+            <Field label="What's included">
+              <ListEditor
+                value={form.includes}
+                onChange={(v) => update("includes", v)}
+                placeholder="Private guide for 3 days"
+              />
+            </Field>
           </FormSection>
 
           <FormSection
@@ -375,6 +369,26 @@ export function TourFormDialog({
                 placeholder="Type a tag and press Enter"
               />
             </Field>
+          </FormSection>
+
+          <FormSection
+            title="Itinerary"
+            description="Day-by-day breakdown shown under the Itinerary tab on the detail page."
+          >
+            <ItineraryEditor
+              value={form.itinerary ?? []}
+              onChange={(v) => update("itinerary", v)}
+            />
+          </FormSection>
+
+          <FormSection
+            title="Reviews"
+            description="Traveler reviews shown under the Reviews tab on the detail page."
+          >
+            <ReviewEditor
+              value={form.reviews ?? []}
+              onChange={(v) => update("reviews", v)}
+            />
           </FormSection>
 
           <FormSection
@@ -638,6 +652,190 @@ function ChipEditor({
           ))}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function ItineraryEditor({
+  value,
+  onChange,
+}: {
+  value: ItineraryItem[];
+  onChange: (next: ItineraryItem[]) => void;
+}) {
+  const updateItem = (index: number, patch: Partial<ItineraryItem>) => {
+    onChange(value.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+  };
+
+  const addItem = () =>
+    onChange([
+      ...value,
+      { title: "", detail: "", duration: "", admission: "" },
+    ]);
+
+  return (
+    <div className="space-y-3">
+      {value.length ? (
+        <ul className="space-y-3">
+          {value.map((item, idx) => (
+            <li
+              key={idx}
+              className="space-y-2 rounded-xl border border-border bg-background p-3"
+            >
+              <div className="flex items-center gap-2">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+                  {idx + 1}
+                </span>
+                <Input
+                  value={item.title}
+                  onChange={(e) => updateItem(idx, { title: e.target.value })}
+                  placeholder="Stop title (e.g. Doha Corniche)"
+                  className="flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => onChange(value.filter((_, i) => i !== idx))}
+                  className="shrink-0 text-muted-foreground transition-colors hover:text-destructive"
+                  aria-label="Remove stop"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+              <Textarea
+                value={item.detail}
+                onChange={(e) => updateItem(idx, { detail: e.target.value })}
+                placeholder="Describe this stop — what travelers see and do…"
+                className="min-h-[80px]"
+              />
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Input
+                  value={item.duration ?? ""}
+                  onChange={(e) =>
+                    updateItem(idx, { duration: e.target.value })
+                  }
+                  placeholder="Duration (e.g. 1 hour 30 minutes)"
+                />
+                <Input
+                  value={item.admission ?? ""}
+                  onChange={(e) =>
+                    updateItem(idx, { admission: e.target.value })
+                  }
+                  placeholder="Admission (e.g. Admission Ticket Free)"
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-xs text-muted-foreground">No itinerary stops yet.</p>
+      )}
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={addItem}
+        className="rounded-lg"
+      >
+        <Plus className="size-3.5" /> Add stop
+      </Button>
+    </div>
+  );
+}
+
+function ReviewEditor({
+  value,
+  onChange,
+}: {
+  value: Review[];
+  onChange: (next: Review[]) => void;
+}) {
+  const updateItem = (index: number, patch: Partial<Review>) => {
+    onChange(value.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+  };
+
+  const addItem = () =>
+    onChange([
+      ...value,
+      {
+        id: crypto.randomUUID(),
+        name: "",
+        rating: 5,
+        date: new Date().toISOString().slice(0, 10),
+        content: "",
+      },
+    ]);
+
+  return (
+    <div className="space-y-3">
+      {value.length ? (
+        <ul className="space-y-3">
+          {value.map((item, idx) => (
+            <li
+              key={item.id}
+              className="space-y-2 rounded-xl border border-border bg-background p-3"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  value={item.name}
+                  onChange={(e) => updateItem(idx, { name: e.target.value })}
+                  placeholder="Reviewer name"
+                  className="min-w-[160px] flex-1"
+                />
+                <Input
+                  type="date"
+                  value={item.date}
+                  onChange={(e) => updateItem(idx, { date: e.target.value })}
+                  className="w-[150px]"
+                />
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={5}
+                    step={0.5}
+                    value={item.rating}
+                    onChange={(e) =>
+                      updateItem(idx, {
+                        rating: Math.min(
+                          5,
+                          Math.max(0, Number(e.target.value) || 0),
+                        ),
+                      })
+                    }
+                    className="w-[80px]"
+                  />
+                  <RatingStars rating={item.rating} />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onChange(value.filter((_, i) => i !== idx))}
+                  className="shrink-0 text-muted-foreground transition-colors hover:text-destructive"
+                  aria-label="Remove review"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+              <Textarea
+                value={item.content}
+                onChange={(e) => updateItem(idx, { content: e.target.value })}
+                placeholder="What the traveler said…"
+                className="min-h-[70px]"
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-xs text-muted-foreground">No reviews yet.</p>
+      )}
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={addItem}
+        className="rounded-lg"
+      >
+        <Plus className="size-3.5" /> Add review
+      </Button>
     </div>
   );
 }

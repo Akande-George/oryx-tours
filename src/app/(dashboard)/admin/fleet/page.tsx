@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { FileDown, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { Badge, Button, Input } from "@/components/atoms";
+import { Badge, Button, Input, Spinner } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import {
   Table,
@@ -45,6 +45,7 @@ export default function AdminFleetPage() {
     vehicles: liveVehicles,
     fleetCategories,
     refresh,
+    ready,
   } = useSupabaseCollections();
   const categoryOptions: ("All" | FleetCategory)[] = useMemo(
     () => [
@@ -290,7 +291,13 @@ export default function AdminFleetPage() {
                       colSpan={9}
                       className="text-center text-sm text-muted-foreground"
                     >
-                      No vehicles match these filters.
+                      {!ready ? (
+                        <span className="inline-flex items-center gap-2">
+                          <Spinner className="size-4" /> Loading fleet…
+                        </span>
+                      ) : (
+                        "No vehicles match these filters."
+                      )}
                     </TableCell>
                   </TableRow>
                 )}

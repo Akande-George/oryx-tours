@@ -3,21 +3,16 @@ import { buttonVariants } from "@/components/ui/button";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { CategoryCard } from "@/components/molecules/CategoryCard";
-import { DestinationCard } from "@/components/molecules/DestinationCard";
+import { TourCard } from "@/components/molecules/TourCard";
 import { FeaturedTours } from "@/components/organisms/FeaturedTours";
 import { Hero2 } from "@/components/ui/hero-2-1";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import {
-  getCategories,
-  getDestinations,
-  getTours,
-} from "@/lib/supabase/data";
+import { getCategories, getTours } from "@/lib/supabase/data";
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
-  const [tours, destinations, categoriesRaw] = await Promise.all([
+  const [tours, categoriesRaw] = await Promise.all([
     getTours(supabase),
-    getDestinations(supabase),
     getCategories(supabase),
   ]);
 
@@ -27,6 +22,13 @@ export default async function HomePage() {
     if (ao !== bo) return ao - bo;
     return a.title.localeCompare(b.title);
   });
+
+  const topRatedTours = [...tours]
+    .sort((a, b) => {
+      if (b.rating !== a.rating) return b.rating - a.rating;
+      return (b.reviewsCount ?? 0) - (a.reviewsCount ?? 0);
+    })
+    .slice(0, 6);
 
   return (
     <div className="flex flex-col gap-16">
@@ -60,14 +62,20 @@ export default async function HomePage() {
       <section className="py-4">
         <Container className="space-y-10">
           <SectionHeading
-            title="Popular destinations"
-            subtitle="Explore signature regions loved by returning travelers."
+            title="Popular tours"
+            subtitle="Our highest-rated experiences, loved by returning travelers."
           />
-          <div className="grid gap-6 md:grid-cols-3">
-            {destinations.map((destination) => (
-              <DestinationCard key={destination.id} destination={destination} />
-            ))}
-          </div>
+          {topRatedTours.length ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {topRatedTours.map((tour) => (
+                <TourCard key={tour.id} tour={tour} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No tours published yet.
+            </p>
+          )}
         </Container>
       </section>
 

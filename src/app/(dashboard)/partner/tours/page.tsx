@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { Badge, Button, Input } from "@/components/atoms";
+import { Badge, Button, Input, Spinner } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import {
   Table,
@@ -26,7 +26,7 @@ import type { Tour } from "@/types";
 export default function PartnerToursPage() {
   const { user } = useAuth();
   const operatorId = user?.operatorId ?? "";
-  const { tours: liveTours, refresh } = useSupabaseCollections();
+  const { tours: liveTours, refresh, ready } = useSupabaseCollections();
 
   const [tours, setTours] = useState<Tour[]>([]);
   const [query, setQuery] = useState("");
@@ -183,9 +183,15 @@ export default function PartnerToursPage() {
                       colSpan={6}
                       className="text-center text-sm text-muted-foreground"
                     >
-                      {tours.length
-                        ? "No tours match this search."
-                        : "You haven't added any tours yet. Click 'Add tour' to get started."}
+                      {!ready ? (
+                        <span className="inline-flex items-center gap-2">
+                          <Spinner className="size-4" /> Loading tours…
+                        </span>
+                      ) : tours.length ? (
+                        "No tours match this search."
+                      ) : (
+                        "You haven't added any tours yet. Click 'Add tour' to get started."
+                      )}
                     </TableCell>
                   </TableRow>
                 )}

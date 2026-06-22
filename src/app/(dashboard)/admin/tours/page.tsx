@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { Badge, Button, Input } from "@/components/atoms";
+import { Badge, Button, Input, Spinner } from "@/components/atoms";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import {
   Table,
@@ -36,6 +36,7 @@ export default function AdminToursPage() {
     tours: liveTours,
     categories: liveCategories,
     refresh,
+    ready,
   } = useSupabaseCollections();
   const categoryOptions = useMemo<("All" | TourCategory)[]>(
     () => ["All", ...liveCategories.map((c) => c.title)],
@@ -244,9 +245,15 @@ export default function AdminToursPage() {
                       colSpan={6}
                       className="text-center text-sm text-muted-foreground"
                     >
-                      {tours.length
-                        ? "No tours match these filters."
-                        : "No tours yet. Click 'Add tour' to seed the catalog."}
+                      {!ready ? (
+                        <span className="inline-flex items-center gap-2">
+                          <Spinner className="size-4" /> Loading tours…
+                        </span>
+                      ) : tours.length ? (
+                        "No tours match these filters."
+                      ) : (
+                        "No tours yet. Click 'Add tour' to seed the catalog."
+                      )}
                     </TableCell>
                   </TableRow>
                 )}

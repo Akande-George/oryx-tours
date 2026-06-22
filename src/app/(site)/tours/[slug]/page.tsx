@@ -3,15 +3,33 @@ import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { RatingStars } from "@/components/molecules/RatingStars";
 import { BookingSidebar } from "@/components/organisms/BookingSidebar";
-import { OperatorCard } from "@/components/organisms/OperatorCard";
 import { TourDetailsTabs } from "@/components/organisms/TourDetailsTabs";
 import { Badge } from "@/components/atoms";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import {
-  getOperatorById,
-  getReviews,
-  getTourBySlug,
-} from "@/lib/supabase/data";
+import { getReviews, getTourBySlug } from "@/lib/supabase/data";
+
+// Returns an embeddable URL only for valid YouTube links; otherwise null.
+const toYouTubeEmbed = (raw?: string | null): string | null => {
+  if (!raw) return null;
+  const url = raw.trim();
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") {
+      const id = parsed.pathname.slice(1);
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+    if (host === "youtube.com" || host === "m.youtube.com") {
+      if (parsed.pathname.startsWith("/embed/")) return url;
+      const id = parsed.searchParams.get("v");
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
 
 export default async function TourDetailsPage({
   params,
@@ -29,12 +47,14 @@ export default async function TourDetailsPage({
     notFound();
   }
 
-  const [operator, reviews] = await Promise.all([
-    tour.operatorId
-      ? getOperatorById(supabase, tour.operatorId)
-      : Promise.resolve(null),
-    getReviews(supabase),
-  ]);
+  const globalReviews = await getReviews(supabase);
+
+  // Prefer the tour's own curated reviews; fall back to the shared pool
+  // for older tours that don't have any embedded yet.
+  const reviews =
+    tour.reviews && tour.reviews.length ? tour.reviews : globalReviews;
+
+  const videoEmbed = toYouTubeEmbed(tour.videoUrl);
 
   return (
     <div className="py-12">
@@ -74,9 +94,9 @@ export default async function TourDetailsPage({
                 />
               ))}
             </div>
-            {tour.videoUrl ? (
+            {videoEmbed ? (
               <iframe
-                src={tour.videoUrl}
+                src={videoEmbed}
                 title={`${tour.title} video`}
                 allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
@@ -95,8 +115,8 @@ export default async function TourDetailsPage({
             />
             <TourDetailsTabs
               description={tour.description}
-              highlights={tour.highlights}
               tags={tour.tags}
+              itinerary={tour.itinerary ?? []}
               reviews={reviews}
               defaultTab={
                 tab === "itinerary" || tab === "reviews" ? tab : "overview"
@@ -104,7 +124,6 @@ export default async function TourDetailsPage({
             />
           </div>
           <div className="space-y-4">
-            {operator ? <OperatorCard operator={operator} /> : null}
             <div className="rounded-2xl border border-white/60 bg-white/80 p-5 text-sm text-muted-foreground shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
               <p className="text-xs font-semibold uppercase tracking-[0.2em]">
                 Included
