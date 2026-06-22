@@ -428,10 +428,11 @@ export default function SignUpPage() {
                   <Label htmlFor="acceptTerms" className="text-sm font-normal">
                     I agree to the{" "}
                     <Link
-                      href="#"
+                      href="/terms"
+                      target="_blank"
                       className="font-medium text-foreground underline underline-offset-2"
                     >
-                      Terms and Privacy Policy
+                      Terms and Conditions
                     </Link>
                     .
                   </Label>

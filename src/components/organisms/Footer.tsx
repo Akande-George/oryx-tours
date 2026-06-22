@@ -218,9 +218,17 @@ export function Footer() {
           </div>
         </div>
       </Container>
-      <div className="border-t border-white/60 py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Oryx Group Events & Tourism. Crafted for
-        modern travelers. All rights reserved.
+      <div className="flex flex-col items-center gap-3 border-t border-white/60 py-6 text-center text-xs text-muted-foreground sm:flex-row sm:justify-between sm:px-6">
+        <p>
+          © {new Date().getFullYear()} Oryx Group Events & Tourism. Crafted
+          for modern travelers. All rights reserved.
+        </p>
+        <Link
+          href="/terms"
+          className="font-medium hover:text-foreground"
+        >
+          Terms & Conditions
+        </Link>
       </div>
     </footer>
   );
