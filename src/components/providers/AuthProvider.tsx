@@ -351,14 +351,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     console.log("[auth] signOut start");
-    try {
-      await supabase.auth.signOut();
-    } catch (e) {
-      console.error("[auth] supabase signOut threw", e);
-    }
+
+    // Wipe local React state immediately so any UI listening to `user`
+    // re-renders as signed out right away — don't wait for the network call.
     setUser(null);
     setAccounts([]);
-
     toast.info("Signed out");
 
     if (typeof window !== "undefined") {
@@ -376,6 +373,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch {
         /* ignore storage errors */
       }
+
+      // Fire-and-forget the Supabase signout so a hung / expired-token
+      // session can't block the navigation. If it ever resolves later
+      // (after we've navigated away) it doesn't matter.
+      void supabase.auth.signOut().catch((e) => {
+        console.error("[auth] supabase signOut failed", e);
+      });
 
       // Force a full reload so React/zustand state, route guards, and the
       // sidebar all reset cleanly. Avoids the "Redirecting to Sign in"
