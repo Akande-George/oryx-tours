@@ -85,18 +85,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
 
+    // Safety net: if anything below hangs (Supabase fetch never resolves,
+    // RLS recursion, network freeze), force ready=true after a few seconds
+    // so the user is never stuck on "Preparing your workspace".
+    const safetyTimer = window.setTimeout(() => {
+      if (active) {
+        console.warn(
+          "[auth] bootstrap timed out — forcing ready=true so the app is usable",
+        );
+        setReady(true);
+      }
+    }, 5000);
+
+    const withTimeout = <T,>(
+      promise: PromiseLike<T>,
+      ms: number,
+      label: string,
+    ) =>
+      Promise.race<T>([
+        Promise.resolve(promise),
+        new Promise<T>((_, reject) =>
+          window.setTimeout(
+            () => reject(new Error(`${label} timed out after ${ms}ms`)),
+            ms,
+          ),
+        ),
+      ]);
+
     const bootstrap = async () => {
       console.log("[auth] bootstrap start");
       try {
         const {
           data: { session },
-        } = await supabase.auth.getSession();
+        } = await withTimeout(
+          supabase.auth.getSession(),
+          4000,
+          "getSession",
+        );
 
         if (!active) return;
         console.log("[auth] session", session?.user?.id ?? "(none)");
 
         if (session?.user) {
-          await loadCurrentProfile(session.user.id);
+          await withTimeout(
+            loadCurrentProfile(session.user.id),
+            4000,
+            "loadCurrentProfile",
+          );
         } else {
           setAccounts([]);
           setUser(null);
@@ -104,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (e) {
         console.error("[auth] bootstrap failed", e);
       } finally {
+        window.clearTimeout(safetyTimer);
         if (active) {
           console.log("[auth] bootstrap ready=true");
           setReady(true);
