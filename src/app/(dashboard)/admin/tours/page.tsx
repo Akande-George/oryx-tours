@@ -76,6 +76,11 @@ export default function AdminToursPage() {
           : [saved, ...prev];
       });
       void refresh();
+      void fetch("/api/notifications/tour-saved", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tourId: saved.id, isNew: !isEdit }),
+      }).catch(() => {});
       toast.success(isEdit ? "Tour updated" : "Tour added", saved.title);
     } catch (e) {
       toast.error("Couldn't save tour", (e as Error).message);

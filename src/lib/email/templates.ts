@@ -155,6 +155,33 @@ export const partnerBookingAlert = ({
   };
 };
 
+export type PasswordResetArgs = {
+  email: string;
+  resetUrl: string;
+};
+
+export const passwordReset = ({ email, resetUrl }: PasswordResetArgs) => {
+  const title = "Reset your password";
+  const body = `
+    <p style="margin:0 0 16px;color:#5c4f3d;">Hi,</p>
+    <p style="margin:0 0 20px;color:#5c4f3d;">
+      We received a request to reset the password for the Oryx Group account
+      tied to <strong>${escape(email)}</strong>. Click the button below to
+      choose a new password. The link expires in 60 minutes.
+    </p>
+    ${button(resetUrl, "Reset password")}
+    <p style="margin:24px 0 0;color:#8a7860;font-size:12px;text-align:center;">
+      Didn't request this? You can safely ignore this email — your password
+      won't change.
+    </p>
+  `;
+  return {
+    subject: title,
+    html: shell(title, body),
+    text: `Reset your Oryx Group password: ${resetUrl}\nThis link expires in 60 minutes.`,
+  };
+};
+
 export type WelcomeArgs = {
   name: string;
   role: "customer" | "partner" | "admin";
@@ -177,6 +204,134 @@ export const welcome = ({ name, role }: WelcomeArgs) => {
     subject: title,
     html: shell(title, body),
   };
+};
+
+export type PartnerApplicationAlertArgs = {
+  applicantName: string;
+  applicantEmail: string;
+  companyName?: string;
+  applicationId: string;
+};
+
+export const partnerApplicationAlert = ({
+  applicantName,
+  applicantEmail,
+  companyName,
+  applicationId,
+}: PartnerApplicationAlertArgs) => {
+  const title = "New partner application";
+  const body = `
+    <p style="margin:0 0 16px;color:#5c4f3d;">A new operator has applied to join Oryx Group.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      ${row("Name", applicantName)}
+      ${row("Email", applicantEmail)}
+      ${companyName ? row("Company", companyName) : ""}
+      ${row("Reference", applicationId.slice(0, 8))}
+    </table>
+    ${button(`${appUrl}/admin/partners`, "Review application")}
+  `;
+  return { subject: title, html: shell(title, body) };
+};
+
+export type PartnerStatusUpdateArgs = {
+  partnerName: string;
+  status: "active" | "rejected";
+};
+
+export const partnerStatusUpdate = ({
+  partnerName,
+  status,
+}: PartnerStatusUpdateArgs) => {
+  const approved = status === "active";
+  const title = approved
+    ? "Welcome to the Oryx Group network"
+    : "Partner application update";
+  const body = approved
+    ? `
+      <p style="margin:0 0 16px;color:#5c4f3d;">Hi ${escape(partnerName.split(" ")[0] || "there")},</p>
+      <p style="margin:0 0 20px;color:#5c4f3d;">
+        Good news — your operator account has been <strong>approved</strong>.
+        You can now start publishing tours, adding vehicles, and accepting
+        bookings.
+      </p>
+      ${button(`${appUrl}/partner`, "Open partner portal")}
+    `
+    : `
+      <p style="margin:0 0 16px;color:#5c4f3d;">Hi ${escape(partnerName.split(" ")[0] || "there")},</p>
+      <p style="margin:0 0 20px;color:#5c4f3d;">
+        Thank you for your interest in operating with Oryx Group. After
+        reviewing your application, we are not able to onboard you at this
+        time.
+      </p>
+      <p style="margin:0 0 8px;color:#5c4f3d;">
+        Reply to this email and our team can share more context or suggest a
+        next step.
+      </p>
+    `;
+  return { subject: title, html: shell(title, body) };
+};
+
+export type TourPublishedArgs = {
+  tour: Tour;
+  partnerFirstName: string;
+  isNew: boolean;
+};
+
+export const tourPublished = ({
+  tour,
+  partnerFirstName,
+  isNew,
+}: TourPublishedArgs) => {
+  const title = isNew ? "Tour published" : "Tour updated";
+  const body = `
+    <p style="margin:0 0 16px;color:#5c4f3d;">Hi ${escape(partnerFirstName || "there")},</p>
+    <p style="margin:0 0 20px;color:#5c4f3d;">
+      Your tour <strong>${escape(tour.title)}</strong> is
+      ${isNew ? "now live" : "updated"} on Oryx Group.
+    </p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      ${row("Title", tour.title)}
+      ${row("Location", `${tour.location}${tour.region ? ` · ${tour.region}` : ""}`)}
+      ${row("Duration", `${tour.durationDays} days`)}
+      ${row("Group size", tour.groupSize)}
+      ${row("Price from", formatPrice(tour.priceFrom))}
+      ${row("Category", tour.category)}
+    </table>
+    ${button(`${appUrl}/tours/${tour.slug}`, "View on site")}
+  `;
+  return { subject: `${title} · ${tour.title}`, html: shell(title, body) };
+};
+
+export type VehiclePublishedArgs = {
+  vehicle: Vehicle;
+  partnerFirstName: string;
+  isNew: boolean;
+};
+
+export const vehiclePublished = ({
+  vehicle,
+  partnerFirstName,
+  isNew,
+}: VehiclePublishedArgs) => {
+  const title = isNew ? "Vehicle published" : "Vehicle updated";
+  const body = `
+    <p style="margin:0 0 16px;color:#5c4f3d;">Hi ${escape(partnerFirstName || "there")},</p>
+    <p style="margin:0 0 20px;color:#5c4f3d;">
+      ${isNew ? "We've added" : "We've updated"} <strong>${escape(vehicle.name)}</strong>
+      to your fleet on Oryx Group.
+    </p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      ${row("Vehicle", vehicle.name)}
+      ${row("Category", vehicle.fleetCategory)}
+      ${row("Type", vehicle.vehicleType ?? "—")}
+      ${row("Capacity", `${vehicle.capacity} passengers`)}
+      ${row("Half day", formatPrice(vehicle.halfDayPrice))}
+      ${row("Airport transfer", formatPrice(vehicle.transferPrice))}
+      ${row("Point-to-point", formatPrice(vehicle.pointToPointPrice ?? 0))}
+    </table>
+    ${button(`${appUrl}/partner/fleet`, "Open fleet")}
+  `;
+  return { subject: `${title} · ${vehicle.name}`, html: shell(title, body) };
 };
 
 export type VehicleInfoArgs = {

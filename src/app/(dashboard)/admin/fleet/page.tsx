@@ -92,6 +92,11 @@ export default function AdminFleetPage() {
           : [saved, ...prev];
       });
       void refresh();
+      void fetch("/api/notifications/vehicle-saved", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ vehicleId: saved.id, isNew: !isEdit }),
+      }).catch(() => {});
       toast.success(isEdit ? "Vehicle updated" : "Vehicle added", saved.name);
     } catch (e) {
       toast.error("Couldn't save vehicle", (e as Error).message);

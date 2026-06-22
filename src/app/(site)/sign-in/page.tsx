@@ -112,7 +112,7 @@ function SignInForm() {
                   Password
                 </Label>
                 <Link
-                  href="#"
+                  href="/forgot-password"
                   className="text-xs font-medium text-primary hover:underline"
                 >
                   Forgot?

@@ -44,6 +44,8 @@ type AuthContextValue = {
   approvePartner: (accountId: string) => void;
   rejectPartner: (accountId: string) => void;
   updateMyProfile: (patch: ProfilePatch) => Promise<AuthUser>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  updatePassword: (newPassword: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -299,6 +301,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: profile.email,
           name: profile.name,
           role: profile.role,
+          userId: profile.id,
+          companyName: profile.companyName,
         }),
       }).catch(() => {});
       return { kind: "signed-in", user: nextUser };
@@ -316,9 +320,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const notifyPartnerStatus = (
+    profileId: string,
+    status: "active" | "rejected",
+  ) => {
+    void fetch("/api/notifications/partner-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ profileId, status }),
+    }).catch(() => {});
+  };
+
   const approvePartner = useCallback(
     async (accountId: string) => {
       await updateAccountStatus(accountId, "active");
+      notifyPartnerStatus(accountId, "active");
       toast.success("Partner approved");
     },
     [updateAccountStatus],
@@ -327,6 +343,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const rejectPartner = useCallback(
     async (accountId: string) => {
       await updateAccountStatus(accountId, "rejected");
+      notifyPartnerStatus(accountId, "rejected");
       toast.info("Partner rejected");
     },
     [updateAccountStatus],
@@ -386,6 +403,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [user],
   );
 
+  const requestPasswordReset = useCallback(async (email: string) => {
+    // We route this through our /api/auth/password-reset endpoint so
+    // Resend (with our branded template) sends the email instead of
+    // Supabase's built-in mailer.
+    const res = await fetch("/api/auth/password-reset", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email.trim().toLowerCase() }),
+    });
+    let payload: { ok?: boolean; error?: string } = {};
+    try {
+      payload = (await res.json()) as { ok?: boolean; error?: string };
+    } catch {
+      /* ignore — body may be empty */
+    }
+    if (!res.ok) {
+      console.error("[auth] password reset request failed", payload);
+      throw new Error(payload.error ?? `HTTP ${res.status}`);
+    }
+  }, []);
+
+  const updatePassword = useCallback(async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (error) {
+      console.error("[auth] updateUser(password) failed", error);
+      throw new Error(error.message);
+    }
+  }, []);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -397,6 +445,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       approvePartner,
       rejectPartner,
       updateMyProfile,
+      requestPasswordReset,
+      updatePassword,
     }),
     [
       user,
@@ -408,6 +458,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       approvePartner,
       rejectPartner,
       updateMyProfile,
+      requestPasswordReset,
+      updatePassword,
     ],
   );
 
