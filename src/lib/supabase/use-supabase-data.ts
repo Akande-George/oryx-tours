@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createSupabaseBrowserClient } from "./client";
 import {
   getBookings,
@@ -36,6 +36,22 @@ type SupabaseCollections = {
   refresh: () => Promise<void>;
 };
 
+export type CollectionKey = keyof Omit<
+  SupabaseCollections,
+  "ready" | "refresh"
+>;
+
+const ALL_KEYS: CollectionKey[] = [
+  "tours",
+  "destinations",
+  "operators",
+  "vehicles",
+  "bookings",
+  "reviews",
+  "categories",
+  "fleetCategories",
+];
+
 const emptyCollections: Omit<SupabaseCollections, "ready" | "refresh"> = {
   tours: [],
   destinations: [],
@@ -49,44 +65,59 @@ const emptyCollections: Omit<SupabaseCollections, "ready" | "refresh"> = {
 
 const supabase = createSupabaseBrowserClient();
 
-export function useSupabaseCollections(): SupabaseCollections {
+const fetchers: Record<
+  CollectionKey,
+  () => Promise<unknown[]>
+> = {
+  tours: () => getTours(supabase),
+  destinations: () => getDestinations(supabase),
+  operators: () => getOperators(supabase),
+  vehicles: () => getVehicles(supabase),
+  bookings: () => getBookings(supabase),
+  reviews: () => getReviews(supabase),
+  categories: () => getCategories(supabase),
+  fleetCategories: () => getFleetCategories(supabase),
+};
+
+/**
+ * Fetch only the Supabase collections a page actually renders.
+ *
+ *   const { vehicles, fleetCategories } = useSupabaseCollections([
+ *     "vehicles",
+ *     "fleetCategories",
+ *   ]);
+ *
+ * Called with no argument it fetches everything (back-compat). Requesting
+ * only what you need cuts the number of round-trips per page and shortens
+ * the cold-start wait.
+ */
+export function useSupabaseCollections(
+  keys?: CollectionKey[],
+): SupabaseCollections {
+  // Stabilise the key list so a new inline array each render doesn't loop.
+  const requested = keys ?? ALL_KEYS;
+  const keySignature = [...requested].sort().join(",");
+
   const [data, setData] = useState({
     ...emptyCollections,
     ready: false,
   });
 
-  const load = useCallback(async () => {
-    const [
-      tours,
-      destinations,
-      operators,
-      vehicles,
-      bookings,
-      reviews,
-      categories,
-      fleetCategories,
-    ] = await Promise.all([
-      getTours(supabase),
-      getDestinations(supabase),
-      getOperators(supabase),
-      getVehicles(supabase),
-      getBookings(supabase),
-      getReviews(supabase),
-      getCategories(supabase),
-      getFleetCategories(supabase),
-    ]);
+  const activeKeys = useMemo(
+    () => keySignature.split(",") as CollectionKey[],
+    [keySignature],
+  );
+  const activeKeysRef = useRef(activeKeys);
+  activeKeysRef.current = activeKeys;
 
-    setData({
-      tours,
-      destinations,
-      operators,
-      vehicles,
-      bookings,
-      reviews,
-      categories,
-      fleetCategories,
-      ready: true,
+  const load = useCallback(async () => {
+    const current = activeKeysRef.current;
+    const results = await Promise.all(current.map((k) => fetchers[k]()));
+    const next: Record<string, unknown[]> = {};
+    current.forEach((k, i) => {
+      next[k] = results[i];
     });
+    setData((prev) => ({ ...prev, ...next, ready: true }) as typeof prev);
   }, []);
 
   useEffect(() => {
@@ -102,10 +133,10 @@ export function useSupabaseCollections(): SupabaseCollections {
     return () => {
       mounted = false;
     };
-  }, [load]);
+  }, [load, keySignature]);
 
-  // Re-fetch when the tab regains focus or becomes visible so newly
-  // added rows in another tab / route show up without a hard refresh.
+  // Re-fetch when the tab regains focus so newly added rows in another tab /
+  // route show up without a hard refresh.
   useEffect(() => {
     const onFocus = () => {
       void load();

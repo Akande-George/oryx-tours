@@ -46,7 +46,7 @@ export default function AdminFleetPage() {
     fleetCategories,
     refresh,
     ready,
-  } = useSupabaseCollections();
+  } = useSupabaseCollections(["vehicles", "fleetCategories"]);
   const categoryOptions: ("All" | FleetCategory)[] = useMemo(
     () => [
       "All",

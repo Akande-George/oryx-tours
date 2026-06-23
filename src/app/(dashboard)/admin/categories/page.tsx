@@ -22,7 +22,7 @@ import { confirmAction } from "@/components/molecules/ConfirmDialog";
 import type { Category } from "@/types";
 
 export default function AdminCategoriesPage() {
-  const { categories: live } = useSupabaseCollections();
+  const { categories: live } = useSupabaseCollections(["categories"]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);

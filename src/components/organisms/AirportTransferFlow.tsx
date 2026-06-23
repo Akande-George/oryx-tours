@@ -18,7 +18,7 @@ import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { AirportDirection } from "@/types";
 
 export function AirportTransferFlow() {
-  const { vehicles } = useSupabaseCollections();
+  const { vehicles } = useSupabaseCollections(["vehicles"]);
   const {
     travelDate,
     guests,

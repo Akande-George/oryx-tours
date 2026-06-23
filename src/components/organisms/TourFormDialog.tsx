@@ -85,7 +85,7 @@ export function TourFormDialog({
   onSubmit,
 }: TourFormDialogProps) {
   const mode = initialTour ? "edit" : "add";
-  const { categories } = useSupabaseCollections();
+  const { categories } = useSupabaseCollections(["categories"]);
   const [form, setForm] = useState<Tour>(() => initialTour ?? emptyTour());
   const [slugLocked, setSlugLocked] = useState<boolean>(Boolean(initialTour));
   const [errors, setErrors] = useState<Partial<Record<keyof Tour, string>>>({});

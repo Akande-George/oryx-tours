@@ -20,7 +20,7 @@ import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 const MAX_STOPS = 6;
 
 export function PointToPointFlow() {
-  const { vehicles } = useSupabaseCollections();
+  const { vehicles } = useSupabaseCollections(["vehicles"]);
   const {
     travelDate,
     guests,

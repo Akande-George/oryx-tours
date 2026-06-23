@@ -12,7 +12,7 @@ import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 
 export default function CustomerToursPage() {
   const savedSlugs = useSavedStore((state) => state.savedSlugs);
-  const { tours } = useSupabaseCollections();
+  const { tours } = useSupabaseCollections(["tours"]);
   const savedTours = tours.filter((tour) => savedSlugs.includes(tour.slug));
   const wishlistValue = savedTours.reduce((sum, t) => sum + t.priceFrom, 0);
 

@@ -35,7 +35,10 @@ const quickLinks = [
 ];
 
 export default function AdminOverviewPage() {
-  const { bookings, operators } = useSupabaseCollections();
+  const { bookings, operators } = useSupabaseCollections([
+    "bookings",
+    "operators",
+  ]);
   const revenue = bookings
     .filter((b) => b.status !== "Cancelled")
     .reduce((sum, b) => sum + b.price, 0);

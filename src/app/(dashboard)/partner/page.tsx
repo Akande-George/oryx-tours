@@ -14,7 +14,11 @@ import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 export default function PartnerOverviewPage() {
   const { user } = useAuth();
   const operatorId = user?.operatorId ?? "";
-  const { bookings, tours, vehicles } = useSupabaseCollections();
+  const { bookings, tours, vehicles } = useSupabaseCollections([
+    "bookings",
+    "tours",
+    "vehicles",
+  ]);
 
   const myTours = useMemo(
     () => tours.filter((tour) => tour.operatorId === operatorId),

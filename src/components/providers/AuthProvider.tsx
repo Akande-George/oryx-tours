@@ -65,6 +65,30 @@ const toAuthUser = (profile: AuthProfile): AuthUser => ({
   companyName: profile.companyName,
 });
 
+// Build a provisional user from the auth session alone, before the profile
+// row loads. This keeps `user` non-null whenever a session exists, so route
+// guards never bounce an authenticated user to sign-in just because the
+// (sometimes slow) profile fetch hasn't finished yet.
+type SessionUser = {
+  id: string;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
+};
+
+const sessionToUser = (u: SessionUser): AuthUser => {
+  const meta = u.user_metadata ?? {};
+  return {
+    id: u.id,
+    email: u.email ?? "",
+    name:
+      (meta.name as string) ?? u.email?.split("@")[0] ?? "Oryx Traveler",
+    role: ((meta.role as AuthUser["role"]) ?? "customer"),
+    status: "active",
+    operatorId: meta.operatorId as string | undefined,
+    companyName: meta.companyName as string | undefined,
+  };
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [accounts, setAccounts] = useState<AuthProfile[]>([]);
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -133,11 +157,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log("[auth] session", session?.user?.id ?? "(none)");
 
         if (session?.user) {
-          await withTimeout(
-            loadCurrentProfile(session.user.id),
-            4000,
-            "loadCurrentProfile",
-          );
+          // Mark authenticated immediately from the session so guards don't
+          // redirect while the profile is still loading.
+          setUser((prev) => prev ?? sessionToUser(session.user));
+          try {
+            await withTimeout(
+              loadCurrentProfile(session.user.id),
+              4000,
+              "loadCurrentProfile",
+            );
+          } catch (e) {
+            // Profile fetch slow/failed — keep the provisional user.
+            console.warn("[auth] profile load fell back to session user", e);
+          }
         } else {
           setAccounts([]);
           setUser(null);
@@ -164,7 +196,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      await loadCurrentProfile(session.user.id);
+      setUser((prev) => prev ?? sessionToUser(session.user));
+      try {
+        await loadCurrentProfile(session.user.id);
+      } catch (e) {
+        console.warn("[auth] onAuthStateChange profile load failed", e);
+      }
     });
 
     return () => {

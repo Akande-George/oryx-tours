@@ -24,7 +24,9 @@ const ratings = [
 export function FiltersPanel() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { categories: liveCategories } = useSupabaseCollections();
+  const { categories: liveCategories } = useSupabaseCollections([
+    "categories",
+  ]);
 
   const sortedCategories = useMemo(
     () =>

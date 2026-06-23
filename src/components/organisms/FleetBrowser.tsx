@@ -41,7 +41,7 @@ export function FleetBrowser({
   onSelect,
   title = "Browse the fleet",
 }: FleetBrowserProps) {
-  const { fleetCategories } = useSupabaseCollections();
+  const { fleetCategories } = useSupabaseCollections(["fleetCategories"]);
   const categoryOptions: ("All" | FleetCategory)[] = useMemo(
     () => [
       "All",

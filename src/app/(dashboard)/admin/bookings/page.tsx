@@ -38,7 +38,7 @@ const statusStyles: Record<BookingStatus, string> = {
 export default function AdminBookingsPage() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Booking | null>(null);
-  const { bookings: liveBookings } = useSupabaseCollections();
+  const { bookings: liveBookings } = useSupabaseCollections(["bookings"]);
   const [bookings, setBookings] = useState<Booking[]>([]);
 
   useEffect(() => {

@@ -37,7 +37,7 @@ export default function AdminToursPage() {
     categories: liveCategories,
     refresh,
     ready,
-  } = useSupabaseCollections();
+  } = useSupabaseCollections(["operators", "tours", "categories"]);
   const categoryOptions = useMemo<("All" | TourCategory)[]>(
     () => ["All", ...liveCategories.map((c) => c.title)],
     [liveCategories],

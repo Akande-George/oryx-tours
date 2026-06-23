@@ -44,7 +44,10 @@ const quickLinks = [
 export default function CustomerOverviewPage() {
   const { user } = useAuth();
   const savedSlugs = useSavedStore((state) => state.savedSlugs);
-  const { bookings: allBookings, tours } = useSupabaseCollections();
+  const { bookings: allBookings, tours } = useSupabaseCollections([
+    "bookings",
+    "tours",
+  ]);
   const bookings = user
     ? allBookings.filter((b) => b.customerId === user.id)
     : [];

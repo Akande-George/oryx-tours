@@ -28,7 +28,7 @@ const statusTone: Record<BookingStatus, string> = {
 export default function CustomerSpendingPage() {
   const [selected, setSelected] = useState<Booking | null>(null);
   const { user } = useAuth();
-  const { bookings: allBookings } = useSupabaseCollections();
+  const { bookings: allBookings } = useSupabaseCollections(["bookings"]);
   const bookings = user
     ? allBookings.filter((b) => b.customerId === user.id)
     : [];

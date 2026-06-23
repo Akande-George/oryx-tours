@@ -24,7 +24,7 @@ const tabDefinitions = [
 export function BookingsManager({ title, subtitle }: BookingsManagerProps) {
   const [selected, setSelected] = useState<Booking | null>(null);
   const { user } = useAuth();
-  const { bookings: liveBookings } = useSupabaseCollections();
+  const { bookings: liveBookings } = useSupabaseCollections(["bookings"]);
   const myBookings = useMemo(
     () =>
       user ? liveBookings.filter((b) => b.customerId === user.id) : [],

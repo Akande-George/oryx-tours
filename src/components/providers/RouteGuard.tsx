@@ -34,8 +34,17 @@ export function RouteGuard({ children, allow }: RouteGuardProps) {
     if (!ready) return;
     if (!user) {
       const next = encodeURIComponent(pathname || "/dashboard");
-      router.replace(`/sign-in?next=${next}`);
-      return;
+      const target = `/sign-in?next=${next}`;
+      router.replace(target);
+      // Fallback: if the client-side navigation doesn't complete (App Router
+      // can stall on a slow RSC fetch), force a hard redirect so the user is
+      // never stranded on the "Redirecting to sign in" splash.
+      const t = window.setTimeout(() => {
+        if (window.location.pathname !== "/sign-in") {
+          window.location.assign(target);
+        }
+      }, 1500);
+      return () => window.clearTimeout(t);
     }
     if (allow && !allow.includes(user.role)) {
       router.replace("/dashboard");

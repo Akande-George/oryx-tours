@@ -30,7 +30,10 @@ export default function PartnerBookingsPage() {
   const { user } = useAuth();
   const operatorId = user?.operatorId ?? "";
   const [query, setQuery] = useState("");
-  const { bookings: liveBookings, tours } = useSupabaseCollections();
+  const { bookings: liveBookings, tours } = useSupabaseCollections([
+    "bookings",
+    "tours",
+  ]);
 
   const partnerTourIds = useMemo(
     () =>

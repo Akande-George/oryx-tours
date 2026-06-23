@@ -26,7 +26,7 @@ const durationLabel: Record<DayHireDuration, string> = {
 };
 
 export function LocalTransportFlow() {
-  const { vehicles } = useSupabaseCollections();
+  const { vehicles } = useSupabaseCollections(["vehicles"]);
   const {
     travelDate,
     guests,

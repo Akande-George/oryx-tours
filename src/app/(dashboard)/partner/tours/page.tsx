@@ -26,7 +26,9 @@ import type { Tour } from "@/types";
 export default function PartnerToursPage() {
   const { user } = useAuth();
   const operatorId = user?.operatorId ?? "";
-  const { tours: liveTours, refresh, ready } = useSupabaseCollections();
+  const { tours: liveTours, refresh, ready } = useSupabaseCollections([
+    "tours",
+  ]);
 
   const [tours, setTours] = useState<Tour[]>([]);
   const [query, setQuery] = useState("");

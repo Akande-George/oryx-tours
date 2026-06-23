@@ -25,7 +25,9 @@ import { confirmAction } from "@/components/molecules/ConfirmDialog";
 import type { FleetCategoryRecord } from "@/types";
 
 export default function AdminFleetCategoriesPage() {
-  const { fleetCategories: live } = useSupabaseCollections();
+  const { fleetCategories: live } = useSupabaseCollections([
+    "fleetCategories",
+  ]);
   const [items, setItems] = useState<FleetCategoryRecord[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<FleetCategoryRecord | null>(null);

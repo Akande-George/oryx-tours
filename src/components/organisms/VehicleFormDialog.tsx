@@ -79,7 +79,7 @@ export function VehicleFormDialog({
   defaultOperatorId = "",
 }: VehicleFormDialogProps) {
   const mode = initialVehicle ? "edit" : "add";
-  const { fleetCategories } = useSupabaseCollections();
+  const { fleetCategories } = useSupabaseCollections(["fleetCategories"]);
   const sortedFleetCategories = [...fleetCategories].sort((a, b) => {
     const ao = a.order ?? 0;
     const bo = b.order ?? 0;

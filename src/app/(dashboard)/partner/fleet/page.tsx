@@ -48,7 +48,7 @@ export default function PartnerFleetPage() {
     fleetCategories,
     refresh,
     ready,
-  } = useSupabaseCollections();
+  } = useSupabaseCollections(["vehicles", "fleetCategories"]);
   const categoryOptions: ("All" | FleetCategory)[] = useMemo(
     () => [
       "All",

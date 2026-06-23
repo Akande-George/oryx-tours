@@ -15,7 +15,11 @@ import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 
 export default function AdminRevenuePage() {
-  const { bookings, operators, tours } = useSupabaseCollections();
+  const { bookings, operators, tours } = useSupabaseCollections([
+    "bookings",
+    "operators",
+    "tours",
+  ]);
   const activeBookings = bookings.filter((b) => b.status !== "Cancelled");
   const totalRevenue = activeBookings.reduce((sum, b) => sum + b.price, 0);
   const avgBookingValue =
