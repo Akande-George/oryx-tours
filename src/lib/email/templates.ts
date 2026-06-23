@@ -182,6 +182,88 @@ export const passwordReset = ({ email, resetUrl }: PasswordResetArgs) => {
   };
 };
 
+export type PersonalizedRequestEmailArgs = {
+  name: string;
+  email: string;
+  destination: string;
+  startDate: string;
+  endDate?: string;
+  partySize: number;
+  experiences: string[];
+  budget: string;
+  budgetAmount?: string;
+  pace: string;
+  lodging: string;
+  phone?: string;
+  notes?: string;
+};
+
+// Confirmation sent to the traveler who submitted the request.
+export const personalizedRequestCustomer = (
+  args: PersonalizedRequestEmailArgs,
+) => {
+  const title = "We're designing your trip";
+  const body = `
+    <p style="margin:0 0 16px;color:#5c4f3d;">Hi ${escape(args.name.split(" ")[0] || "there")},</p>
+    <p style="margin:0 0 20px;color:#5c4f3d;">
+      Thank you for your personalized trip request. Our concierge team is
+      putting together a tailored itinerary and will be in touch within 24
+      hours. Here's what we captured:
+    </p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      ${row("Destination", args.destination)}
+      ${row("Dates", `${args.startDate}${args.endDate ? ` → ${args.endDate}` : ""}`)}
+      ${row("Travelers", String(args.partySize))}
+      ${args.experiences.length ? row("Experiences", args.experiences.join(", ")) : ""}
+      ${row("Budget", `${args.budget}${args.budgetAmount ? ` (${args.budgetAmount})` : ""}`)}
+      ${row("Pace", args.pace)}
+      ${row("Lodging", args.lodging)}
+    </table>
+    <p style="margin:24px 0 0;color:#8a7860;font-size:12px;text-align:center;">
+      Need to add something? Reply to this email or write to info@oryxgp.com
+    </p>
+  `;
+  return {
+    subject: title,
+    html: shell(title, body),
+    text: `Thanks ${args.name}, we received your personalized trip request for ${args.destination} and will reply within 24 hours.`,
+  };
+};
+
+// Alert sent to the concierge/admin team with the full brief.
+export const personalizedRequestConcierge = (
+  args: PersonalizedRequestEmailArgs,
+) => {
+  const title = "New personalized trip request";
+  const body = `
+    <p style="margin:0 0 20px;color:#5c4f3d;">
+      A new personalized trip request just came in.
+    </p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;">
+      ${row("Name", args.name)}
+      ${row("Email", args.email)}
+      ${args.phone ? row("Phone", args.phone) : ""}
+      ${row("Destination", args.destination)}
+      ${row("Dates", `${args.startDate}${args.endDate ? ` → ${args.endDate}` : ""}`)}
+      ${row("Travelers", String(args.partySize))}
+      ${args.experiences.length ? row("Experiences", args.experiences.join(", ")) : ""}
+      ${row("Budget", `${args.budget}${args.budgetAmount ? ` (${args.budgetAmount})` : ""}`)}
+      ${row("Pace", args.pace)}
+      ${row("Lodging", args.lodging)}
+    </table>
+    ${
+      args.notes
+        ? `<p style="margin:16px 0 0;color:#5c4f3d;"><strong>Notes:</strong><br/>${escape(args.notes)}</p>`
+        : ""
+    }
+    ${button(`${appUrl}/admin/requests`, "Open request inbox")}
+  `;
+  return {
+    subject: `New trip request · ${args.destination} · ${args.name}`,
+    html: shell(title, body),
+  };
+};
+
 export type WelcomeArgs = {
   name: string;
   role: "customer" | "partner" | "admin";

@@ -134,3 +134,24 @@ export type Review = {
   date: string;
   content: string;
 };
+
+export type PersonalizedRequestStatus = "new" | "contacted" | "closed";
+
+export type PersonalizedRequest = {
+  id: string;
+  destination: string;
+  startDate: string;
+  endDate?: string;
+  partySize: number;
+  experiences: string[];
+  budget: string;
+  budgetAmount?: string;
+  pace: string;
+  lodging: string;
+  name: string;
+  email: string;
+  phone?: string;
+  notes?: string;
+  status: PersonalizedRequestStatus;
+  createdAt?: string;
+};

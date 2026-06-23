@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import { todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { toast } from "@/components/molecules/Toaster";
 
 type Experience =
   | "wellness"
@@ -213,16 +214,44 @@ export default function PersonalizedPage() {
     return true;
   }, [step, state]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!stepValid) return;
     if (step < 4) {
       setStep(step + 1);
       return;
     }
     setSubmitting(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/personalized", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          destination: state.destination,
+          startDate: state.startDate,
+          endDate: state.endDate || undefined,
+          partySize: state.partySize,
+          experiences: state.experiences,
+          budget: state.budget,
+          budgetAmount: state.budgetAmount || undefined,
+          pace: state.pace,
+          lodging: state.lodging,
+          name: state.name,
+          email: state.email,
+          phone: state.phone || undefined,
+          notes: state.notes || undefined,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Could not send request");
+      toast.success(
+        "Request sent",
+        "Our concierge will reply within 24 hours.",
+      );
       router.push("/dashboard");
-    }, 600);
+    } catch (e) {
+      toast.error("Couldn't send request", (e as Error).message);
+      setSubmitting(false);
+    }
   };
 
   const handleBack = () => {
@@ -291,28 +320,23 @@ export default function PersonalizedPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="partySize">Number of guests</Label>
-                      <Select
-                        value={String(state.partySize)}
-                        onValueChange={(value) =>
-                          update("partySize", Number(value))
-                        }
-                      >
-                        <SelectTrigger
+                      <div className="relative">
+                        <Users className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
                           id="partySize"
-                          className="h-11 w-full justify-between rounded-lg [&>svg]:size-4"
-                        >
-                          <SelectValue placeholder="Select number of guests" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.from({ length: 10 }, (_, i) => i + 1).map(
-                            (count) => (
-                              <SelectItem key={count} value={String(count)}>
-                                {count} {count === 1 ? "guest" : "guests"}
-                              </SelectItem>
-                            ),
-                          )}
-                        </SelectContent>
-                      </Select>
+                          type="number"
+                          min={1}
+                          value={state.partySize}
+                          onChange={(e) =>
+                            update(
+                              "partySize",
+                              Math.max(1, Number(e.target.value) || 1),
+                            )
+                          }
+                          placeholder="2"
+                          className="h-11 pl-9"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="startDate">Start date</Label>

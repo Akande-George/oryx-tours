@@ -7,6 +7,8 @@ import type {
   Destination,
   FleetCategoryRecord,
   Operator,
+  PersonalizedRequest,
+  PersonalizedRequestStatus,
   Review,
   Tour,
   Vehicle,
@@ -63,6 +65,31 @@ export const getFleetCategories = (client: SupabaseClient) =>
     "fleet_categories",
     "fleet categories",
   );
+
+export const getPersonalizedRequests = (client: SupabaseClient) =>
+  readCollection<PersonalizedRequest>(
+    client,
+    "personalized_requests",
+    "personalized requests",
+    "createdAt",
+  );
+
+export const updatePersonalizedRequestStatus = async (
+  client: SupabaseClient,
+  id: string,
+  status: PersonalizedRequestStatus,
+) => {
+  const { error } = await client
+    .from("personalized_requests")
+    .update({ status })
+    .eq("id", id);
+
+  if (error && process.env.NODE_ENV !== "production") {
+    console.error(`Failed to update personalized request ${id}`, error);
+  }
+
+  return !error;
+};
 
 export const getProfiles = (client: SupabaseClient) =>
   readCollection<AuthProfile>(client, "profiles", "profiles");
