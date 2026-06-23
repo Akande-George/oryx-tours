@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import { CheckCircle2, Info, X, XCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, generateId } from "@/lib/utils";
 
 export type ToastKind = "success" | "error" | "info";
 
@@ -23,7 +23,7 @@ type ToastState = {
 const useToastStore = create<ToastState>((set) => ({
   toasts: [],
   push: (toast) => {
-    const id = crypto.randomUUID();
+    const id = generateId();
     set((state) => ({ toasts: [...state.toasts, { ...toast, id }] }));
     return id;
   },

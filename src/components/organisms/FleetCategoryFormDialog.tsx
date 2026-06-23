@@ -12,10 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { generateId } from "@/lib/utils";
 import type { FleetCategoryRecord } from "@/types";
 
 const empty = (): FleetCategoryRecord => ({
-  id: crypto.randomUUID(),
+  id: generateId(),
   title: "",
   description: "",
   order: 0,

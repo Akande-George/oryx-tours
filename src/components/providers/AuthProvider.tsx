@@ -46,6 +46,10 @@ type AuthContextValue = {
   updateMyProfile: (patch: ProfilePatch) => Promise<AuthUser>;
   requestPasswordReset: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
+  setRecoverySession: (
+    accessToken: string,
+    refreshToken: string,
+  ) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -438,6 +442,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const setRecoverySession = useCallback(
+    async (accessToken: string, refreshToken: string) => {
+      const { data, error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+      if (error || !data.session?.user) {
+        console.error("[auth] setSession (recovery) failed", error);
+        throw new Error(error?.message ?? "Invalid or expired reset link");
+      }
+      // Load the profile so the rest of the app sees the user as signed in.
+      await loadCurrentProfile(data.session.user.id);
+    },
+    [loadCurrentProfile],
+  );
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -451,6 +471,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       updateMyProfile,
       requestPasswordReset,
       updatePassword,
+      setRecoverySession,
     }),
     [
       user,
@@ -464,6 +485,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       updateMyProfile,
       requestPasswordReset,
       updatePassword,
+      setRecoverySession,
     ],
   );
 

@@ -14,37 +14,82 @@ import { toast } from "@/components/molecules/Toaster";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const { user, ready, updatePassword, signOut } = useAuth();
+  const { user, updatePassword, signOut, setRecoverySession } = useAuth();
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [verifying, setVerifying] = useState(true);
   const [tokenReady, setTokenReady] = useState(false);
   const [tokenError, setTokenError] = useState<string | null>(null);
 
   // Supabase puts the recovery tokens in the URL hash, e.g.
-  //   #access_token=...&type=recovery
-  // The auth client picks it up automatically and fires SIGNED_IN /
-  // PASSWORD_RECOVERY. We just wait for `ready` and a session to exist.
+  //   #access_token=...&refresh_token=...&type=recovery
+  // We parse them and establish the session explicitly — relying on the
+  // client to auto-detect the hash is unreliable with the SSR client.
   useEffect(() => {
-    if (!ready) return;
-    if (user) {
-      setTokenReady(true);
-      return;
-    }
-    if (typeof window === "undefined") return;
-    const hash = window.location.hash;
-    if (hash.includes("error") || hash.includes("expired")) {
-      setTokenError(
-        "This reset link is invalid or has expired. Request a new one.",
-      );
-    } else {
-      setTokenError(
-        "We couldn't verify the reset link. Open it directly from your email or request a new one.",
-      );
-    }
-  }, [ready, user]);
+    let cancelled = false;
+
+    const verify = async () => {
+      // Already signed in (e.g. came back to the page) — allow reset.
+      if (user) {
+        setTokenReady(true);
+        setVerifying(false);
+        return;
+      }
+
+      if (typeof window === "undefined") return;
+      const hash = window.location.hash.replace(/^#/, "");
+      const params = new URLSearchParams(hash);
+
+      if (params.get("error") || params.get("error_description")) {
+        if (!cancelled) {
+          setTokenError(
+            "This reset link is invalid or has expired. Request a new one.",
+          );
+          setVerifying(false);
+        }
+        return;
+      }
+
+      const accessToken = params.get("access_token");
+      const refreshToken = params.get("refresh_token");
+
+      if (!accessToken || !refreshToken) {
+        if (!cancelled) {
+          setTokenError(
+            "We couldn't verify the reset link. Open it directly from your email or request a new one.",
+          );
+          setVerifying(false);
+        }
+        return;
+      }
+
+      try {
+        await setRecoverySession(accessToken, refreshToken);
+        if (cancelled) return;
+        // Clean the tokens out of the URL bar.
+        window.history.replaceState(null, "", window.location.pathname);
+        setTokenReady(true);
+      } catch (e) {
+        if (!cancelled) {
+          setTokenError(
+            (e as Error).message ||
+              "This reset link is invalid or has expired. Request a new one.",
+          );
+        }
+      } finally {
+        if (!cancelled) setVerifying(false);
+      }
+    };
+
+    void verify();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -107,7 +152,7 @@ export default function ResetPasswordPage() {
             </h1>
           </div>
 
-          {!ready ? (
+          {verifying ? (
             <p className="text-sm text-muted-foreground">
               Verifying reset link…
             </p>

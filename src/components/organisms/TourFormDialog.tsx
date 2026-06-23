@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, generateId } from "@/lib/utils";
 import { ImageUploader } from "@/components/atoms/ImageUploader";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { RatingStars } from "@/components/molecules/RatingStars";
@@ -46,7 +46,7 @@ const slugify = (input: string) =>
     .replace(/-+/g, "-");
 
 const emptyTour = (): Tour => ({
-  id: crypto.randomUUID(),
+  id: generateId(),
   slug: "",
   title: "",
   location: "",
@@ -757,7 +757,7 @@ function ReviewEditor({
     onChange([
       ...value,
       {
-        id: crypto.randomUUID(),
+        id: generateId(),
         name: "",
         rating: 5,
         date: new Date().toISOString().slice(0, 10),

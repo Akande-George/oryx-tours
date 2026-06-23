@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { generateId } from "@/lib/utils";
 
 type ConfirmTone = "default" | "destructive";
 
@@ -35,7 +36,7 @@ const useConfirmStore = create<ConfirmState>((set, get) => ({
   pending: null,
   open: (req) =>
     new Promise<boolean>((resolve) => {
-      const id = crypto.randomUUID();
+      const id = generateId();
       set({ pending: { ...req, id, resolve } });
     }),
   resolve: (ok) => {

@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { cn, generateId } from "@/lib/utils";
 import { ImageUploader } from "@/components/atoms/ImageUploader";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { FleetCategory, Vehicle, VehicleType } from "@/types";
@@ -45,7 +45,7 @@ const gradientPresets = [
 ];
 
 const emptyVehicle = (operatorId = ""): Vehicle => ({
-  id: crypto.randomUUID(),
+  id: generateId(),
   name: "",
   fleetCategory: "",
   vehicleType: "Sedan",
