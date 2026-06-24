@@ -50,7 +50,7 @@ export function BookingsManager({ title, subtitle }: BookingsManagerProps) {
       <SectionHeading title={title} subtitle={subtitle} />
 
       <Tabs defaultValue="upcoming">
-        <TabsList className="grid h-auto w-full grid-cols-1 gap-1 sm:grid-cols-3">
+        <TabsList className="grid !h-auto w-full grid-cols-1 gap-1 sm:grid-cols-3">
           {tabDefinitions.map((tab) => (
             <TabsTrigger key={tab.value} value={tab.value}>
               {tab.label}

@@ -43,7 +43,7 @@ export function BookingHub({ initialType }: BookingHubProps) {
   return (
     <div className="space-y-6">
       <Tabs value={serviceType} onValueChange={handleTabChange}>
-        <TabsList className="grid h-auto w-full grid-cols-1 gap-1 sm:grid-cols-3">
+        <TabsList className="grid !h-auto w-full grid-cols-1 gap-1 sm:grid-cols-3">
           {tabs.map(({ value, label, Icon }) => (
             <TabsTrigger key={value} value={value} className="gap-2">
               <Icon className="h-4 w-4" /> {label}

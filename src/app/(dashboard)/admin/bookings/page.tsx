@@ -132,7 +132,7 @@ export default function AdminBookingsPage() {
           </div>
 
           <Tabs defaultValue="all">
-            <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-4">
+            <TabsList className="grid !h-auto w-full grid-cols-2 gap-1 sm:grid-cols-4">
               {tabs.map((tab) => (
                 <TabsTrigger key={tab.value} value={tab.value}>
                   {tab.label}

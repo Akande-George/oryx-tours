@@ -105,47 +105,51 @@ export default function AdminRevenuePage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-4 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.35)]">
             <p className="text-sm font-semibold">Catalog value by category</p>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">Value</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {categoryRows.map((row) => (
-                  <TableRow key={row.category}>
-                    <TableCell>{row.category}</TableCell>
-                    <TableCell className="text-right">
-                      {formatPrice(row.value)}
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Category</TableHead>
+                    <TableHead className="text-right">Value</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {categoryRows.map((row) => (
+                    <TableRow key={row.category}>
+                      <TableCell>{row.category}</TableCell>
+                      <TableCell className="text-right">
+                        {formatPrice(row.value)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
           <div className="space-y-4 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.35)]">
             <p className="text-sm font-semibold">Operator performance</p>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Operator</TableHead>
-                  <TableHead>Tours</TableHead>
-                  <TableHead className="text-right">Catalog value</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {byOperator.map((row) => (
-                  <TableRow key={row.name}>
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell>{row.tours}</TableCell>
-                    <TableCell className="text-right">
-                      {formatPrice(row.revenue)}
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Operator</TableHead>
+                    <TableHead>Tours</TableHead>
+                    <TableHead className="text-right">Catalog value</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {byOperator.map((row) => (
+                    <TableRow key={row.name}>
+                      <TableCell>{row.name}</TableCell>
+                      <TableCell>{row.tours}</TableCell>
+                      <TableCell className="text-right">
+                        {formatPrice(row.revenue)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </div>
       </div>

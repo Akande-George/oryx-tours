@@ -11,7 +11,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <RouteGuard>
         <div className="flex">
           <Sidebar />
-          <main className="min-w-0 flex-1 space-y-8 px-4 py-10 sm:px-6 lg:px-10">
+          {/* Extra top padding on mobile so the floating sidebar toggle
+              (fixed top-20 left-4) never overlaps the page heading. */}
+          <main className="min-w-0 flex-1 space-y-8 px-4 pb-10 pt-20 sm:px-6 md:pt-10 lg:px-10">
             {children}
           </main>
         </div>

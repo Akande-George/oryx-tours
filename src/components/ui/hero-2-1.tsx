@@ -42,7 +42,7 @@ const Hero2 = () => {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="mt-10"
         >
-          <h1 className="mx-auto max-w-4xl text-5xl font-semibold leading-tight text-white drop-shadow-lg md:text-6xl lg:text-7xl">
+          <h1 className="mx-auto max-w-4xl text-4xl font-semibold leading-tight text-white drop-shadow-lg sm:text-5xl md:text-6xl lg:text-7xl">
             Design the journey that matches your pace and palette.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-white/80">

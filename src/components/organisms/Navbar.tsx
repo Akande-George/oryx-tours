@@ -167,28 +167,44 @@ export function Navbar() {
           >
             <Menu className="h-5 w-5" />
           </SheetTrigger>
-          <SheetContent side="right" className="w-[280px]">
+          <SheetContent side="right" className="flex w-[280px] flex-col">
             <SheetHeader>
               <SheetTitle>Explore</SheetTitle>
             </SheetHeader>
-            <div className="mt-6 flex flex-col gap-4">
+            <nav className="mt-2 flex flex-col">
               {navLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="text-sm">
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="rounded-lg px-2 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
                   {link.label}
                 </Link>
               ))}
+            </nav>
+            <div className="mt-auto flex flex-col gap-3 border-t border-border pt-4">
               {ready && user ? (
                 <>
                   <div className="rounded-xl border border-border bg-muted/40 p-3 text-xs">
                     <p className="font-semibold text-foreground">{user.name}</p>
-                    <p className="text-muted-foreground">{user.email}</p>
+                    <p className="truncate text-muted-foreground">
+                      {user.email}
+                    </p>
                     <p className="mt-1 uppercase tracking-[0.2em] text-primary">
                       {user.role}
                     </p>
                   </div>
+                  <Link
+                    href="/booking"
+                    className={buttonVariants({
+                      className: "w-full rounded-full",
+                    })}
+                  >
+                    Book a tour
+                  </Link>
                   <Button
                     variant="outline"
-                    className="rounded-full"
+                    className="w-full rounded-full"
                     onClick={handleSignOut}
                   >
                     <LogOut className="mr-2 h-4 w-4" /> Sign out
@@ -197,10 +213,18 @@ export function Navbar() {
               ) : (
                 <>
                   <Link
+                    href="/booking"
+                    className={buttonVariants({
+                      className: "w-full rounded-full",
+                    })}
+                  >
+                    Book a tour
+                  </Link>
+                  <Link
                     href="/sign-in"
                     className={buttonVariants({
                       variant: "outline",
-                      className: "rounded-full",
+                      className: "w-full rounded-full",
                     })}
                   >
                     Sign in
@@ -209,19 +233,13 @@ export function Navbar() {
                     href="/sign-up"
                     className={buttonVariants({
                       variant: "ghost",
-                      className: "rounded-full",
+                      className: "w-full rounded-full",
                     })}
                   >
                     Sign up
                   </Link>
                 </>
               )}
-              <Link
-                href="/booking"
-                className={buttonVariants({ className: "rounded-full" })}
-              >
-                Book a tour
-              </Link>
             </div>
           </SheetContent>
         </Sheet>

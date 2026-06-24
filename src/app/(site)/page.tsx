@@ -80,7 +80,7 @@ export default async function HomePage() {
       </section>
 
       <section className="py-12">
-        <Container className="relative overflow-hidden rounded-3xl border border-white/60 bg-gradient-to-br from-[#f7e6c8] via-[#f8f2e6] to-[#f1d1aa] p-10 shadow-[0_24px_60px_-32px_rgba(92,70,39,0.5)]">
+        <Container className="relative overflow-hidden rounded-3xl border border-white/60 bg-gradient-to-br from-[#f7e6c8] via-[#f8f2e6] to-[#f1d1aa] p-6 shadow-[0_24px_60px_-32px_rgba(92,70,39,0.5)] sm:p-10">
           <div className="absolute right-6 top-6 hidden h-28 w-28 rounded-full bg-white/60 blur-2xl lg:block" />
           <div className="space-y-4">
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-muted-foreground">
