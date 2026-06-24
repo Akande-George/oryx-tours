@@ -167,59 +167,54 @@ export function Navbar() {
           >
             <Menu className="h-5 w-5" />
           </SheetTrigger>
-          <SheetContent side="right" className="flex w-[280px] flex-col">
+          <SheetContent
+            side="right"
+            className="flex w-[300px] max-w-[85vw] flex-col gap-0 overflow-y-auto"
+          >
             <SheetHeader>
               <SheetTitle>Explore</SheetTitle>
             </SheetHeader>
-            <nav className="mt-2 flex flex-col">
+
+            <nav className="flex flex-col gap-1 px-4 pt-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-lg px-2 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                  className="rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
                   {link.label}
                 </Link>
               ))}
             </nav>
-            <div className="mt-auto flex flex-col gap-3 border-t border-border pt-4">
+
+            <div className="mt-4 flex flex-col gap-3 border-t border-border px-4 pb-6 pt-4">
               {ready && user ? (
-                <>
-                  <div className="rounded-xl border border-border bg-muted/40 p-3 text-xs">
-                    <p className="font-semibold text-foreground">{user.name}</p>
-                    <p className="truncate text-muted-foreground">
-                      {user.email}
-                    </p>
-                    <p className="mt-1 uppercase tracking-[0.2em] text-primary">
-                      {user.role}
-                    </p>
-                  </div>
-                  <Link
-                    href="/booking"
-                    className={buttonVariants({
-                      className: "w-full rounded-full",
-                    })}
-                  >
-                    Book a tour
-                  </Link>
-                  <Button
-                    variant="outline"
-                    className="w-full rounded-full"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" /> Sign out
-                  </Button>
-                </>
+                <div className="rounded-xl border border-border bg-muted/40 p-3 text-xs">
+                  <p className="font-semibold text-foreground">{user.name}</p>
+                  <p className="truncate text-muted-foreground">{user.email}</p>
+                  <p className="mt-1 uppercase tracking-[0.2em] text-primary">
+                    {user.role}
+                  </p>
+                </div>
+              ) : null}
+
+              <Link
+                href="/booking"
+                className={buttonVariants({ className: "w-full rounded-full" })}
+              >
+                Book a tour
+              </Link>
+
+              {ready && user ? (
+                <Button
+                  variant="outline"
+                  className="w-full rounded-full"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-2 h-4 w-4" /> Sign out
+                </Button>
               ) : (
                 <>
-                  <Link
-                    href="/booking"
-                    className={buttonVariants({
-                      className: "w-full rounded-full",
-                    })}
-                  >
-                    Book a tour
-                  </Link>
                   <Link
                     href="/sign-in"
                     className={buttonVariants({
