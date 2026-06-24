@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { SavedToursLoader } from "@/components/providers/SavedToursLoader";
+import { RecoveryHashHandler } from "@/components/providers/RecoveryHashHandler";
 import { Toaster } from "@/components/molecules/Toaster";
 import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
 
@@ -34,6 +36,9 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground">
         <AuthProvider>
           <SavedToursLoader />
+          <Suspense fallback={null}>
+            <RecoveryHashHandler />
+          </Suspense>
           {children}
         </AuthProvider>
         <Toaster />
