@@ -95,7 +95,11 @@ const experienceOptions: Array<{
     label: "Culture",
     hint: "Heritage sites, art, local makers.",
   },
-  { value: "cuisine", label: "Cuisine", hint: "Chef tables, markets, tastings." },
+  {
+    value: "cuisine",
+    label: "Cuisine",
+    hint: "Chef tables, markets, tastings.",
+  },
   {
     value: "wildlife",
     label: "Wildlife",
@@ -274,354 +278,343 @@ export default function PersonalizedPage() {
 
         <div className="flex justify-center">
           <MultiStepForm
-              currentStep={step}
-              totalSteps={4}
-              stepLabel={meta.label}
-              title={meta.title}
-              description={meta.description}
-              onBack={handleBack}
-              onNext={handleNext}
-              nextDisabled={!stepValid || submitting}
-              nextButtonText={
-                submitting
-                  ? "Sending..."
-                  : step === 4
-                    ? "Send to concierge"
-                    : "Next step"
-              }
-              size="lg"
-              footerContent={
-                <a
-                  href="mailto:info@oryxgp.com"
-                  className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                >
-                  Talk to a concierge instead
-                  <ArrowUpRight className="size-3.5" />
-                </a>
-              }
-            >
-              {step === 1 ? (
-                <div className="space-y-5">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="destination">Where to?</Label>
-                      <div className="relative">
-                        <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          id="destination"
-                          value={state.destination}
-                          onChange={(e) =>
-                            update("destination", e.target.value)
-                          }
-                          placeholder="National Museum of Qatar"
-                          className="h-11 pl-9"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="partySize">Number of guests</Label>
-                      <div className="relative">
-                        <Users className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          id="partySize"
-                          type="number"
-                          min={1}
-                          value={state.partySize}
-                          onChange={(e) =>
-                            update(
-                              "partySize",
-                              Math.max(1, Number(e.target.value) || 1),
-                            )
-                          }
-                          placeholder="2"
-                          className="h-11 pl-9"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="startDate">Start date</Label>
-                      <DateInput
-                        id="startDate"
-                        min={todayISO()}
-                        value={state.startDate}
-                        onChange={(e) => update("startDate", e.target.value)}
-                        className="h-11"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="endDate">End date</Label>
-                      <DateInput
-                        id="endDate"
-                        min={state.startDate || todayISO()}
-                        value={state.endDate}
-                        onChange={(e) => update("endDate", e.target.value)}
-                        className="h-11"
+            currentStep={step}
+            totalSteps={4}
+            stepLabel={meta.label}
+            title={meta.title}
+            description={meta.description}
+            onBack={handleBack}
+            onNext={handleNext}
+            nextDisabled={!stepValid || submitting}
+            nextButtonText={
+              submitting
+                ? "Sending..."
+                : step === 4
+                  ? "Send to concierge"
+                  : "Next step"
+            }
+            size="lg"
+            footerContent={
+              <a
+                href="mailto:info@oryxgp.com"
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              >
+                Talk to a concierge instead
+                <ArrowUpRight className="size-3.5" />
+              </a>
+            }
+          >
+            {step === 1 ? (
+              <div className="space-y-5">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="destination">Where to?</Label>
+                    <div className="relative">
+                      <MapPin className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="destination"
+                        value={state.destination}
+                        onChange={(e) => update("destination", e.target.value)}
+                        placeholder="National Museum of Qatar"
+                        className="h-11 pl-9"
                       />
                     </div>
                   </div>
-                  <p className="rounded-xl border border-primary/15 bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
-                    Not sure on dates? Leave the end date blank — we&apos;ll
-                    suggest an ideal window for the season.
-                  </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="partySize">Number of guests</Label>
+                    <div className="relative">
+                      <Users className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="partySize"
+                        type="number"
+                        min={1}
+                        value={state.partySize}
+                        onChange={(e) =>
+                          update(
+                            "partySize",
+                            Math.max(1, Number(e.target.value) || 1),
+                          )
+                        }
+                        placeholder="2"
+                        className="h-11 pl-9"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate">Start date</Label>
+                    <DateInput
+                      id="startDate"
+                      min={todayISO()}
+                      value={state.startDate}
+                      onChange={(e) => update("startDate", e.target.value)}
+                      className="h-11"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="endDate">End date</Label>
+                    <DateInput
+                      id="endDate"
+                      min={state.startDate || todayISO()}
+                      value={state.endDate}
+                      onChange={(e) => update("endDate", e.target.value)}
+                      className="h-11"
+                    />
+                  </div>
                 </div>
-              ) : null}
+                <p className="rounded-xl border border-primary/15 bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
+                  Not sure on dates? Leave the end date blank — we&apos;ll
+                  suggest an ideal window for the season.
+                </p>
+              </div>
+            ) : null}
 
-              {step === 2 ? (
-                <div className="space-y-4">
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {experienceOptions.map((option) => {
-                      const active = state.experiences.includes(option.value);
+            {step === 2 ? (
+              <div className="space-y-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {experienceOptions.map((option) => {
+                    const active = state.experiences.includes(option.value);
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => toggleExperience(option.value)}
+                        className={cn(
+                          "group flex items-start gap-3 rounded-2xl border p-4 text-left transition-all",
+                          active
+                            ? "border-primary bg-primary/10 shadow-sm"
+                            : "border-border bg-background hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors",
+                            active
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-muted-foreground/30 bg-background",
+                          )}
+                        >
+                          {active ? <CheckCircle2 className="size-4" /> : null}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-sm font-semibold">
+                            {option.label}
+                          </span>
+                          <span className="mt-0.5 block text-xs text-muted-foreground">
+                            {option.hint}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Selected {state.experiences.length} of{" "}
+                  {experienceOptions.length} — choose at least one.
+                </p>
+              </div>
+            ) : null}
+
+            {step === 3 ? (
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="size-4 text-muted-foreground" />
+                    <Label className="text-sm font-semibold">Budget tier</Label>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {budgetOptions.map((option) => {
+                      const active = state.budget === option.value;
                       return (
                         <button
                           key={option.value}
                           type="button"
-                          onClick={() => toggleExperience(option.value)}
+                          onClick={() => update("budget", option.value)}
                           className={cn(
-                            "group flex items-start gap-3 rounded-2xl border p-4 text-left transition-all",
+                            "flex flex-col items-start rounded-2xl border p-4 text-left transition-all",
                             active
                               ? "border-primary bg-primary/10 shadow-sm"
                               : "border-border bg-background hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md",
                           )}
                         >
-                          <span
-                            className={cn(
-                              "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border transition-colors",
-                              active
-                                ? "border-primary bg-primary text-primary-foreground"
-                                : "border-muted-foreground/30 bg-background",
-                            )}
-                          >
-                            {active ? (
-                              <CheckCircle2 className="size-4" />
-                            ) : null}
+                          <span className="text-sm font-semibold">
+                            {option.label}
                           </span>
-                          <span className="min-w-0">
-                            <span className="block text-sm font-semibold">
-                              {option.label}
-                            </span>
-                            <span className="mt-0.5 block text-xs text-muted-foreground">
-                              {option.hint}
-                            </span>
+                          <span className="mt-0.5 text-xs font-medium text-primary">
+                            {option.range}
+                          </span>
+                          <span className="mt-1.5 text-xs text-muted-foreground">
+                            {option.hint}
                           </span>
                         </button>
                       );
                     })}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Selected {state.experiences.length} of{" "}
-                    {experienceOptions.length} — choose at least one.
-                  </p>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="budgetAmount"
+                      className="text-xs font-medium text-muted-foreground"
+                    >
+                      Or share an exact figure (optional)
+                    </Label>
+                    <Input
+                      id="budgetAmount"
+                      value={state.budgetAmount}
+                      onChange={(e) => update("budgetAmount", e.target.value)}
+                      placeholder="e.g. $8,000 total"
+                      className="h-10"
+                    />
+                  </div>
                 </div>
-              ) : null}
 
-              {step === 3 ? (
-                <div className="space-y-6">
+                <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <DollarSign className="size-4 text-muted-foreground" />
+                      <Bed className="size-4 text-muted-foreground" />
                       <Label className="text-sm font-semibold">
-                        Budget tier
+                        Lodging style
                       </Label>
                     </div>
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      {budgetOptions.map((option) => {
-                        const active = state.budget === option.value;
+                    <div className="grid gap-2">
+                      {lodgingOptions.map((option) => {
+                        const active = state.lodging === option.value;
                         return (
                           <button
                             key={option.value}
                             type="button"
-                            onClick={() => update("budget", option.value)}
+                            onClick={() => update("lodging", option.value)}
                             className={cn(
-                              "flex flex-col items-start rounded-2xl border p-4 text-left transition-all",
+                              "flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition-colors",
                               active
-                                ? "border-primary bg-primary/10 shadow-sm"
-                                : "border-border bg-background hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md",
+                                ? "border-primary bg-primary/10"
+                                : "border-border bg-background hover:border-primary/40",
                             )}
                           >
-                            <span className="text-sm font-semibold">
-                              {option.label}
+                            <span>
+                              <span className="block text-sm font-medium">
+                                {option.label}
+                              </span>
+                              <span className="block text-xs text-muted-foreground">
+                                {option.hint}
+                              </span>
                             </span>
-                            <span className="mt-0.5 text-xs font-medium text-primary">
-                              {option.range}
-                            </span>
-                            <span className="mt-1.5 text-xs text-muted-foreground">
-                              {option.hint}
-                            </span>
+                            {active ? (
+                              <CheckCircle2 className="size-4 text-primary" />
+                            ) : null}
                           </button>
                         );
                       })}
                     </div>
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="budgetAmount"
-                        className="text-xs font-medium text-muted-foreground"
-                      >
-                        Or share an exact figure (optional)
-                      </Label>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Gauge className="size-4 text-muted-foreground" />
+                      <Label className="text-sm font-semibold">Pace</Label>
+                    </div>
+                    <div className="grid gap-2">
+                      {paceOptions.map((option) => {
+                        const active = state.pace === option.value;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => update("pace", option.value)}
+                            className={cn(
+                              "flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition-colors",
+                              active
+                                ? "border-primary bg-primary/10"
+                                : "border-border bg-background hover:border-primary/40",
+                            )}
+                          >
+                            <span>
+                              <span className="block text-sm font-medium">
+                                {option.label}
+                              </span>
+                              <span className="block text-xs text-muted-foreground">
+                                {option.hint}
+                              </span>
+                            </span>
+                            {active ? (
+                              <CheckCircle2 className="size-4 text-primary" />
+                            ) : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {step === 4 ? (
+              <div className="space-y-5">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full name</Label>
+                    <div className="relative">
+                      <User className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
-                        id="budgetAmount"
-                        value={state.budgetAmount}
-                        onChange={(e) =>
-                          update("budgetAmount", e.target.value)
-                        }
-                        placeholder="e.g. $8,000 total"
-                        className="h-10"
+                        id="name"
+                        value={state.name}
+                        onChange={(e) => update("name", e.target.value)}
+                        placeholder="Your name"
+                        className="h-11 pl-9"
                       />
                     </div>
                   </div>
-
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Bed className="size-4 text-muted-foreground" />
-                        <Label className="text-sm font-semibold">
-                          Lodging style
-                        </Label>
-                      </div>
-                      <div className="grid gap-2">
-                        {lodgingOptions.map((option) => {
-                          const active = state.lodging === option.value;
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => update("lodging", option.value)}
-                              className={cn(
-                                "flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition-colors",
-                                active
-                                  ? "border-primary bg-primary/10"
-                                  : "border-border bg-background hover:border-primary/40",
-                              )}
-                            >
-                              <span>
-                                <span className="block text-sm font-medium">
-                                  {option.label}
-                                </span>
-                                <span className="block text-xs text-muted-foreground">
-                                  {option.hint}
-                                </span>
-                              </span>
-                              {active ? (
-                                <CheckCircle2 className="size-4 text-primary" />
-                              ) : null}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Gauge className="size-4 text-muted-foreground" />
-                        <Label className="text-sm font-semibold">Pace</Label>
-                      </div>
-                      <div className="grid gap-2">
-                        {paceOptions.map((option) => {
-                          const active = state.pace === option.value;
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => update("pace", option.value)}
-                              className={cn(
-                                "flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition-colors",
-                                active
-                                  ? "border-primary bg-primary/10"
-                                  : "border-border bg-background hover:border-primary/40",
-                              )}
-                            >
-                              <span>
-                                <span className="block text-sm font-medium">
-                                  {option.label}
-                                </span>
-                                <span className="block text-xs text-muted-foreground">
-                                  {option.hint}
-                                </span>
-                              </span>
-                              {active ? (
-                                <CheckCircle2 className="size-4 text-primary" />
-                              ) : null}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-
-              {step === 4 ? (
-                <div className="space-y-5">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Full name</Label>
-                      <div className="relative">
-                        <User className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          id="name"
-                          value={state.name}
-                          onChange={(e) => update("name", e.target.value)}
-                          placeholder="Your name"
-                          className="h-11 pl-9"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <div className="relative">
-                        <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          id="email"
-                          type="email"
-                          value={state.email}
-                          onChange={(e) => update("email", e.target.value)}
-                          placeholder="you@example.com"
-                          className="h-11 pl-9"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2 md:col-span-2">
-                      <Label htmlFor="phone">Phone (optional)</Label>
-                      <div className="relative">
-                        <Phone className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          id="phone"
-                          value={state.phone}
-                          onChange={(e) => update("phone", e.target.value)}
-                          placeholder="+1 555 0100"
-                          className="h-11 pl-9"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
                   <div className="space-y-2">
-                    <Label htmlFor="notes">Anything else?</Label>
-                    <Textarea
-                      id="notes"
-                      value={state.notes}
-                      onChange={(e) => update("notes", e.target.value)}
-                      placeholder="Dietary needs, celebrations, mobility requests, special anchors..."
-                      className="min-h-[120px]"
-                    />
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        value={state.email}
+                        onChange={(e) => update("email", e.target.value)}
+                        placeholder="you@example.com"
+                        className="h-11 pl-9"
+                      />
+                    </div>
                   </div>
-
-                  <div className="rounded-xl border border-primary/15 bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
-                    <p className="font-semibold text-foreground">
-                      Trip recap
-                    </p>
-                    <p className="mt-1">
-                      {state.destination || "Destination TBD"} ·{" "}
-                      {state.partySize}{" "}
-                      {state.partySize === 1 ? "guest" : "guests"} ·{" "}
-                      {state.experiences.length || "0"} experience
-                      {state.experiences.length === 1 ? "" : "s"} ·{" "}
-                      {budgetOptions.find((b) => b.value === state.budget)?.label}{" "}
-                      tier
-                    </p>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="phone">Phone (optional)</Label>
+                    <div className="relative">
+                      <Phone className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="phone"
+                        value={state.phone}
+                        onChange={(e) => update("phone", e.target.value)}
+                        placeholder="+1 555 0100"
+                        className="h-11 pl-9"
+                      />
+                    </div>
                   </div>
                 </div>
-              ) : null}
+
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Anything else?</Label>
+                  <Textarea
+                    id="notes"
+                    value={state.notes}
+                    onChange={(e) => update("notes", e.target.value)}
+                    placeholder="Dietary needs, celebrations, mobility requests, special anchors..."
+                    className="min-h-[120px]"
+                  />
+                </div>
+
+                <div className="rounded-xl border border-primary/15 bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
+                  <p className="font-semibold text-foreground">Trip recap</p>
+                  <p className="mt-1">
+                    {state.destination || "Destination TBD"} · {state.partySize}{" "}
+                    {state.partySize === 1 ? "guest" : "guests"} ·{" "}
+                    {state.experiences.length || "0"} experience
+                    {state.experiences.length === 1 ? "" : "s"} ·{" "}
+                    {budgetOptions.find((b) => b.value === state.budget)?.label}{" "}
+                    tier
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </MultiStepForm>
         </div>
 
@@ -712,7 +705,7 @@ export default function PersonalizedPage() {
               </p>
             </div>
             <a
-              href="mailto:concierge@oryx.test"
+              href="mailto:info@oryxgp.com"
               className="inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Contact concierge

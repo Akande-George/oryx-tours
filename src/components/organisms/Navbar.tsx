@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogOut, Menu, User } from "lucide-react";
@@ -41,16 +42,20 @@ const customerLinks = [
 export function Navbar() {
   const router = useRouter();
   const { user, ready, signOut } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const roleLinks = user?.role === "customer" ? customerLinks : [];
 
   const navLinks = [...publicLinks, ...roleLinks];
 
   const handleSignOut = () => {
+    setMobileOpen(false);
     signOut();
     router.push("/");
     router.refresh();
   };
+
+  const closeMobile = () => setMobileOpen(false);
 
   const initials = user
     ? user.name
@@ -161,7 +166,7 @@ export function Navbar() {
             Book a tour
           </Link>
         </div>
-        <Sheet>
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger
             render={<Button variant="ghost" className="md:hidden" />}
           >
@@ -180,6 +185,7 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={closeMobile}
                   className="rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
                   {link.label}
@@ -200,6 +206,7 @@ export function Navbar() {
 
               <Link
                 href="/booking"
+                onClick={closeMobile}
                 className={buttonVariants({ className: "w-full rounded-full" })}
               >
                 Book a tour
@@ -217,6 +224,7 @@ export function Navbar() {
                 <>
                   <Link
                     href="/sign-in"
+                    onClick={closeMobile}
                     className={buttonVariants({
                       variant: "outline",
                       className: "w-full rounded-full",
@@ -226,6 +234,7 @@ export function Navbar() {
                   </Link>
                   <Link
                     href="/sign-up"
+                    onClick={closeMobile}
                     className={buttonVariants({
                       variant: "ghost",
                       className: "w-full rounded-full",

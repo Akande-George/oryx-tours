@@ -5,11 +5,11 @@ import { Button } from "@/components/atoms";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatPrice } from "@/lib/format";
-import { useSavedStore } from "@/store/saved-store";
+import { useSavedTours } from "@/store/use-saved-tours";
 import type { Tour } from "@/types";
 
 export function BookingSidebar({ tour }: { tour: Tour }) {
-  const { toggleSaved, isSaved } = useSavedStore();
+  const { toggleSaved, isSaved } = useSavedTours();
   const saved = isSaved(tour.slug);
 
   return (

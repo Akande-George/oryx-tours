@@ -64,7 +64,7 @@ export function FleetBrowser({
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return vehicles.filter((v) => {
+    const matched = vehicles.filter((v) => {
       if (category !== "All" && v.fleetCategory !== category) return false;
       if (vehicleType !== "All" && v.vehicleType !== vehicleType) return false;
       if (!needle) return true;
@@ -78,6 +78,13 @@ export function FleetBrowser({
         .join(" ")
         .toLowerCase();
       return haystack.includes(needle);
+    });
+
+    // Luxury first: highest "from" price leads, so VIP / premium vehicles
+    // surface ahead of economy ones.
+    return matched.sort((a, b) => {
+      if (b.priceFrom !== a.priceFrom) return b.priceFrom - a.priceFrom;
+      return a.name.localeCompare(b.name);
     });
   }, [vehicles, query, category, vehicleType]);
 

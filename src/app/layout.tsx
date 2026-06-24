@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { SavedToursLoader } from "@/components/providers/SavedToursLoader";
 import { Toaster } from "@/components/molecules/Toaster";
 import { ConfirmDialog } from "@/components/molecules/ConfirmDialog";
 
@@ -31,7 +32,10 @@ export default function RootLayout({
       className={`${inter.variable} ${interTight.variable} h-full scroll-smooth antialiased`}
     >
       <body className="min-h-screen bg-background text-foreground">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <SavedToursLoader />
+          {children}
+        </AuthProvider>
         <Toaster />
         <ConfirmDialog />
       </body>

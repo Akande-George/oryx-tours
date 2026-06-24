@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { Clock, MapPin } from "lucide-react";
 import { Button, DateInput, Input } from "@/components/atoms";
 import { Card, CardContent } from "@/components/ui/card";
@@ -45,15 +45,25 @@ export function LocalTransportFlow() {
   const dayHireMode: DayHireDuration =
     durationMode === "half-day" ? "half-day" : "full-day";
 
+  const formRef = useRef<HTMLDivElement>(null);
   const selected = vehicles.find((v) => v.id === vehicleId) ?? null;
   const dateValid = travelDate !== "" && travelDate >= todayISO();
 
-  const total = useMemo(() => {
-    if (!selected) return 0;
-    return dayHireMode === "half-day"
+  const baseRate = selected
+    ? dayHireMode === "half-day"
       ? selected.halfDayPrice
-      : selected.fullDayPrice;
-  }, [selected, dayHireMode]);
+      : selected.fullDayPrice
+    : 0;
+
+  const total = useMemo(
+    () => baseRate * Math.max(1, guests),
+    [baseRate, guests],
+  );
+
+  const handleSelectVehicle = (id: string) => {
+    setVehicleId(id);
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const ready =
     pickup.trim() !== "" &&
@@ -73,7 +83,10 @@ export function LocalTransportFlow() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <div
+        ref={formRef}
+        className="grid scroll-mt-24 gap-6 lg:grid-cols-[1.1fr_0.9fr]"
+      >
         <div className="space-y-4 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-primary" />
@@ -198,11 +211,13 @@ export function LocalTransportFlow() {
                   {formatPrice(total)}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {selected.name} · {durationLabel[dayHireMode]}
+                  {selected.name} · {durationLabel[dayHireMode]} · {guests}{" "}
+                  {guests === 1 ? "passenger" : "passengers"}
                 </p>
                 <div className="space-y-1 pt-2 text-sm text-muted-foreground">
                   <p>Half day: {formatPrice(selected.halfDayPrice)}</p>
                   <p>Full day: {formatPrice(selected.fullDayPrice)}</p>
+                  <p>Extra hour: {formatPrice(selected.extraHourPrice)}</p>
                 </div>
               </>
             ) : (
@@ -224,7 +239,7 @@ export function LocalTransportFlow() {
       <FleetBrowser
         vehicles={vehicles}
         selectedVehicleId={vehicleId}
-        onSelect={setVehicleId}
+        onSelect={handleSelectVehicle}
       />
     </div>
   );

@@ -66,6 +66,60 @@ export const getFleetCategories = (client: SupabaseClient) =>
     "fleet categories",
   );
 
+export const getSavedTourSlugs = async (
+  client: SupabaseClient,
+  customerId: string,
+): Promise<string[]> => {
+  const { data, error } = await client
+    .from("saved_tours")
+    .select("tourSlug")
+    .eq("customerId", customerId);
+
+  if (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Failed to load saved tours", error);
+    }
+    return [];
+  }
+
+  return (data ?? []).map((row) => (row as { tourSlug: string }).tourSlug);
+};
+
+export const addSavedTour = async (
+  client: SupabaseClient,
+  customerId: string,
+  tourSlug: string,
+) => {
+  const { error } = await client
+    .from("saved_tours")
+    .upsert(
+      { customerId, tourSlug },
+      { onConflict: "customerId,tourSlug" },
+    );
+
+  if (error) {
+    console.error("Failed to save tour", error);
+    throw new Error(formatSupabaseError("Failed to save tour", error));
+  }
+};
+
+export const removeSavedTour = async (
+  client: SupabaseClient,
+  customerId: string,
+  tourSlug: string,
+) => {
+  const { error } = await client
+    .from("saved_tours")
+    .delete()
+    .eq("customerId", customerId)
+    .eq("tourSlug", tourSlug);
+
+  if (error) {
+    console.error("Failed to unsave tour", error);
+    throw new Error(formatSupabaseError("Failed to unsave tour", error));
+  }
+};
+
 export const getPersonalizedRequests = (client: SupabaseClient) =>
   readCollection<PersonalizedRequest>(
     client,

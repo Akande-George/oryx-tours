@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { MapPin, Plus, Route, X } from "lucide-react";
 import { Button, DateInput, Input } from "@/components/atoms";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,17 +36,26 @@ export function PointToPointFlow() {
     removeStop,
   } = useBookingStore();
 
+  const formRef = useRef<HTMLDivElement>(null);
   const selected = vehicles.find((v) => v.id === vehicleId) ?? null;
   const dateValid = travelDate !== "" && travelDate >= todayISO();
 
   const activeStops = stops.filter((stop) => stop.trim() !== "");
   const stopCount = Math.max(activeStops.length, 1);
 
+  const perLeg = selected
+    ? selected.pointToPointPrice || selected.transferPrice
+    : 0;
+
   const total = useMemo(() => {
     if (!selected) return 0;
-    const perLeg = selected.pointToPointPrice || selected.transferPrice;
-    return perLeg * stopCount;
-  }, [selected, stopCount]);
+    return perLeg * stopCount * Math.max(1, guests);
+  }, [selected, perLeg, stopCount, guests]);
+
+  const handleSelectVehicle = (id: string) => {
+    setVehicleId(id);
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const ready =
     pickup.trim() !== "" &&
@@ -69,7 +78,10 @@ export function PointToPointFlow() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <div
+        ref={formRef}
+        className="grid scroll-mt-24 gap-6 lg:grid-cols-[1.1fr_0.9fr]"
+      >
         <div className="space-y-4 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
           <div className="flex items-center gap-2">
             <Route className="h-4 w-4 text-primary" />
@@ -225,10 +237,13 @@ export function PointToPointFlow() {
                 <p className="text-sm text-muted-foreground">
                   {selected.name} · {stopCount}{" "}
                   {stopCount === 1 ? "stop" : "stops"} ·{" "}
-                  {formatPrice(
-                    selected.pointToPointPrice || selected.transferPrice,
+                  {guests} {guests === 1 ? "passenger" : "passengers"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {formatPrice(perLeg)} per leg · {formatPrice(
+                    selected.extraHourPrice,
                   )}{" "}
-                  per leg
+                  per extra hour
                 </p>
                 <ul className="space-y-1 pt-2 text-sm text-muted-foreground">
                   {selected.features.map((feature) => (
@@ -255,7 +270,7 @@ export function PointToPointFlow() {
       <FleetBrowser
         vehicles={vehicles}
         selectedVehicleId={vehicleId}
-        onSelect={setVehicleId}
+        onSelect={handleSelectVehicle}
       />
     </div>
   );

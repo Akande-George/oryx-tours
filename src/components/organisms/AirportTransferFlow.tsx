@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useRef } from "react";
 import { MapPin, Plane } from "lucide-react";
 import { Button, DateInput, Input } from "@/components/atoms";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,6 +35,7 @@ export function AirportTransferFlow() {
     setAirportDirection,
   } = useBookingStore();
 
+  const formRef = useRef<HTMLDivElement>(null);
   const selected = vehicles.find((v) => v.id === vehicleId) ?? null;
   const dateValid = travelDate !== "" && travelDate >= todayISO();
   const ready =
@@ -42,6 +44,16 @@ export function AirportTransferFlow() {
     dateValid &&
     guests >= 1 &&
     !!selected;
+
+  const total = useMemo(
+    () => (selected ? selected.transferPrice * Math.max(1, guests) : 0),
+    [selected, guests],
+  );
+
+  const handleSelectVehicle = (id: string) => {
+    setVehicleId(id);
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const isAirportPickup = airportDirection === "pickup";
 
@@ -62,7 +74,7 @@ export function AirportTransferFlow() {
     toast.success(
       "Transfer confirmed",
       selected
-        ? `${selected.name} · ${pickup} → ${dropoff} · ${travelDate} · ${formatPrice(selected.transferPrice)}`
+        ? `${selected.name} · ${pickup} → ${dropoff} · ${travelDate} · ${formatPrice(total)}`
         : undefined,
     );
   };
@@ -95,7 +107,10 @@ export function AirportTransferFlow() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <div
+        ref={formRef}
+        className="grid scroll-mt-24 gap-6 lg:grid-cols-[1.1fr_0.9fr]"
+      >
         <div className="space-y-4 rounded-2xl border border-white/60 bg-white/80 p-6 shadow-[0_18px_40px_-30px_rgba(92,70,39,0.4)]">
           <div className="flex items-center gap-2">
             <Plane className="h-4 w-4 text-primary" />
@@ -195,11 +210,15 @@ export function AirportTransferFlow() {
             {selected ? (
               <>
                 <p className="text-3xl font-semibold text-primary">
-                  {formatPrice(selected.transferPrice)}
+                  {formatPrice(total)}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {selected.name} · {selected.fleetCategory} ·{" "}
-                  {selected.capacity} passengers
+                  {selected.name} · {selected.fleetCategory} · {guests}{" "}
+                  {guests === 1 ? "passenger" : "passengers"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {formatPrice(selected.transferPrice)} per passenger ·{" "}
+                  {formatPrice(selected.extraHourPrice)} per extra hour
                 </p>
                 <ul className="space-y-1 pt-2 text-sm text-muted-foreground">
                   {selected.features.map((feature) => (
@@ -226,7 +245,7 @@ export function AirportTransferFlow() {
       <FleetBrowser
         vehicles={vehicles}
         selectedVehicleId={vehicleId}
-        onSelect={setVehicleId}
+        onSelect={handleSelectVehicle}
       />
     </div>
   );
