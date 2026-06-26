@@ -1,6 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Globe, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import {
+  ArrowRight,
+  Globe,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+} from "lucide-react";
 import { Container } from "@/components/layout/Container";
 
 function LinkedinIcon({ className }: { className?: string }) {
@@ -84,151 +91,192 @@ const socialLinks = [
   },
 ];
 
+const experienceLinks = [
+  { label: "Luxury retreats", href: "/tours" },
+  { label: "Adventure escapes", href: "/tours" },
+  { label: "Cultural tours", href: "/tours" },
+  { label: "Airport transfers", href: "/transfers" },
+  { label: "Personalized trips", href: "/personalized" },
+];
+
 export function Footer() {
   return (
-    <footer className="border-t border-white/60 bg-white/70 backdrop-blur">
-      <Container className="grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Oryx Tours" width={36} height={36} />
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary">
-              Oryx Tours
+    <footer className="relative overflow-hidden bg-[#1f190f] text-[#e8dfcd]">
+      {/* Decorative glows */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_60%_at_85%_0%,rgba(207,160,124,0.18),transparent_60%),radial-gradient(45%_55%_at_5%_100%,rgba(58,139,92,0.18),transparent_65%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#cfa07c]/50 to-transparent"
+      />
+
+      <Container className="relative">
+        {/* CTA strip */}
+        <div className="flex flex-col gap-6 border-b border-white/10 py-10 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#cfa07c]">
+              Ready when you are
             </p>
+            <h2 className="font-heading text-2xl font-semibold text-white sm:text-3xl">
+              Let&apos;s design your next journey.
+            </h2>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Curated journeys across desert, coast, and heritage landscapes.
-            Every experience is crafted with concierge-level care.
-          </p>
-          <div className="flex items-center gap-3 pt-2">
-            {socialLinks.map(({ label, href, Icon }) => (
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/booking"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#e8dfcd] py-1 pl-5 pr-1 text-sm font-semibold text-[#1f190f] transition-all hover:gap-3"
+            >
+              Book a tour
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1f190f] transition-transform group-hover:scale-110">
+                <ArrowRight className="h-4 w-4 text-[#e8dfcd]" />
+              </span>
+            </Link>
+            <Link
+              href="/personalized"
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10"
+            >
+              Plan a custom trip
+            </Link>
+          </div>
+        </div>
+
+        {/* Main grid */}
+        <div className="grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Image src="/logo.png" alt="Oryx Tours" width={36} height={36} />
+              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#cfa07c]">
+                Oryx Group
+              </p>
+            </div>
+            <p className="max-w-sm text-sm leading-relaxed text-[#e8dfcd]/70">
+              Curated journeys across desert, coast, and heritage landscapes.
+              Every experience is crafted with concierge-level care.
+            </p>
+            <div className="flex items-center gap-3 pt-1">
+              {socialLinks.map(({ label, href, Icon }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-[#e8dfcd]/80 transition-all duration-300 hover:-translate-y-1 hover:border-[#cfa07c] hover:bg-[#cfa07c] hover:text-[#1f190f]"
+                >
+                  <Icon className="h-4 w-4" />
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-sm">
+            <p className="mb-4 font-semibold text-white">Experiences</p>
+            <div className="space-y-1">
+              {experienceLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="group flex items-center gap-1 py-1 text-[#e8dfcd]/70 transition-colors hover:text-white"
+                >
+                  <ArrowRight className="h-3.5 w-3.5 -translate-x-2 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
+                  <span className="-ml-5 transition-all duration-300 group-hover:ml-0">
+                    {link.label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-sm">
+            <p className="mb-4 font-semibold text-white">Global headquarters</p>
+            <div className="space-y-2.5 text-[#e8dfcd]/70">
+              <p className="flex items-start gap-2.5 leading-relaxed">
+                <MapPin className="mt-[3px] h-4 w-4 shrink-0 text-[#cfa07c]" />
+                <span>
+                  Office 705, 7th Floor, Building 8, Emrair Street, Zone 18, Old
+                  Salata - Corniche, Doha, Qatar.
+                </span>
+              </p>
               <Link
-                key={label}
-                href={href}
+                href="mailto:info@oryxgp.com"
+                className="flex items-center gap-2.5 transition-colors hover:text-white"
+              >
+                <Mail className="h-4 w-4 shrink-0 text-[#cfa07c]" />
+                <span>info@oryxgp.com</span>
+              </Link>
+              <Link
+                href="tel:+97444931726"
+                className="flex items-center gap-2.5 transition-colors hover:text-white"
+              >
+                <Phone className="h-4 w-4 shrink-0 text-[#cfa07c]" />
+                <span>+974 4493 1726</span>
+              </Link>
+              <Link
+                href="https://wa.me/97439998609"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={label}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white/80 text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+                className="flex items-center gap-2.5 transition-colors hover:text-white"
               >
-                <Icon className="h-4 w-4" />
+                <MessageCircle className="h-4 w-4 shrink-0 text-[#cfa07c]" />
+                <span>+974 3999 8609</span>
               </Link>
-            ))}
+              <Link
+                href="https://www.oryxgp.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 transition-colors hover:text-white"
+              >
+                <Globe className="h-4 w-4 shrink-0 text-[#cfa07c]" />
+                <span>www.oryxgp.com</span>
+              </Link>
+            </div>
           </div>
-        </div>
 
-        <div className="text-sm">
-          <p className="mb-3 font-semibold">Experiences</p>
-          <div className="space-y-2 text-muted-foreground">
-            <Link
-              href="/tours"
-              className="block hover:text-foreground"
-            >
-              Luxury retreats
-            </Link>
-            <Link
-              href="/tours"
-              className="block hover:text-foreground"
-            >
-              Adventure escapes
-            </Link>
-            <Link
-              href="/tours"
-              className="block hover:text-foreground"
-            >
-              Cultural tours
-            </Link>
-            <Link
-              href="/transfers"
-              className="block hover:text-foreground"
-            >
-              Airport transfers
-            </Link>
-          </div>
-        </div>
-
-        <div className="text-sm">
-          <p className="mb-3 font-semibold">Global headquarters</p>
-          <div className="space-y-2.5 text-muted-foreground">
-            <p className="flex items-start gap-2.5 leading-relaxed">
-              <MapPin className="mt-[3px] h-4 w-4 shrink-0" />
-              <span>
-                Office 705, 7th Floor, Building 8, Emrair Street, Zone 18, Old
-                Salata - Corniche, Doha, Qatar.
-              </span>
-            </p>
-            <Link
-              href="mailto:info@oryxgp.com"
-              className="flex items-center gap-2.5 hover:text-foreground"
-            >
-              <Mail className="h-4 w-4 shrink-0" />
-              <span>info@oryxgp.com</span>
-            </Link>
-            <Link
-              href="tel:+97444931726"
-              className="flex items-center gap-2.5 hover:text-foreground"
-            >
-              <Phone className="h-4 w-4 shrink-0" />
-              <span>+974 4493 1726</span>
-            </Link>
-            <Link
-              href="https://wa.me/97439998609"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2.5 hover:text-foreground"
-            >
-              <MessageCircle className="h-4 w-4 shrink-0" />
-              <span>+974 3999 8609</span>
-            </Link>
-            <Link
-              href="https://www.oryxgp.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2.5 hover:text-foreground"
-            >
-              <Globe className="h-4 w-4 shrink-0" />
-              <span>www.oryxgp.com</span>
-            </Link>
-          </div>
-        </div>
-
-        <div className="text-sm">
-          <p className="mb-3 font-semibold">Africa headquarters</p>
-          <div className="space-y-2.5 text-muted-foreground">
-            <p className="flex items-start gap-2.5 leading-relaxed">
-              <MapPin className="mt-[3px] h-4 w-4 shrink-0" />
-              <span>
-                Office D02, 3rd Floor, The Statement Hotel, 1002 First Avenue,
-                Off Ahmadu Bello Way, Central Business District, F.C.T, Abuja,
-                Nigeria.
-              </span>
-            </p>
-            <Link
-              href="mailto:Oryx_africa@oryxgp.com"
-              className="flex items-center gap-2.5 hover:text-foreground"
-            >
-              <Mail className="h-4 w-4 shrink-0" />
-              <span>Oryx_africa@oryxgp.com</span>
-            </Link>
-            <Link
-              href="tel:+2347072342929"
-              className="flex items-center gap-2.5 hover:text-foreground"
-            >
-              <Phone className="h-4 w-4 shrink-0" />
-              <span>+234 707 234 2929</span>
-            </Link>
+          <div className="text-sm">
+            <p className="mb-4 font-semibold text-white">Africa headquarters</p>
+            <div className="space-y-2.5 text-[#e8dfcd]/70">
+              <p className="flex items-start gap-2.5 leading-relaxed">
+                <MapPin className="mt-[3px] h-4 w-4 shrink-0 text-[#cfa07c]" />
+                <span>
+                  Office D02, 3rd Floor, The Statement Hotel, 1002 First Avenue,
+                  Off Ahmadu Bello Way, Central Business District, F.C.T, Abuja,
+                  Nigeria.
+                </span>
+              </p>
+              <Link
+                href="mailto:Oryx_africa@oryxgp.com"
+                className="flex items-center gap-2.5 transition-colors hover:text-white"
+              >
+                <Mail className="h-4 w-4 shrink-0 text-[#cfa07c]" />
+                <span>Oryx_africa@oryxgp.com</span>
+              </Link>
+              <Link
+                href="tel:+2347072342929"
+                className="flex items-center gap-2.5 transition-colors hover:text-white"
+              >
+                <Phone className="h-4 w-4 shrink-0 text-[#cfa07c]" />
+                <span>+234 707 234 2929</span>
+              </Link>
+            </div>
           </div>
         </div>
       </Container>
-      <div className="flex flex-col items-center gap-3 border-t border-white/60 py-6 text-center text-xs text-muted-foreground sm:flex-row sm:justify-between sm:px-6">
-        <p>
-          © {new Date().getFullYear()} Oryx Group Events & Tourism. Crafted
-          for modern travelers. All rights reserved.
-        </p>
-        <Link
-          href="/terms"
-          className="font-medium hover:text-foreground"
-        >
-          Terms & Conditions
-        </Link>
+
+      <div className="relative border-t border-white/10">
+        <Container className="flex flex-col items-center gap-3 py-6 text-center text-xs text-[#e8dfcd]/60 sm:flex-row sm:justify-between sm:text-left">
+          <p>
+            © {new Date().getFullYear()} Oryx Group Events & Tourism. Crafted
+            for modern travelers. All rights reserved.
+          </p>
+          <Link
+            href="/terms"
+            className="font-medium text-[#e8dfcd]/80 transition-colors hover:text-white"
+          >
+            Terms &amp; Conditions
+          </Link>
+        </Container>
       </div>
     </footer>
   );
