@@ -14,7 +14,7 @@ import { VehicleCard } from "@/components/molecules/VehicleCard";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import type { FleetCategory, Vehicle, VehicleType } from "@/types";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 6;
 
 const typeOptions: ("All" | VehicleType)[] = [
   "All",
