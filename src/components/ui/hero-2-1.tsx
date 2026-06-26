@@ -1,13 +1,65 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { motion, useInView } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { Container } from "@/components/layout/Container";
 
-const HERO_IMAGE = "/Tours.png";
+const HERO_IMAGES = [
+  "/Tours.png",
+  "/an-incredible-view-of.jpg",
+  "/corniche-022.jpg",
+  "/banana-island-resort-058.jpg",
+  "/20220127-1643268462-571.jpg",
+];
+
+const SLIDE_INTERVAL_MS = 5000;
+
+/* ---------------- Background slider ---------------- */
+const HeroSlider = () => {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    }, SLIDE_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return (
+    <>
+      <AnimatePresence mode="sync">
+        <motion.img
+          key={index}
+          src={HERO_IMAGES[index]}
+          alt="Curated Oryx Group journeys"
+          initial={{ opacity: 0, scale: 1.08 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ opacity: { duration: 1.2 }, scale: { duration: 6 } }}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </AnimatePresence>
+
+      {/* Slide indicators */}
+      <div className="absolute right-5 top-6 z-20 flex gap-2">
+        {HERO_IMAGES.map((src, i) => (
+          <button
+            key={src}
+            type="button"
+            aria-label={`Show slide ${i + 1}`}
+            onClick={() => setIndex(i)}
+            className={`h-1.5 rounded-full transition-all ${
+              i === index ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
+            }`}
+          />
+        ))}
+      </div>
+    </>
+  );
+};
 
 /* ---------------- WordsPullUp ---------------- */
 type WordsPullUpProps = {
@@ -51,13 +103,8 @@ const Hero2 = () => {
   return (
     <section className="px-3 pt-3 sm:px-4 sm:pt-4">
       <div className="relative min-h-[88vh] w-full overflow-hidden rounded-2xl md:rounded-[2rem]">
-        {/* Background image */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={HERO_IMAGE}
-          alt="Curated Oryx Group journeys"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+        {/* Background slider */}
+        <HeroSlider />
 
         {/* Noise overlay */}
         <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.5] mix-blend-overlay" />
