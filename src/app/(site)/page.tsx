@@ -42,12 +42,13 @@ export default async function HomePage() {
             subtitle="Select a travel rhythm that matches your mood and timeline."
           />
           {categories.length ? (
-            <div className="grid gap-6 md:grid-cols-3">
-              {categories.map((category) => (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {categories.map((category, index) => (
                 <CategoryCard
                   key={category.id}
                   title={category.title}
                   description={category.description}
+                  index={index}
                 />
               ))}
             </div>
