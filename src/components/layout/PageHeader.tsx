@@ -44,7 +44,7 @@ export function PageHeader({
         <div className="max-w-3xl space-y-5">
           {/* Eyebrow with rule */}
           <div className="flex items-center gap-3">
-            <span className="h-2 w-2 rotate-45 bg-emerald-400" />
+            <span className="h-2 w-2 rotate-45 bg-[#3a8b5c]" />
             <span className="h-px w-10 bg-white/40" />
             <span className="text-xs font-semibold uppercase tracking-[0.35em] text-white/80">
               {eyebrow}
@@ -57,7 +57,7 @@ export function PageHeader({
             {accent ? (
               <>
                 {" "}
-                <span className="font-serif italic text-emerald-300">
+                <span className="font-serif italic text-[#3a8b5c]">
                   {accent}
                 </span>
               </>
@@ -73,7 +73,7 @@ export function PageHeader({
           {/* Decorative bottom rule */}
           <div className="flex items-center gap-2 pt-2">
             <span className="h-px w-12 bg-white/30" />
-            <span className="h-1.5 w-1.5 rotate-45 bg-emerald-400/80" />
+            <span className="h-1.5 w-1.5 rotate-45 bg-[#3a8b5c]/80" />
             <span className="h-px w-16 bg-white/20" />
           </div>
         </div>
