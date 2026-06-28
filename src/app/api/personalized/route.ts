@@ -67,7 +67,7 @@ export async function POST(req: Request) {
     );
   }
 
-  // Fire both emails — don't fail the request if email delivery hiccups.
+  // Fire both emails - don't fail the request if email delivery hiccups.
   const emailArgs: PersonalizedRequestEmailArgs = {
     name: record.name,
     email: record.email,

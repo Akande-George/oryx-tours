@@ -156,7 +156,7 @@ export function VehicleFormDialog({
           <DialogDescription>
             {mode === "edit"
               ? "Update specs, features, and rate card for this vehicle."
-              : "Configure a new vehicle for the fleet — including category, capacity, and every rate."}
+              : "Configure a new vehicle for the fleet - including category, capacity, and every rate."}
           </DialogDescription>
         </DialogHeader>
 
@@ -186,7 +186,7 @@ export function VehicleFormDialog({
                       placeholder={
                         sortedFleetCategories.length
                           ? "Pick a category"
-                          : "No fleet categories yet — add one in /admin/fleet-categories"
+                          : "No fleet categories yet - add one in /admin/fleet-categories"
                       }
                     />
                   </SelectTrigger>

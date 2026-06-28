@@ -17,7 +17,7 @@ export type EmailResult =
 export const sendEmail = async (args: EmailArgs): Promise<EmailResult> => {
   // Read env vars at call time (not module-load time). Reading them as
   // top-level consts captures whatever was present when the module first
-  // loaded — which can be undefined in some serverless/bundling setups even
+  // loaded - which can be undefined in some serverless/bundling setups even
   // when the variable is configured. Reading per-call is robust.
   const apiKey = process.env.RESEND_API_KEY;
   const fromEmail =
@@ -28,7 +28,7 @@ export const sendEmail = async (args: EmailArgs): Promise<EmailResult> => {
 
   if (!apiKey) {
     console.warn(
-      "[resend] RESEND_API_KEY not set — skipping email",
+      "[resend] RESEND_API_KEY not set - skipping email",
       args.subject,
     );
     return { ok: false, error: "RESEND_API_KEY not configured" };

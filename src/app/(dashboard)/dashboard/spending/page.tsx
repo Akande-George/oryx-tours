@@ -81,7 +81,7 @@ export default function CustomerSpendingPage() {
               Last payment
             </p>
             <p className="text-base font-semibold">
-              {lastPayment ? formatDate(lastPayment.date) : "—"}
+              {lastPayment ? formatDate(lastPayment.date) : "-"}
             </p>
             <p className="text-xs text-muted-foreground">
               {lastPayment ? formatPrice(lastPayment.price) : "No payments yet"}

@@ -229,7 +229,7 @@ export default function PartnerFleetPage() {
                             categoryBadge(vehicle.fleetCategory),
                           )}
                         >
-                          {vehicle.fleetCategory || "—"}
+                          {vehicle.fleetCategory || "-"}
                         </Badge>
                       </TableCell>
                       <TableCell>{vehicle.capacity} pax</TableCell>

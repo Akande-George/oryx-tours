@@ -21,7 +21,7 @@ const readCollection = async <T>(
   orderColumn: string = "id",
 ) => {
   // Ordering by a deterministic column (default: id) keeps row positions
-  // stable across reads — without it, Postgres is free to return rows in
+  // stable across reads - without it, Postgres is free to return rows in
   // any order, so an UPDATE shuffles items in the UI.
   const { data, error } = await client
     .from(table)
@@ -297,7 +297,7 @@ const formatSupabaseError = (
   err: { message?: string; details?: string; hint?: string; code?: string },
 ) => {
   const parts = [err.message, err.details, err.hint].filter(Boolean);
-  const summary = parts.length ? parts.join(" — ") : "Unknown error";
+  const summary = parts.length ? parts.join(" - ") : "Unknown error";
   return `${label}: ${summary}${err.code ? ` (code ${err.code})` : ""}`;
 };
 
@@ -310,7 +310,7 @@ const upsertRow = async <T extends { id: string }>(
   // Normalize the row before writing:
   //  - drop `undefined` keys (no value to write)
   //  - convert an empty `operatorId` to null so it doesn't trip the FK
-  // Everything else — including empty strings and empty arrays — is kept so
+  // Everything else - including empty strings and empty arrays - is kept so
   // that editing can clear a field back to empty (e.g. removing a video URL
   // or emptying the itinerary).
   const sanitized = Object.fromEntries(
@@ -324,7 +324,7 @@ const upsertRow = async <T extends { id: string }>(
   console.log(`[supabase] upsert ${label}`, sanitized);
   // NOTE: use .select() (not .single()). With .single(), a successful write
   // whose row is then hidden by an RLS SELECT policy returns 0 rows and
-  // surfaces as an error — making a save that actually persisted look failed.
+  // surfaces as an error - making a save that actually persisted look failed.
   const { data, error } = await client
     .from(table)
     .upsert(sanitized)

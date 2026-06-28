@@ -9,7 +9,7 @@ type SavedState = {
 };
 
 // In-memory cache of the signed-in user's saved tour slugs. The source of
-// truth is the `saved_tours` table in Supabase — this store is hydrated from
+// truth is the `saved_tours` table in Supabase - this store is hydrated from
 // it on login and kept in sync optimistically by useSavedTours().
 export const useSavedStore = create<SavedState>((set, get) => ({
   savedSlugs: [],

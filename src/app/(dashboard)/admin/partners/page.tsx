@@ -108,7 +108,7 @@ export default function AdminPartnersPage() {
                       </TableCell>
                       <TableCell>
                         {partner.companyName ?? (
-                          <span className="text-muted-foreground">—</span>
+                          <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
                       <TableCell>{partner.email}</TableCell>

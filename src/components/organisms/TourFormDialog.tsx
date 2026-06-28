@@ -24,6 +24,8 @@ import { cn, generateId } from "@/lib/utils";
 import { ImageUploader } from "@/components/atoms/ImageUploader";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
 import { RatingStars } from "@/components/molecules/RatingStars";
+import { RichTextEditor } from "@/components/molecules/RichTextEditor";
+import { htmlToPlainText } from "@/lib/rich-text";
 import type { ItineraryItem, Review, Tour, TourCategory } from "@/types";
 
 const difficulties: Tour["difficulty"][] = ["Easy", "Moderate", "Challenging"];
@@ -52,6 +54,7 @@ const emptyTour = (): Tour => ({
   location: "",
   region: "",
   durationDays: 1,
+  duration: "",
   groupSize: "Up to 8 guests",
   difficulty: "Easy",
   priceFrom: 0,
@@ -118,7 +121,8 @@ export function TourFormDialog({
     if (!form.slug.trim()) next.slug = "Slug is required";
     if (!form.location.trim()) next.location = "Location is required";
     if (!form.region.trim()) next.region = "Region is required";
-    if (!form.description.trim()) next.description = "Description is required";
+    if (!htmlToPlainText(form.description).trim())
+      next.description = "Description is required";
     if (form.durationDays < 1) next.durationDays = "Must be at least 1 day";
     if (form.priceFrom < 0) next.priceFrom = "Price must be ≥ 0";
     if (form.rating < 0 || form.rating > 5) next.rating = "Rating must be 0–5";
@@ -146,7 +150,7 @@ export function TourFormDialog({
           </DialogTitle>
           <DialogDescription>
             {mode === "edit"
-              ? "Update every detail of the tour experience — from pricing to gallery."
+              ? "Update every detail of the tour experience - from pricing to gallery."
               : "Set up the full experience travelers will see in the catalog."}
           </DialogDescription>
         </DialogHeader>
@@ -213,7 +217,7 @@ export function TourFormDialog({
                       placeholder={
                         categories.length
                           ? "Pick a category"
-                          : "No categories yet — add one in /admin/categories"
+                          : "No categories yet - add one in /admin/categories"
                       }
                     />
                   </SelectTrigger>
@@ -268,6 +272,16 @@ export function TourFormDialog({
                       Math.max(1, Number(e.target.value) || 1),
                     )
                   }
+                />
+              </Field>
+              <Field
+                label="Duration label"
+                description="Optional. Overrides the day count on the listing, e.g. '8 hours' or '3 days, 2 nights'."
+              >
+                <Input
+                  value={form.duration ?? ""}
+                  onChange={(e) => update("duration", e.target.value)}
+                  placeholder="8 hours"
                 />
               </Field>
               <Field label="Group size" className="md:col-span-2">
@@ -335,19 +349,23 @@ export function TourFormDialog({
             title="Story"
             description="The pitch travelers will read on the listing."
           >
-            <Field label="Description" error={errors.description} required>
-              <Textarea
+            <Field
+              label="Description"
+              error={errors.description}
+              required
+              description="Format the overview with headings, bold, lists, and links - it renders on the tour detail page."
+            >
+              <RichTextEditor
                 value={form.description}
-                onChange={(e) => update("description", e.target.value)}
-                placeholder="Describe the experience — pace, vibe, signature moments..."
-                className="min-h-[120px]"
+                onChange={(html) => update("description", html)}
+                placeholder="Describe the experience - pace, vibe, signature moments..."
               />
             </Field>
           </FormSection>
 
           <FormSection
             title="What's included"
-            description="Inclusions listed in the sidebar — guide, meals, transfers, and so on. One per line."
+            description="Inclusions listed in the sidebar - guide, meals, transfers, and so on. One per line."
           >
             <Field label="What's included">
               <ListEditor
@@ -704,7 +722,7 @@ function ItineraryEditor({
               <Textarea
                 value={item.detail}
                 onChange={(e) => updateItem(idx, { detail: e.target.value })}
-                placeholder="Describe this stop — what travelers see and do…"
+                placeholder="Describe this stop - what travelers see and do…"
                 className="min-h-[80px]"
               />
               <div className="grid gap-2 sm:grid-cols-2">

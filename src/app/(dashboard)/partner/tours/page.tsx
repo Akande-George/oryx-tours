@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TourFormDialog } from "@/components/organisms/TourFormDialog";
-import { formatPrice } from "@/lib/format";
+import { formatDuration, formatPrice } from "@/lib/format";
 import { RouteGuard } from "@/components/providers/RouteGuard";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useSupabaseCollections } from "@/lib/supabase/use-supabase-data";
@@ -110,7 +110,7 @@ export default function PartnerToursPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <SectionHeading
             title="Your tours"
-            subtitle="Add new tours with full content — gallery, itinerary, video, pricing."
+            subtitle="Add new tours with full content - gallery, itinerary, video, pricing."
           />
           <Button type="button" onClick={openAdd} className="rounded-full">
             <Plus className="size-4" /> Add tour
@@ -154,7 +154,7 @@ export default function PartnerToursPage() {
                           {tour.category}
                         </Badge>
                       </TableCell>
-                      <TableCell>{tour.durationDays} days</TableCell>
+                      <TableCell>{formatDuration(tour)}</TableCell>
                       <TableCell>{formatPrice(tour.priceFrom)}</TableCell>
                       <TableCell>{tour.rating.toFixed(1)}</TableCell>
                       <TableCell className="text-right">

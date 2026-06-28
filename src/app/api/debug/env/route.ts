@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 // Diagnostic only: reports WHICH server env vars the running function can see.
-// Returns booleans + a short masked fingerprint — never the actual secret.
+// Returns booleans + a short masked fingerprint - never the actual secret.
 // Delete this route once the env issue is resolved.
 export const dynamic = "force-dynamic";
 

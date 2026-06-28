@@ -71,7 +71,7 @@ export const bookingConfirmation = ({
     <p style="margin:0 0 16px;color:#5c4f3d;">Hi ${escape(customerName.split(" ")[0] || "there")},</p>
     <p style="margin:0 0 20px;color:#5c4f3d;">
       Your booking for <strong style="color:#2a1d10;">${escape(booking.tourTitle)}</strong>
-      is confirmed. Below are your details — keep this email handy at check-in.
+      is confirmed. Below are your details - keep this email handy at check-in.
     </p>
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
       ${row("Reference", booking.reference)}
@@ -90,7 +90,7 @@ export const bookingConfirmation = ({
   return {
     subject: `${title} · ${booking.reference}`,
     html: shell(title, body),
-    text: `Booking confirmed — ${booking.tourTitle}\nReference: ${booking.reference}\nDeparture: ${booking.date}\nGuests: ${booking.guests}\nTotal paid: ${formatPrice(booking.paidAmount ?? booking.price)}\n\nDownload your pass: ${appUrl}/passes/booking/${booking.id}`,
+    text: `Booking confirmed - ${booking.tourTitle}\nReference: ${booking.reference}\nDeparture: ${booking.date}\nGuests: ${booking.guests}\nTotal paid: ${formatPrice(booking.paidAmount ?? booking.price)}\n\nDownload your pass: ${appUrl}/passes/booking/${booking.id}`,
   };
 };
 
@@ -171,7 +171,7 @@ export const passwordReset = ({ email, resetUrl }: PasswordResetArgs) => {
     </p>
     ${button(resetUrl, "Reset password")}
     <p style="margin:24px 0 0;color:#8a7860;font-size:12px;text-align:center;">
-      Didn't request this? You can safely ignore this email — your password
+      Didn't request this? You can safely ignore this email - your password
       won't change.
     </p>
   `;
@@ -273,7 +273,7 @@ export const welcome = ({ name, role }: WelcomeArgs) => {
   const title = role === "partner" ? "Application received" : "Welcome to Oryx Group";
   const intro =
     role === "partner"
-      ? "Thanks for applying to operate with Oryx Group. Our team is reviewing your application — we'll be in touch within 48 hours."
+      ? "Thanks for applying to operate with Oryx Group. Our team is reviewing your application - we'll be in touch within 48 hours."
       : "Thanks for joining Oryx Group. Browse curated tours, save favourites, and your concierge is one tap away.";
   const cta = role === "partner" ? "/partner" : "/tours";
   const ctaText = role === "partner" ? "Visit partner portal" : "Explore tours";
@@ -332,7 +332,7 @@ export const partnerStatusUpdate = ({
     ? `
       <p style="margin:0 0 16px;color:#5c4f3d;">Hi ${escape(partnerName.split(" ")[0] || "there")},</p>
       <p style="margin:0 0 20px;color:#5c4f3d;">
-        Good news — your operator account has been <strong>approved</strong>.
+        Good news - your operator account has been <strong>approved</strong>.
         You can now start publishing tours, adding vehicles, and accepting
         bookings.
       </p>
@@ -405,7 +405,7 @@ export const vehiclePublished = ({
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
       ${row("Vehicle", vehicle.name)}
       ${row("Category", vehicle.fleetCategory)}
-      ${row("Type", vehicle.vehicleType ?? "—")}
+      ${row("Type", vehicle.vehicleType ?? "-")}
       ${row("Capacity", `${vehicle.capacity} passengers`)}
       ${row("Half day", formatPrice(vehicle.halfDayPrice))}
       ${row("Airport transfer", formatPrice(vehicle.transferPrice))}

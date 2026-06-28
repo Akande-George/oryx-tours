@@ -21,6 +21,9 @@ export type Tour = {
   location: string;
   region: string;
   durationDays: number;
+  // Optional free-text duration (e.g. "8 hours", "3 days, 2 nights"). When set
+  // it is shown in place of the derived "{durationDays}-day" label.
+  duration?: string;
   groupSize: string;
   difficulty: "Easy" | "Moderate" | "Challenging";
   priceFrom: number;

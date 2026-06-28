@@ -11,7 +11,7 @@ export default function TransfersPage() {
         title="Airport transfers &"
         accent="local fleet."
         subtitle="Executive pickups with concierge-level coordination across Doha."
-        imageSrc="/transfers.png"
+        imageSrc="/transfers.jpg"
       />
       <Container className="space-y-10 py-12">
         <Suspense

@@ -180,7 +180,7 @@ export default function AdminRequestsPage() {
                         {r.budgetAmount ? ` · ${r.budgetAmount}` : ""}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
-                        {r.createdAt ? formatDate(r.createdAt) : "—"}
+                        {r.createdAt ? formatDate(r.createdAt) : "-"}
                       </TableCell>
                       <TableCell>
                         <Select

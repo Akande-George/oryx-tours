@@ -125,7 +125,7 @@ export function Footer() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <Link
-              href="/booking"
+              href="/tours"
               className="group inline-flex items-center gap-2 rounded-full bg-[#e8dfcd] py-1 pl-5 pr-1 text-sm font-semibold text-[#1f190f] transition-all hover:gap-3"
             >
               Book a tour

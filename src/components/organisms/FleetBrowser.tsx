@@ -80,9 +80,13 @@ export function FleetBrowser({
       return haystack.includes(needle);
     });
 
-    // Luxury first: highest "from" price leads, so VIP / premium vehicles
-    // surface ahead of economy ones.
+    // Luxury first, buses last. Coaches (buses) always sink to the bottom of
+    // the list; within each group the highest "from" price leads so VIP /
+    // premium vehicles surface ahead of economy ones.
     return matched.sort((a, b) => {
+      const aBus = a.vehicleType === "Coach" ? 1 : 0;
+      const bBus = b.vehicleType === "Coach" ? 1 : 0;
+      if (aBus !== bBus) return aBus - bBus;
       if (b.priceFrom !== a.priceFrom) return b.priceFrom - a.priceFrom;
       return a.name.localeCompare(b.name);
     });

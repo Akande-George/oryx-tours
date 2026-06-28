@@ -136,7 +136,7 @@ export default function AdminToursPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <SectionHeading
             title="Tours"
-            subtitle="Manage the catalog — add, edit, or remove listings."
+            subtitle="Manage the catalog - add, edit, or remove listings."
           />
           <Button type="button" onClick={openAdd} className="rounded-full">
             <Plus className="size-4" />

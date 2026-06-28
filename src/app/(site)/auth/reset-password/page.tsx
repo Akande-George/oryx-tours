@@ -26,13 +26,13 @@ export default function ResetPasswordPage() {
 
   // Supabase puts the recovery tokens in the URL hash, e.g.
   //   #access_token=...&refresh_token=...&type=recovery
-  // We parse them and establish the session explicitly — relying on the
+  // We parse them and establish the session explicitly - relying on the
   // client to auto-detect the hash is unreliable with the SSR client.
   useEffect(() => {
     let cancelled = false;
 
     const verify = async () => {
-      // Already signed in (e.g. came back to the page) — allow reset.
+      // Already signed in (e.g. came back to the page) - allow reset.
       if (user) {
         setTokenReady(true);
         setVerifying(false);

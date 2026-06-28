@@ -104,7 +104,7 @@ export function useSupabaseCollections(
   });
 
   // Derive the active keys from the (stable) signature inside the callback so
-  // we never write a ref during render — keySignature is the dependency.
+  // we never write a ref during render - keySignature is the dependency.
   const load = useCallback(async () => {
     const current = keySignature.split(",") as CollectionKey[];
     const results = await Promise.all(current.map((k) => fetchers[k]()));

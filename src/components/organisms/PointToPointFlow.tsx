@@ -188,14 +188,14 @@ export function PointToPointFlow() {
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a vehicle for your estimate">
                   {selected
-                    ? `${selected.name} — ${selected.fleetCategory} · ${selected.capacity} seats`
+                    ? `${selected.name} - ${selected.fleetCategory} · ${selected.capacity} seats`
                     : null}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {vehicles.map((vehicle) => (
                   <SelectItem key={vehicle.id} value={vehicle.id}>
-                    {vehicle.name} — {vehicle.fleetCategory} ·{" "}
+                    {vehicle.name} - {vehicle.fleetCategory} ·{" "}
                     {vehicle.capacity} seats
                   </SelectItem>
                 ))}

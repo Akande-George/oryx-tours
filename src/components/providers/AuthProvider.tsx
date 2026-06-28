@@ -121,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const safetyTimer = window.setTimeout(() => {
       if (active) {
         console.warn(
-          "[auth] bootstrap timed out — forcing ready=true so the app is usable",
+          "[auth] bootstrap timed out - forcing ready=true so the app is usable",
         );
         setReady(true);
       }
@@ -167,7 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               "loadCurrentProfile",
             );
           } catch (e) {
-            // Profile fetch slow/failed — keep the provisional user.
+            // Profile fetch slow/failed - keep the provisional user.
             console.warn("[auth] profile load fell back to session user", e);
           }
         } else {
@@ -242,7 +242,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Self-heal: the profiles row never landed (no trigger / RLS issue).
         // Create a minimal customer profile from the auth user metadata
         // so the user isn't stuck in a redirect loop.
-        console.warn("[auth] no profile row — creating fallback");
+        console.warn("[auth] no profile row - creating fallback");
         const meta = data.user.user_metadata ?? {};
         const fallback: AuthProfile = {
           id: data.user.id,
@@ -394,7 +394,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log("[auth] signOut start");
 
     // Wipe local React state immediately so any UI listening to `user`
-    // re-renders as signed out right away — don't wait for the network call.
+    // re-renders as signed out right away - don't wait for the network call.
     setUser(null);
     setAccounts([]);
     toast.info("Signed out");
@@ -461,7 +461,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       payload = (await res.json()) as { ok?: boolean; error?: string };
     } catch {
-      /* ignore — body may be empty */
+      /* ignore - body may be empty */
     }
     if (!res.ok) {
       console.error("[auth] password reset request failed", payload);

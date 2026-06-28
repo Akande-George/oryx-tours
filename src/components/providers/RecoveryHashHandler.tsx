@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 // Safety net for password-recovery links. If Supabase redirects the recovery
 // link to the Site URL (e.g. the redirect target wasn't allow-listed), the
-// access/refresh tokens land in the hash of whatever page we're on — usually
+// access/refresh tokens land in the hash of whatever page we're on - usually
 // the home page. Detect that and forward to /auth/reset-password, preserving
 // the hash so the reset form can establish the session.
 export function RecoveryHashHandler() {

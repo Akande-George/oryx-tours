@@ -4,6 +4,7 @@ import { BookingFlow } from "@/components/organisms/BookingFlow";
 import { BookingHub } from "@/components/organisms/BookingHub";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTourBySlug } from "@/lib/supabase/data";
+import { formatDuration } from "@/lib/format";
 import type { ServiceType } from "@/types";
 
 const isServiceType = (value: string | undefined): value is ServiceType =>
@@ -25,7 +26,7 @@ export default async function BookingPage({
           <Container className="space-y-8">
             <SectionHeading
               title={`Book ${tour.title}`}
-              subtitle={`${tour.location} · ${tour.durationDays} days · ${tour.groupSize}`}
+              subtitle={`${tour.location} · ${formatDuration(tour)} · ${tour.groupSize}`}
             />
             <BookingFlow tour={tour} />
           </Container>
@@ -41,7 +42,7 @@ export default async function BookingPage({
       <Container className="space-y-8">
         <SectionHeading
           title="Book your experience"
-          subtitle="Airport transfers, day hire, and point-to-point rides — all in one place."
+          subtitle="Airport transfers, day hire, and point-to-point rides - all in one place."
         />
         <BookingHub initialType={initialType} />
       </Container>

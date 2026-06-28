@@ -149,13 +149,13 @@ const stepMeta = [
     label: "Step 1 of 4",
     title: "Trip basics",
     description:
-      "Tell us where, when, and who is traveling — we'll start the canvas.",
+      "Tell us where, when, and who is traveling - we'll start the canvas.",
   },
   {
     label: "Step 2 of 4",
     title: "Experiences you crave",
     description:
-      "Pick the moments that matter. Mix and match — your concierge will weave them together.",
+      "Pick the moments that matter. Mix and match - your concierge will weave them together.",
   },
   {
     label: "Step 3 of 4",
@@ -357,7 +357,7 @@ export default function PersonalizedPage() {
                   </div>
                 </div>
                 <p className="rounded-xl border border-primary/15 bg-primary/5 px-4 py-3 text-xs text-muted-foreground">
-                  Not sure on dates? Leave the end date blank — we&apos;ll
+                  Not sure on dates? Leave the end date blank - we&apos;ll
                   suggest an ideal window for the season.
                 </p>
               </div>
@@ -404,7 +404,7 @@ export default function PersonalizedPage() {
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Selected {state.experiences.length} of{" "}
-                  {experienceOptions.length} — choose at least one.
+                  {experienceOptions.length} - choose at least one.
                 </p>
               </div>
             ) : null}
@@ -627,7 +627,7 @@ export default function PersonalizedPage() {
               </h3>
             </div>
             <p className="max-w-md text-sm text-muted-foreground">
-              From brief to boarding pass — here&apos;s how your trip comes
+              From brief to boarding pass - here&apos;s how your trip comes
               together once you hit send.
             </p>
           </div>

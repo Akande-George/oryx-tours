@@ -19,6 +19,7 @@ interface PlaceCardProps {
   isTopRated?: boolean;
   description: string;
   priceFrom: number;
+  priceSuffix?: string;
   href?: string;
   className?: string;
 }
@@ -33,6 +34,7 @@ export const PlaceCard = ({
   isTopRated = false,
   description,
   priceFrom,
+  priceSuffix,
   href,
   className,
 }: PlaceCardProps) => {
@@ -224,6 +226,11 @@ export const PlaceCard = ({
               From{" "}
             </span>
             ${priceFrom.toLocaleString()}
+            {priceSuffix ? (
+              <span className="ml-1 text-xs font-normal text-muted-foreground">
+                {priceSuffix}
+              </span>
+            ) : null}
           </p>
           {href ? (
             <Button

@@ -7,6 +7,8 @@ import { TourDetailsTabs } from "@/components/organisms/TourDetailsTabs";
 import { Badge } from "@/components/atoms";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getReviews, getTourBySlug } from "@/lib/supabase/data";
+import { htmlToPlainText } from "@/lib/rich-text";
+import { formatDuration } from "@/lib/format";
 
 // Returns an embeddable URL only for valid YouTube links; otherwise null.
 const toYouTubeEmbed = (raw?: string | null): string | null => {
@@ -63,7 +65,7 @@ export default async function TourDetailsPage({
           <div className="flex flex-wrap items-center gap-2">
             <Badge className="rounded-full">{tour.category}</Badge>
             <Badge variant="secondary" className="rounded-full">
-              {tour.durationDays}-day
+              {formatDuration(tour)}
             </Badge>
             <Badge variant="secondary" className="rounded-full">
               {tour.groupSize}
@@ -71,7 +73,7 @@ export default async function TourDetailsPage({
           </div>
           <h1 className="text-3xl font-semibold sm:text-4xl">{tour.title}</h1>
           <p className="max-w-3xl text-base text-muted-foreground sm:text-lg">
-            {tour.description}
+            {htmlToPlainText(tour.description)}
           </p>
           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
             <span>{tour.location}</span>

@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     );
   }
 
-  // Don't leak whether an account exists — always return a generic success
+  // Don't leak whether an account exists - always return a generic success
   // so we don't enable email enumeration. We log internally if no user.
   try {
     const admin = createSupabaseAdminClient();
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     });
 
     if (error) {
-      // Common: "User not found" — swallow into generic response.
+      // Common: "User not found" - swallow into generic response.
       console.warn("[password-reset] generateLink:", error.message);
       return NextResponse.json({ ok: true });
     }

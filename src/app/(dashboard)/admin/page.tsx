@@ -17,7 +17,7 @@ const quickLinks = [
   {
     href: "/admin/tours",
     label: "Tours",
-    description: "Manage the catalog — add, edit, or remove listings.",
+    description: "Manage the catalog - add, edit, or remove listings.",
     icon: MapIcon,
   },
   {

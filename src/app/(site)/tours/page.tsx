@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { FiltersPanel } from "@/components/organisms/FiltersPanel";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTours } from "@/lib/supabase/data";
+import { htmlToPlainText } from "@/lib/rich-text";
 import type { Tour, TourCategory } from "@/types";
 
 type ToursPageProps = {
@@ -65,7 +66,7 @@ export default async function ToursPage({ searchParams }: ToursPageProps) {
         tour.title,
         tour.location,
         tour.region,
-        tour.description,
+        htmlToPlainText(tour.description),
         ...(tour.tags ?? []),
       ]
         .join(" ")
@@ -101,7 +102,7 @@ export default async function ToursPage({ searchParams }: ToursPageProps) {
         title="Tours and"
         accent="experiences."
         subtitle="Choose from curated itineraries with private guides and premium stays."
-        imageSrc="/Tours.png"
+        imageSrc="/tours.jpeg"
       />
       <Container className="space-y-8 py-12">
         <SearchBar variant="compact" />
@@ -110,7 +111,7 @@ export default async function ToursPage({ searchParams }: ToursPageProps) {
           <p className="text-sm text-muted-foreground">
             Showing {tours.length} of {allTours.length} experiences
             {activeFilters.length
-              ? ` — filtered by ${activeFilters.join(" · ")}`
+              ? ` - filtered by ${activeFilters.join(" · ")}`
               : ""}
           </p>
           <SortSelect />

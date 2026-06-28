@@ -228,7 +228,7 @@ export default function CustomerOverviewPage() {
                   No saved tours yet
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Browse the catalog and tap the heart on any tour — it&apos;ll
+                  Browse the catalog and tap the heart on any tour - it&apos;ll
                   land here for easy access later.
                 </p>
               </div>

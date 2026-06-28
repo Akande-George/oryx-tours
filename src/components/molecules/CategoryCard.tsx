@@ -5,38 +5,33 @@ import { motion } from "framer-motion";
 import { ArrowRight, Compass } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Brand-tinted gradient palettes rotated by index so every category card in
-// the grid feels distinct while staying on-palette.
+// Gradient palettes built from the Oryx brand colors (green #3a8b5c,
+// maroon #6b0f2a, mint #cfe8da, sand #cfa07c, cream #efd9bf) and rotated by
+// index so every category card feels distinct while staying on-brand.
 const palettes = [
   {
-    gradient: "from-amber-100 to-orange-200/60",
-    badge: "#d97706",
-    glyph: "text-amber-500/30",
+    // Brand green → mint
+    gradient: "from-[#e3f1e8] to-[#cfe8da]",
+    badge: "#3a8b5c",
+    glyph: "text-[#3a8b5c]/20",
   },
   {
-    gradient: "from-emerald-100 to-teal-200/60",
-    badge: "#0d9488",
-    glyph: "text-emerald-500/30",
+    // Brand maroon
+    gradient: "from-[#f5e1e7] to-[#e7cfd6]",
+    badge: "#6b0f2a",
+    glyph: "text-[#6b0f2a]/20",
   },
   {
-    gradient: "from-rose-100 to-pink-200/55",
-    badge: "#be123c",
-    glyph: "text-rose-500/30",
+    // Brand sand / cream
+    gradient: "from-[#f4e7d7] to-[#efd9bf]",
+    badge: "#b07a4f",
+    glyph: "text-[#cfa07c]/30",
   },
   {
-    gradient: "from-sky-100 to-indigo-200/55",
-    badge: "#4f46e5",
-    glyph: "text-sky-500/30",
-  },
-  {
-    gradient: "from-stone-100 to-amber-200/50",
-    badge: "#92400e",
-    glyph: "text-stone-500/30",
-  },
-  {
-    gradient: "from-violet-100 to-fuchsia-200/55",
-    badge: "#7c3aed",
-    glyph: "text-violet-500/30",
+    // Deep mint / teal-green
+    gradient: "from-[#d8efe4] to-[#bfe0d0]",
+    badge: "#2f6b4f",
+    glyph: "text-[#2f6b4f]/20",
   },
 ];
 

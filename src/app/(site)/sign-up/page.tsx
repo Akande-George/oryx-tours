@@ -48,10 +48,10 @@ const initialForm: FormData = {
 };
 
 const collageImages = [
-  { src: "/corniche-022.jpg", alt: "Doha Corniche skyline" },
+  { src: "/auth/1.jpeg", alt: "Doha Corniche skyline" },
   { src: "/an-incredible-view-of.jpg", alt: "Coastal Qatar view" },
   { src: "/banana-island-resort-058.jpg", alt: "Banana Island Resort" },
-  { src: "/20220127-1643268462-571.jpg", alt: "Qatar heritage detail" },
+  { src: "/auth/2.jpeg", alt: "Qatar heritage detail" },
 ];
 
 export default function SignUpPage() {
@@ -63,9 +63,15 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [pendingPartner, setPendingPartner] = useState<{ name: string; email: string } | null>(null);
+  const [pendingPartner, setPendingPartner] = useState<{
+    name: string;
+    email: string;
+  } | null>(null);
 
-  const updateField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
+  const updateField = <K extends keyof FormData>(
+    key: K,
+    value: FormData[K],
+  ) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
     if (errors[key]) {
       setErrors((prev) => ({ ...prev, [key]: undefined }));
@@ -222,240 +228,247 @@ export default function SignUpPage() {
                 </div>
               </div>
             ) : (
-            <form className="space-y-5" onSubmit={handleSubmit}>
-              {errors.general ? (
-                <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                  {errors.general}
-                </p>
-              ) : null}
-
-              <div className="space-y-2">
-                <Label>Account type</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {(["customer", "partner"] as AccountType[]).map((type) => {
-                    const active = formData.accountType === type;
-                    return (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => updateField("accountType", type)}
-                        className={`rounded-xl border px-4 py-3 text-left text-sm transition-colors ${active ? "border-primary bg-primary/10" : "border-border bg-background hover:border-primary/40"}`}
-                      >
-                        <p className="font-semibold capitalize">
-                          {type === "customer" ? "Traveler" : "Partner operator"}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {type === "customer"
-                            ? "Book tours and transfers."
-                            : "List tours and a fleet. Requires admin approval."}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {formData.accountType === "partner" ? (
-                <div className="space-y-2">
-                  <Label htmlFor="companyName">Company / operator name</Label>
-                  <Input
-                    id="companyName"
-                    value={formData.companyName}
-                    onChange={(event) =>
-                      updateField("companyName", event.target.value)
-                    }
-                    placeholder="Dune Voyages"
-                    className="h-11"
-                    disabled={isLoading}
-                  />
-                  {errors.companyName ? (
-                    <p className="text-xs text-destructive">
-                      {errors.companyName}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First name</Label>
-                  <div className="relative">
-                    <User className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="firstName"
-                      value={formData.firstName}
-                      onChange={(event) =>
-                        updateField("firstName", event.target.value)
-                      }
-                      placeholder="John"
-                      className="h-11 pl-9"
-                      disabled={isLoading}
-                    />
-                  </div>
-                  {errors.firstName ? (
-                    <p className="text-xs text-destructive">
-                      {errors.firstName}
-                    </p>
-                  ) : null}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last name</Label>
-                  <div className="relative">
-                    <User className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      id="lastName"
-                      value={formData.lastName}
-                      onChange={(event) =>
-                        updateField("lastName", event.target.value)
-                      }
-                      placeholder="Doe"
-                      className="h-11 pl-9"
-                      disabled={isLoading}
-                    />
-                  </div>
-                  {errors.lastName ? (
-                    <p className="text-xs text-destructive">
-                      {errors.lastName}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
-                <div className="relative">
-                  <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(event) =>
-                      updateField("email", event.target.value)
-                    }
-                    placeholder="john.doe@example.com"
-                    className="h-11 pl-9"
-                    disabled={isLoading}
-                  />
-                </div>
-                {errors.email ? (
-                  <p className="text-xs text-destructive">{errors.email}</p>
-                ) : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(event) =>
-                      updateField("password", event.target.value)
-                    }
-                    placeholder="Create a strong password"
-                    className="h-11 px-9"
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                    tabIndex={-1}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="size-4" />
-                    ) : (
-                      <Eye className="size-4" />
-                    )}
-                  </button>
-                </div>
-                {errors.password ? (
-                  <p className="text-xs text-destructive">{errors.password}</p>
-                ) : null}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm password</Label>
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={(event) =>
-                      updateField("confirmPassword", event.target.value)
-                    }
-                    placeholder="Re-enter your password"
-                    className="h-11 px-9"
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                    aria-label={
-                      showConfirmPassword ? "Hide password" : "Show password"
-                    }
-                    tabIndex={-1}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="size-4" />
-                    ) : (
-                      <Eye className="size-4" />
-                    )}
-                  </button>
-                </div>
-                {errors.confirmPassword ? (
-                  <p className="text-xs text-destructive">
-                    {errors.confirmPassword}
+              <form className="space-y-5" onSubmit={handleSubmit}>
+                {errors.general ? (
+                  <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                    {errors.general}
                   </p>
                 ) : null}
-              </div>
 
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="acceptTerms"
-                    checked={formData.acceptTerms}
-                    onCheckedChange={(checked) =>
-                      updateField("acceptTerms", checked === true)
-                    }
-                  />
-                  <Label htmlFor="acceptTerms" className="text-sm font-normal">
-                    I agree to the{" "}
-                    <Link
-                      href="/terms"
-                      target="_blank"
-                      className="font-medium text-foreground underline underline-offset-2"
+                <div className="space-y-2">
+                  <Label>Account type</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(["customer", "partner"] as AccountType[]).map((type) => {
+                      const active = formData.accountType === type;
+                      return (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => updateField("accountType", type)}
+                          className={`rounded-xl border px-4 py-3 text-left text-sm transition-colors ${active ? "border-primary bg-primary/10" : "border-border bg-background hover:border-primary/40"}`}
+                        >
+                          <p className="font-semibold capitalize">
+                            {type === "customer"
+                              ? "Traveler"
+                              : "Partner operator"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {type === "customer"
+                              ? "Book tours and transfers."
+                              : "List tours and a fleet. Requires admin approval."}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {formData.accountType === "partner" ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="companyName">Company / operator name</Label>
+                    <Input
+                      id="companyName"
+                      value={formData.companyName}
+                      onChange={(event) =>
+                        updateField("companyName", event.target.value)
+                      }
+                      placeholder="Dune Voyages"
+                      className="h-11"
+                      disabled={isLoading}
+                    />
+                    {errors.companyName ? (
+                      <p className="text-xs text-destructive">
+                        {errors.companyName}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First name</Label>
+                    <div className="relative">
+                      <User className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="firstName"
+                        value={formData.firstName}
+                        onChange={(event) =>
+                          updateField("firstName", event.target.value)
+                        }
+                        placeholder="John"
+                        className="h-11 pl-9"
+                        disabled={isLoading}
+                      />
+                    </div>
+                    {errors.firstName ? (
+                      <p className="text-xs text-destructive">
+                        {errors.firstName}
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last name</Label>
+                    <div className="relative">
+                      <User className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="lastName"
+                        value={formData.lastName}
+                        onChange={(event) =>
+                          updateField("lastName", event.target.value)
+                        }
+                        placeholder="Doe"
+                        className="h-11 pl-9"
+                        disabled={isLoading}
+                      />
+                    </div>
+                    {errors.lastName ? (
+                      <p className="text-xs text-destructive">
+                        {errors.lastName}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email address</Label>
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(event) =>
+                        updateField("email", event.target.value)
+                      }
+                      placeholder="john.doe@example.com"
+                      className="h-11 pl-9"
+                      disabled={isLoading}
+                    />
+                  </div>
+                  {errors.email ? (
+                    <p className="text-xs text-destructive">{errors.email}</p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <div className="relative">
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(event) =>
+                        updateField("password", event.target.value)
+                      }
+                      placeholder="Create a strong password"
+                      className="h-11 px-9"
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      tabIndex={-1}
                     >
-                      Terms and Conditions
-                    </Link>
-                    .
-                  </Label>
+                      {showPassword ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password ? (
+                    <p className="text-xs text-destructive">
+                      {errors.password}
+                    </p>
+                  ) : null}
                 </div>
-                {errors.acceptTerms ? (
-                  <p className="text-xs text-destructive">
-                    {errors.acceptTerms}
-                  </p>
-                ) : null}
-              </div>
 
-              <Button
-                type="submit"
-                className="h-11 w-full rounded-full text-sm font-semibold"
-                disabled={isLoading}
-              >
-                {isLoading
-                  ? "Creating account..."
-                  : formData.accountType === "partner"
-                    ? "Submit partner application"
-                    : "Create account"}
-              </Button>
-            </form>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm password</Label>
+                  <div className="relative">
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={(event) =>
+                        updateField("confirmPassword", event.target.value)
+                      }
+                      placeholder="Re-enter your password"
+                      className="h-11 px-9"
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                      aria-label={
+                        showConfirmPassword ? "Hide password" : "Show password"
+                      }
+                      tabIndex={-1}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.confirmPassword ? (
+                    <p className="text-xs text-destructive">
+                      {errors.confirmPassword}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="acceptTerms"
+                      checked={formData.acceptTerms}
+                      onCheckedChange={(checked) =>
+                        updateField("acceptTerms", checked === true)
+                      }
+                    />
+                    <Label
+                      htmlFor="acceptTerms"
+                      className="text-sm font-normal"
+                    >
+                      I agree to the{" "}
+                      <Link
+                        href="/terms"
+                        target="_blank"
+                        className="font-medium text-foreground underline underline-offset-2"
+                      >
+                        Terms and Conditions
+                      </Link>
+                      .
+                    </Label>
+                  </div>
+                  {errors.acceptTerms ? (
+                    <p className="text-xs text-destructive">
+                      {errors.acceptTerms}
+                    </p>
+                  ) : null}
+                </div>
+
+                <Button
+                  type="submit"
+                  className="h-11 w-full rounded-full text-sm font-semibold"
+                  disabled={isLoading}
+                >
+                  {isLoading
+                    ? "Creating account..."
+                    : formData.accountType === "partner"
+                      ? "Submit partner application"
+                      : "Create account"}
+                </Button>
+              </form>
             )}
           </motion.div>
 

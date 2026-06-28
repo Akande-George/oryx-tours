@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Clock, Ticket } from "lucide-react";
 import { Badge } from "@/components/atoms";
 import { ReviewCard } from "@/components/molecules/ReviewCard";
+import { RichText } from "@/components/molecules/RichText";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ItineraryItem, Review } from "@/types";
 
@@ -117,7 +118,10 @@ export function TourDetailsTabs({
         <TabsTrigger value="reviews">Reviews</TabsTrigger>
       </TabsList>
       <TabsContent value="overview" className="space-y-4">
-        <p className="text-base text-muted-foreground">{description}</p>
+        <RichText
+          value={description}
+          className="text-base text-muted-foreground"
+        />
         {itinerary.length ? (
           <ul className="space-y-2 text-sm text-muted-foreground">
             {itinerary.map((item, index) => (
@@ -161,7 +165,7 @@ export function TourDetailsTabs({
           ))
         ) : (
           <p className="text-sm text-muted-foreground">
-            No reviews yet — be the first to experience this tour.
+            No reviews yet - be the first to experience this tour.
           </p>
         )}
       </TabsContent>

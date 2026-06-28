@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/atoms";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatPrice } from "@/lib/format";
+import { formatDuration, formatPrice } from "@/lib/format";
 import { useSavedTours } from "@/store/use-saved-tours";
 import type { Tour } from "@/types";
 
@@ -21,9 +21,12 @@ export function BookingSidebar({ tour }: { tour: Tour }) {
           </p>
           <p className="text-2xl font-semibold text-primary">
             {formatPrice(tour.priceFrom)}
+            <span className="ml-1 text-sm font-normal text-muted-foreground">
+              per person
+            </span>
           </p>
           <p className="text-sm text-muted-foreground">
-            {tour.durationDays} days · {tour.groupSize}
+            {formatDuration(tour)} · {tour.groupSize}
           </p>
         </div>
         <div className="space-y-2 rounded-xl border border-border bg-muted/30 p-4 text-sm">

@@ -20,7 +20,7 @@ export function SearchBar({ variant = "hero", className }: SearchBarProps) {
   const searchParams = useSearchParams();
 
   // Remount the inner form when the relevant URL params change so its fields
-  // re-initialise from the URL — no setState-in-effect, no cascading renders.
+  // re-initialise from the URL - no setState-in-effect, no cascading renders.
   const syncKey = `${searchParams.get("q") ?? ""}|${searchParams.get("date") ?? ""}|${searchParams.get("guests") ?? ""}`;
 
   return (

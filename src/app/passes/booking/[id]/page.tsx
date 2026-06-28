@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate, formatDuration, formatPrice } from "@/lib/format";
 import { PrintTrigger } from "@/components/passes/PrintTrigger";
 import type { Booking, Tour } from "@/types";
 import type { AuthProfile } from "@/lib/auth";
@@ -73,7 +73,7 @@ export default async function BookingPassPage({
         <dl style={{ margin: "24px 0 0" }}>
           <div className="pass-row">
             <dt>Traveler</dt>
-            <dd>{customer?.name ?? "—"}</dd>
+            <dd>{customer?.name ?? "-"}</dd>
           </div>
           <div className="pass-row">
             <dt>Departure</dt>
@@ -86,7 +86,7 @@ export default async function BookingPassPage({
           {tour ? (
             <div className="pass-row">
               <dt>Duration</dt>
-              <dd>{tour.durationDays} days</dd>
+              <dd>{formatDuration(tour)}</dd>
             </div>
           ) : null}
           <div className="pass-row">
@@ -95,7 +95,7 @@ export default async function BookingPassPage({
           </div>
           <div className="pass-row">
             <dt>Payment</dt>
-            <dd>{booking.paymentStatus ?? "—"}</dd>
+            <dd>{booking.paymentStatus ?? "-"}</dd>
           </div>
           <div className="pass-row">
             <dt>Status</dt>

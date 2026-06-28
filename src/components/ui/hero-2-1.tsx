@@ -129,7 +129,7 @@ const Hero2 = () => {
           </div>
         </div>
 
-        {/* Hero content — bottom aligned */}
+        {/* Hero content - bottom aligned */}
         <Container className="absolute inset-x-0 bottom-0 z-10 px-4 pb-6 sm:px-6 sm:pb-8 md:px-8">
           <div className="grid grid-cols-12 items-end gap-6">
             {/* Big headline */}

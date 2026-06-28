@@ -131,7 +131,7 @@ export default function AdminFleetCategoriesPage() {
                         {record.title}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {record.description || "—"}
+                        {record.description || "-"}
                       </TableCell>
                       <TableCell>{record.order ?? 0}</TableCell>
                       <TableCell className="text-right">

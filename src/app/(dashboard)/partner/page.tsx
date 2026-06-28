@@ -88,7 +88,7 @@ export default function PartnerOverviewPage() {
           <ActionCard
             icon={Map}
             title="Manage your tours"
-            description="Add new tours with full content — itinerary, gallery, video, pricing."
+            description="Add new tours with full content - itinerary, gallery, video, pricing."
             href="/partner/tours"
             cta="Open tours"
           />
