@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Calendar, MapPin, Users } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+  type ReadonlyURLSearchParams,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { Button, DateInput, Input } from "@/components/atoms";
 import { todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -13,22 +17,34 @@ type SearchBarProps = {
 };
 
 export function SearchBar({ variant = "hero", className }: SearchBarProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Remount the inner form when the relevant URL params change so its fields
+  // re-initialise from the URL — no setState-in-effect, no cascading renders.
+  const syncKey = `${searchParams.get("q") ?? ""}|${searchParams.get("date") ?? ""}|${searchParams.get("guests") ?? ""}`;
+
+  return (
+    <SearchBarForm
+      key={syncKey}
+      variant={variant}
+      className={className}
+      searchParams={searchParams}
+    />
+  );
+}
+
+function SearchBarForm({
+  variant = "hero",
+  className,
+  searchParams,
+}: SearchBarProps & { searchParams: ReadonlyURLSearchParams }) {
+  const router = useRouter();
 
   const [destination, setDestination] = useState(searchParams.get("q") ?? "");
   const [date, setDate] = useState(searchParams.get("date") ?? "");
   const [guests, setGuests] = useState(
     Math.max(1, Number(searchParams.get("guests") ?? "2") || 2),
   );
-
-  // Re-sync on URL changes (e.g. category clicked elsewhere)
-  useEffect(() => {
-    setDestination(searchParams.get("q") ?? "");
-    setDate(searchParams.get("date") ?? "");
-    const g = Number(searchParams.get("guests") ?? "2");
-    setGuests(Math.max(1, Number.isFinite(g) ? g : 2));
-  }, [searchParams]);
 
   const handleSearch = () => {
     // Preserve any unrelated params (category, duration, rating)

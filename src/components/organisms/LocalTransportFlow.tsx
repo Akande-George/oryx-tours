@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import { Clock, MapPin } from "lucide-react";
 import { Button, DateInput, Input } from "@/components/atoms";
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,10 +55,7 @@ export function LocalTransportFlow() {
       : selected.fullDayPrice
     : 0;
 
-  const total = useMemo(
-    () => baseRate * Math.max(1, guests),
-    [baseRate, guests],
-  );
+  const total = baseRate * Math.max(1, guests);
 
   const handleSelectVehicle = (id: string) => {
     setVehicleId(id);

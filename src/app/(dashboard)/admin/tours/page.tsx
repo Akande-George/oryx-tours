@@ -91,6 +91,15 @@ export default function AdminToursPage() {
   const handleDelete = async (id: string) => {
     console.log("[admin/tours] handleDelete", id);
     const removed = tours.find((t) => t.id === id);
+    const ok = await confirmAction({
+      title: "Delete this tour?",
+      description: removed
+        ? `"${removed.title}" will be permanently removed from the catalog.`
+        : "This tour will be permanently removed.",
+      confirmLabel: "Delete",
+      tone: "destructive",
+    });
+    if (!ok) return;
     try {
       await deleteTour(createSupabaseBrowserClient(), id);
       setTours((prev) => prev.filter((t) => t.id !== id));

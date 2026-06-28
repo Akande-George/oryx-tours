@@ -2,7 +2,7 @@ import { SearchBar } from "@/components/molecules/SearchBar";
 import { SortSelect } from "@/components/molecules/SortSelect";
 import { TourCard } from "@/components/molecules/TourCard";
 import { Container } from "@/components/layout/Container";
-import { SectionHeading } from "@/components/layout/SectionHeading";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { FiltersPanel } from "@/components/organisms/FiltersPanel";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getTours } from "@/lib/supabase/data";
@@ -95,12 +95,15 @@ export default async function ToursPage({ searchParams }: ToursPageProps) {
   ].filter(Boolean);
 
   return (
-    <div className="py-12">
-      <Container className="space-y-8">
-        <SectionHeading
-          title="Tours and experiences"
-          subtitle="Choose from curated itineraries with private guides and premium stays."
-        />
+    <div>
+      <PageHeader
+        eyebrow="Tours"
+        title="Tours and"
+        accent="experiences."
+        subtitle="Choose from curated itineraries with private guides and premium stays."
+        imageSrc="/Tours.png"
+      />
+      <Container className="space-y-8 py-12">
         <SearchBar variant="compact" />
         <FiltersPanel />
         <div className="flex flex-wrap items-center justify-between gap-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Button, Input } from "@/components/atoms";
 import {
@@ -90,11 +90,14 @@ export function FleetBrowser({
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 
-  useEffect(() => {
-    if (page > pageCount - 1) setPage(0);
-  }, [page, pageCount]);
+  // Clamp the page during render rather than via setState-in-effect, so a
+  // shrinking result set can't leave us on an out-of-range (empty) page.
+  const safePage = Math.min(page, pageCount - 1);
 
-  const visible = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const visible = filtered.slice(
+    safePage * PAGE_SIZE,
+    (safePage + 1) * PAGE_SIZE,
+  );
 
   const handleQuery = (v: string) => {
     setQuery(v);
@@ -191,21 +194,21 @@ export function FleetBrowser({
             variant="outline"
             size="sm"
             className="rounded-full"
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
-            disabled={page === 0}
+            onClick={() => setPage(Math.max(0, safePage - 1))}
+            disabled={safePage === 0}
           >
             <ChevronLeft className="h-3.5 w-3.5" /> Previous
           </Button>
           <p className="text-xs text-muted-foreground">
-            Page {page + 1} of {pageCount}
+            Page {safePage + 1} of {pageCount}
           </p>
           <Button
             type="button"
             variant="outline"
             size="sm"
             className="rounded-full"
-            onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
-            disabled={page >= pageCount - 1}
+            onClick={() => setPage(Math.min(pageCount - 1, safePage + 1))}
+            disabled={safePage >= pageCount - 1}
           >
             Next <ChevronRight className="h-3.5 w-3.5" />
           </Button>

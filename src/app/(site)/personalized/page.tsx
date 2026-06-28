@@ -19,18 +19,11 @@ import {
   Users,
 } from "lucide-react";
 import { Container } from "@/components/layout/Container";
-import { SectionHeading } from "@/components/layout/SectionHeading";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { DateInput, Input } from "@/components/atoms";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MultiStepForm } from "@/components/ui/multi-step-form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/molecules/Toaster";
@@ -265,17 +258,19 @@ export default function PersonalizedPage() {
   const meta = stepMeta[step - 1];
 
   return (
-    <div className="relative py-12 sm:py-16">
+    <div className="relative">
+      <PageHeader
+        eyebrow="Personalized"
+        title="Personalized tour"
+        accent="design."
+        subtitle="Four quick steps. We'll send a tailored itinerary within 24 hours."
+        imageSrc="/Personalized.jpeg"
+      />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_15%_10%,rgba(58,139,92,0.14),transparent_60%),radial-gradient(45%_45%_at_85%_85%,rgba(107,15,42,0.12),transparent_70%)]"
       />
-      <Container className="space-y-10">
-        <SectionHeading
-          title="Personalized tour design"
-          subtitle="Four quick steps. We'll send a tailored itinerary within 24 hours."
-        />
-
+      <Container className="space-y-10 py-12 sm:py-16">
         <div className="flex justify-center">
           <MultiStepForm
             currentStep={step}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createSupabaseBrowserClient } from "./client";
 import {
   getBookings,
@@ -103,22 +103,17 @@ export function useSupabaseCollections(
     ready: false,
   });
 
-  const activeKeys = useMemo(
-    () => keySignature.split(",") as CollectionKey[],
-    [keySignature],
-  );
-  const activeKeysRef = useRef(activeKeys);
-  activeKeysRef.current = activeKeys;
-
+  // Derive the active keys from the (stable) signature inside the callback so
+  // we never write a ref during render — keySignature is the dependency.
   const load = useCallback(async () => {
-    const current = activeKeysRef.current;
+    const current = keySignature.split(",") as CollectionKey[];
     const results = await Promise.all(current.map((k) => fetchers[k]()));
     const next: Record<string, unknown[]> = {};
     current.forEach((k, i) => {
       next[k] = results[i];
     });
     setData((prev) => ({ ...prev, ...next, ready: true }) as typeof prev);
-  }, []);
+  }, [keySignature]);
 
   useEffect(() => {
     let mounted = true;
@@ -133,7 +128,7 @@ export function useSupabaseCollections(
     return () => {
       mounted = false;
     };
-  }, [load, keySignature]);
+  }, [load]);
 
   // Re-fetch when the tab regains focus so newly added rows in another tab /
   // route show up without a hard refresh.

@@ -36,7 +36,15 @@ export async function POST(request: NextRequest) {
       ).end(buffer);
     });
 
-    const result = (await uploadPromise) as any;
+    type CloudinaryResult = {
+      secure_url?: string;
+      public_id?: string;
+      width?: number;
+      height?: number;
+      format?: string;
+      bytes?: number;
+    };
+    const result = (await uploadPromise) as CloudinaryResult;
 
     return NextResponse.json({
       secure_url: result.secure_url,
@@ -46,10 +54,10 @@ export async function POST(request: NextRequest) {
       format: result.format,
       bytes: result.bytes,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Cloudinary upload error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to upload image" },
+      { error: (error as Error).message || "Failed to upload image" },
       { status: 500 }
     );
   }
