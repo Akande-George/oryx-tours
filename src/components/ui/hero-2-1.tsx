@@ -8,11 +8,13 @@ import { SearchBar } from "@/components/molecules/SearchBar";
 import { Container } from "@/components/layout/Container";
 
 const HERO_IMAGES = [
-  "/heroslides/20240703_1719996813-634.jpg",
-  "/heroslides/38-MIA-Skyline-Fine-Art-By-Ahmad-Alnaji.jpg",
-  "/heroslides/Souq-Waqif-aeriel-view-1024x683.jpg",
-  "/heroslides/banana-island-adventure-park.webp",
-  "/heroslides/banana-island-resort-058.jpg",
+  "/heroslides/Hp1.jpg",
+  "/heroslides/anaji.jpg",
+  "/heroslides/banana.jpg",
+  "/heroslides/black-women.jpg",
+  "/heroslides/blueskies.jpg",
+  "/heroslides/green.jpg",
+  "/heroslides/medium.jpeg",
 ];
 
 const SLIDE_INTERVAL_MS = 5000;
