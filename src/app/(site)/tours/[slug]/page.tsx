@@ -4,6 +4,7 @@ import { SectionHeading } from "@/components/layout/SectionHeading";
 import { RatingStars } from "@/components/molecules/RatingStars";
 import { BookingSidebar } from "@/components/organisms/BookingSidebar";
 import { TourDetailsTabs } from "@/components/organisms/TourDetailsTabs";
+import { TourExcerpt } from "@/components/molecules/TourExcerpt";
 import { Badge } from "@/components/atoms";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getReviews, getTourBySlug } from "@/lib/supabase/data";
@@ -72,9 +73,7 @@ export default async function TourDetailsPage({
             </Badge>
           </div>
           <h1 className="text-3xl font-semibold sm:text-4xl">{tour.title}</h1>
-          <p className="max-w-3xl text-base text-muted-foreground sm:text-lg">
-            {htmlToPlainText(tour.description)}
-          </p>
+          <TourExcerpt text={htmlToPlainText(tour.description)} />
           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
             <span>{tour.location}</span>
             <span>•</span>
@@ -110,7 +109,7 @@ export default async function TourDetailsPage({
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1.4fr_0.6fr]">
-          <div className="space-y-6">
+          <div id="tour-overview" className="space-y-6 scroll-mt-24">
             <SectionHeading
               title="About this experience"
               subtitle="Every detail is curated with a dedicated concierge."
